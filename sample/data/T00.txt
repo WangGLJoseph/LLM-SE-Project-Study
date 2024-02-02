@@ -1,0 +1,50 @@
+File: ../sample/repo/23s1-cp-spa-team-00/PKB/PKB_util/PKB.h
+Generator: copilot
+Intervention: 2
+Code:
+  inline const std::shared_ptr<PkbWriter> &getPkbWriter() {
+    return pkbWriter;
+  }
+
+
+-----------------
+File: ../sample/repo/23s1-cp-spa-team-00/PKB/PKB.h
+Generator: copilot
+Intervention: 2
+Code:
+  inline const std::shared_ptr<PkbWriter> &getPkbWriter() {
+    return pkbWriter;
+  }
+
+
+-----------------
+File: ../sample/repo/23s1-cp-spa-team-00/PKB/PKB.cpp
+Generator: copilot
+Intervention: 0
+Code:
+
+  pkbWriter = std::make_shared<PkbWriter>(entityManager,
+                                          patternManager,
+                                          relationshipManager);
+  pkbReader = std::make_shared<PkbReader>(entityManager,
+                                          patternManager,
+                                          relationshipManager);
+
+
+-----------------
+File: ../sample/repo/23s1-cp-spa-team-00/PKB/PKB.cpp
+Generator: copilot
+Intervention: 1
+Code:
+  foo = foo * bar;
+
+-----------------
+Directory:../sample/repo/23s1-cp-spa-team-00
+Total Snippets: 5
+Total lines: 26
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 5
+PKB lines: 26
+QPS Snippets: 0
+QPS lines: 0

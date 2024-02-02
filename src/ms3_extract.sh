@@ -7,7 +7,7 @@ g++ -std=c++17 ace.cpp -o ace
 error_log="../sample/data/errorlog.txt"
 
 # Loop through all teams, modify team numbers as needed (only 0 is used here for sample)
-for ((i=0; i<=1; i++)); do
+for ((i=0; i<=0; i++)); do
   input="T$(printf "%02d" $i)"
   output="T$(printf "%02d" $i).txt"
 
