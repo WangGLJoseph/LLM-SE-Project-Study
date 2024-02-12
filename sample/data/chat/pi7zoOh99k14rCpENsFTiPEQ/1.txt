@@ -1,0 +1,33 @@
+struct CharHash {
+    size_t operator()(char c) const { return std::hash<char>()(c); }
+};
+
+struct StringHash {
+    size_t operator()(const std::string& s) const {
+        return std::hash<std::string>()(s);
+    }
+};
+
+struct StatementTypeHash {
+    size_t operator()(const StatementType& k) const {
+        return std::hash<int>()(static_cast<int>(k));
+    }
+};
+
+struct EntityTypeHash {
+    size_t operator()(const EntityType& k) const {
+        return std::hash<int>()(static_cast<int>(k));
+    }
+};
+
+struct AbstractionTypeHash {
+    size_t operator()(const AbstractionType& k) const {
+        return std::hash<int>()(static_cast<int>(k));
+    }
+};
+
+struct TokenTypeHash {
+    size_t operator()(const TokenType& k) const {
+        return std::hash<int>()(static_cast<int>(k));
+    }
+};

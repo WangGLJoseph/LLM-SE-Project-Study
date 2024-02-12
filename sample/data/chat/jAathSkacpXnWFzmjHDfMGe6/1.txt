@@ -1,0 +1,5 @@
+std::shared_ptr<PkbWriter> pkbWriter;
+    std::shared_ptr<PkbReader> pkbReader;
+    std::shared_ptr<EntityManager> entityManager;
+    std::shared_ptr<PatternManager> patternManager;
+    std::shared_ptr<RelationshipManager> relationshipManager;

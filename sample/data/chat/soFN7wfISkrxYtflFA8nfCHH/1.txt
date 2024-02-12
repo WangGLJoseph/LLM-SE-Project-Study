@@ -1,0 +1,5 @@
+inline std::ostream& operator<<(std::ostream& os,
+                                const AbstractionType& abstraction_type) {
+    os << abstraction_type_to_string[abstraction_type];
+    return os;
+}

@@ -1,0 +1,9 @@
+class SyntaxError final : public Exception {
+ public:
+    explicit SyntaxError(const std::string& err) noexcept
+        : Exception("Syntax error: " + err) {}
+    SyntaxError(const std::string& err, const size_t& pos) noexcept
+        : Exception("Syntax error: " + err, pos) {}
+    SyntaxError(const std::string& err, const std::string& value) noexcept
+        : Exception("Syntax error: " + err, value) {}
+};

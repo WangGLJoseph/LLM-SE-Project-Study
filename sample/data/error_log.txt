@@ -1,0 +1,2 @@
+23s2-cp-spa-team-00: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+23s2-cp-spa-team-00: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h

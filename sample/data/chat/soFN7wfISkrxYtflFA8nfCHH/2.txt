@@ -1,0 +1,4 @@
+inline std::ostream& operator<<(std::ostream& os, const TokenType& token_type) {
+    os << token_type_to_string[token_type];
+    return os;
+}

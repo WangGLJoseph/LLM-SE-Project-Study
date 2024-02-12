@@ -1,0 +1,283 @@
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/pkb/PKB.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/jAathSkacpXnWFzmjHDfMGe6?model=gpt-4&mode=chat
+ChatId: jAathSkacpXnWFzmjHDfMGe6
+Code:
+std::shared_ptr<PkbWriter> pkbWriter;
+    std::shared_ptr<PkbReader> pkbReader;
+    std::shared_ptr<EntityManager> entityManager;
+    std::shared_ptr<PatternManager> patternManager;
+    std::shared_ptr<RelationshipManager> relationshipManager;
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/pkb/PKB.h
+Generator: copilot
+Intervention: 2
+Language: c
+Prompt: used copilot
+ChatId: 
+Code:
+inline const std::shared_ptr<PkbWriter> &getPkbWriter() {
+        return pkbWriter;
+    }
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/pkb/PKB.cpp
+Generator: copilot
+Intervention: 0
+Language: c
+Prompt: used copilot
+ChatId: 
+Code:
+pkbWriter = std::make_shared<PkbWriter>(entityManager,
+                                            patternManager,
+                                            relationshipManager);
+    pkbReader = std::make_shared<PkbReader>(entityManager,
+                                            patternManager,
+                                            relationshipManager);
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/pkb/PKB.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+foo = foo * bar;
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/pi7zoOh99k14rCpENsFTiPEQ?model=gpt-4&mode=chat
+ChatId: pi7zoOh99k14rCpENsFTiPEQ
+Code:
+struct CharHash {
+    size_t operator()(char c) const { return std::hash<char>()(c); }
+};
+
+struct StringHash {
+    size_t operator()(const std::string& s) const {
+        return std::hash<std::string>()(s);
+    }
+};
+
+struct StatementTypeHash {
+    size_t operator()(const StatementType& k) const {
+        return std::hash<int>()(static_cast<int>(k));
+    }
+};
+
+struct EntityTypeHash {
+    size_t operator()(const EntityType& k) const {
+        return std::hash<int>()(static_cast<int>(k));
+    }
+};
+
+struct AbstractionTypeHash {
+    size_t operator()(const AbstractionType& k) const {
+        return std::hash<int>()(static_cast<int>(k));
+    }
+};
+
+struct TokenTypeHash {
+    size_t operator()(const TokenType& k) const {
+        return std::hash<int>()(static_cast<int>(k));
+    }
+};
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+inline std::unordered_map<const StatementType, const std::string,
+                          StatementTypeHash>
+    statement_type_to_string = {
+        {StatementType::READ, "read"},     {StatementType::PRINT, "print"},
+        {StatementType::ASSIGN, "assign"}, {StatementType::CALL, "call"},
+        {StatementType::WHILE, "while"},   {StatementType::IF, "if"},
+        {StatementType::NONE, "none"}};
+
+inline std::unordered_map<const EntityType, const std::string, EntityTypeHash>
+    entity_type_to_string = {{EntityType::PROCEDURE, "procedure"},
+                             {EntityType::STATEMENT, "stmt"},
+                             {EntityType::VARIABLE, "variable"},
+                             {EntityType::CONSTANT, "constant"},
+                             {EntityType::NONE, "none"}};
+
+inline std::unordered_map<const AbstractionType, const std::string,
+                          AbstractionTypeHash>
+    abstraction_type_to_string = {{AbstractionType::FOLLOWS, "Follows"},
+                                  {AbstractionType::FOLLOWS_STAR, "Follows*"},
+                                  {AbstractionType::PARENT, "Parent"},
+                                  {AbstractionType::PARENT_STAR, "Parent*"},
+                                  {AbstractionType::USES, "Uses"},
+                                  {AbstractionType::MODIFIES, "Modifies"},
+                                  {AbstractionType::CALLS, "Calls"},
+                                  {AbstractionType::CALLS_STAR, "Calls*"},
+                                  {AbstractionType::NEXT, "Next"},
+                                  {AbstractionType::NEXT_STAR, "Next*"},
+                                  {AbstractionType::AFFECTS, "Affects"},
+                                  {AbstractionType::AFFECTS_STAR, "Affects*"}};
+
+inline std::unordered_map<const TokenType, const std::string, TokenTypeHash>
+    token_type_to_string = {{TokenType::AND, "And"},
+                            {TokenType::ASTERISK, "Asterisk"},
+                            {TokenType::COMMA, "Comma"},
+                            {TokenType::DOT, "Dot"},
+                            {TokenType::DOUBLE_EQUAL, "DoubleEqual"},
+                            {TokenType::DOUBLE_QUOTES, "DoubleQuotes"},
+                            {TokenType::END_OF_FILE, "EndOfFile"},
+                            {TokenType::EQUAL, "Equal"},
+                            {TokenType::EXCLAMATION, "Exclamation"},
+                            {TokenType::GTE, "GreaterThanEqual"},
+                            {TokenType::HYPHEN, "Hyphen"},
+                            {TokenType::INVALID, "Invalid"},
+                            {TokenType::LEFT_CHEVRON, "LeftChevron"},
+                            {TokenType::LEFT_CURLY, "LeftCurly"},
+                            {TokenType::LEFT_PARENTHESIS, "LeftParenthesis"},
+                            {TokenType::LTE, "LessThanEqual"},
+                            {TokenType::NEQ, "NotEqual"},
+                            {TokenType::NUMBER, "Number"},
+                            {TokenType::OR, "Or"},
+                            {TokenType::PERCENT, "Percent"},
+                            {TokenType::PLUS, "Plus"},
+                            {TokenType::RIGHT_CHEVRON, "RightChevron"},
+                            {TokenType::RIGHT_CURLY, "RightCurly"},
+                            {TokenType::RIGHT_PARENTHESIS, "RightParenthesis"},
+                            {TokenType::SEMICOLON, "Semicolon"},
+                            {TokenType::SLASH, "Slash"},
+                            {TokenType::STRING, "String"},
+                            {TokenType::UNDERSCORE, "Underscore"}};
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+Generator: copilot
+Intervention: 2
+Language: c
+Prompt: 
+ChatId: 
+Code:
+inline std::ostream& operator<<(std::ostream& os,
+                                const EntityType& entity_type) {
+    os << entity_type_to_string[entity_type];
+    return os;
+}
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/soFN7wfISkrxYtflFA8nfCHH?model=gpt-4&mode=chat
+ChatId: soFN7wfISkrxYtflFA8nfCHH
+Code:
+inline std::ostream& operator<<(std::ostream& os,
+                                const AbstractionType& abstraction_type) {
+    os << abstraction_type_to_string[abstraction_type];
+    return os;
+}
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/soFN7wfISkrxYtflFA8nfCHH?model=gpt-4&mode=chat
+ChatId: soFN7wfISkrxYtflFA8nfCHH
+Code:
+inline std::ostream& operator<<(std::ostream& os, const TokenType& token_type) {
+    os << token_type_to_string[token_type];
+    return os;
+}
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class FileError final : public Exception {
+ public:
+    explicit FileError(const std::string& err) noexcept
+        : Exception("File error: " + err) {}
+    FileError(const std::string& err, const size_t& pos) noexcept
+        : Exception("File error: " + err, pos) {}
+    FileError(const std::string& err, const std::string& value) noexcept
+        : Exception("File error: " + err, value) {}
+};
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/NOluedVgW5yWh05DioM75jSz?model=gpt-4&mode=chat
+ChatId: NOluedVgW5yWh05DioM75jSz
+Code:
+class SyntaxError final : public Exception {
+ public:
+    explicit SyntaxError(const std::string& err) noexcept
+        : Exception("Syntax error: " + err) {}
+    SyntaxError(const std::string& err, const size_t& pos) noexcept
+        : Exception("Syntax error: " + err, pos) {}
+    SyntaxError(const std::string& err, const std::string& value) noexcept
+        : Exception("Syntax error: " + err, value) {}
+};
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h
+Generator: copilot
+Intervention: 1
+Language: c
+Prompt: used copilot
+ChatId: 
+Code:
+class SemanticError final : public Exception {
+ public:
+    explicit SemanticError(const std::string& err) noexcept
+        : Exception("Semantic error: " + err) {}
+    SemanticError(const std::string& err, const size_t& pos) noexcept
+        : Exception("Semantic error: " + err, pos) {}
+    SemanticError(const std::string& err, const std::string& value) noexcept
+        : Exception("Semantic error: " + err, value) {}
+};
+
+// ai-gen stop
+
+class SourceParsingError final : public Exception {
+ public:
+    explicit SourceParsingError(const std::string& err) noexcept
+        : Exception("Source parsing error: " + err) {}
+    SourceParsingError(const std::string& err, const size_t& pos) noexcept
+        : Exception("Source parsing error: " + err, pos) {}
+    SourceParsingError(const std::string& err,
+                       const std::string& value) noexcept
+        : Exception("Source parsing error: " + err, value) {}
+};
+--------------------
+File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class SystemError final : public Exception {
+ public:
+    explicit SystemError(const std::string& err) noexcept
+        : Exception("System error: " + err) {}
+    SystemError(const std::string& err, const size_t& pos) noexcept
+        : Exception("System error: " + err, pos) {}
+    SystemError(const std::string& err, const std::string& value) noexcept
+        : Exception("System error: " + err, value) {}
+};
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-00
+Total Snippets: 13
+Total lines: 179
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 4
+PKB lines: 16
+QPS Snippets: 0
+QPS lines: 0
