@@ -341,8 +341,10 @@ void processFile(const std::string &repoName,
             // Remove all the whitespace characters from both ends of the string
             prompt = std::regex_replace(prompt, std::regex("^\\s+|\\s+$"), "");
             // Match the string starting with http:// or https://
-            const std::regex urlRegex(R"(^https?:\/\/[^\s\/$.?#].[^\s]*$)", std::regex_constants::icase);
-            if (std::regex_match(prompt, urlRegex)) {
+            const std::regex urlRegex(R"(https?:\/\/[^\s\/$.?#].[^\s]*)", std::regex_constants::icase);
+            std::smatch urlMatch;
+            if (std::regex_search(prompt, urlMatch, urlRegex) && !urlMatch.empty()) {
+                prompt = urlMatch[0].str();
                 std::smatch chatIdMatch;
                 // Extract the chat id inside the URL
                 const std::regex chatIdRegex(R"(/p/([^/?]+))");
