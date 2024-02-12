@@ -443,14 +443,14 @@ void saveResult(const std::string &repoName,
     outCodeFile << "Code:\n";
     outCodeFile << result << "\n";
     outCodeFile << std::string(20, '-') + "\n"; // Separator between results
-    outDatasetFile << "\"" << repoName << "\","
-                   << "\"" << component << "\","
-                   << "\"" << filePath << "\","
-                   << "\"" << generator << "\","
-                   << "\"" << intervention << "\","
-                   << "\"" << language << "\","
-                   << "\"" << prompt << "\","
-                   << "\"" << chatId << "\"\n";
+    outDatasetFile << repoName << ","
+                   << component << ","
+                   << filePath << ","
+                   << generator << ","
+                   << intervention << ","
+                   << language << ","
+                   << prompt << ","
+                   << chatId << "\n";
     // Reset variables
     generator = "";
     intervention = "";
