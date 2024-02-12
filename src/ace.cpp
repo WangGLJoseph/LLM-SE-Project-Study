@@ -20,14 +20,6 @@ std::string toLowercase(const std::string &str);
 
 int countFilesInDirectory(const std::string &path);
 
-void processFile(const std::string &repoName,
-                 const std::string &filePath,
-                 std::ofstream &outCodeFile,
-                 std::ofstream &outDatasetFile,
-                 const std::string &outChatPath,
-                 int &totalGeneratedSnippets,
-                 int &totalGeneratedLines);
-
 void processDirectory(const std::string &repoName,
                       const std::string &directoryPath,
                       std::ofstream &outCodeFile,
@@ -36,9 +28,19 @@ void processDirectory(const std::string &repoName,
                       int &totalGeneratedSnippets,
                       int &totalGeneratedLines);
 
+void processFile(const std::string &repoName,
+                 const std::string &directoryPath,
+                 const std::string &filePath,
+                 std::ofstream &outCodeFile,
+                 std::ofstream &outDatasetFile,
+                 const std::string &outChatPath,
+                 int &totalGeneratedSnippets,
+                 int &totalGeneratedLines);
+
 std::string trimResult(const std::string &result);
 
 void saveResult(const std::string &repoName,
+                const std::string &directoryPath,
                 const std::string &filePath,
                 std::ofstream &outCodeFile,
                 std::ofstream &outDatasetFile,
@@ -194,6 +196,7 @@ void processDirectory(const std::string &repoName,
             std::string extension = fs::path(filePath).extension().string();
             if (extension == ".cpp" || extension == ".h" || extension == ".hpp") {
                 processFile(repoName,
+                            directoryPath,
                             filePath,
                             outCodeFile,
                             outDatasetFile,
@@ -206,6 +209,7 @@ void processDirectory(const std::string &repoName,
 }
 
 void processFile(const std::string &repoName,
+                 const std::string &directoryPath,
                  const std::string &filePath,
                  std::ofstream &outCodeFile,
                  std::ofstream &outDatasetFile,
@@ -279,8 +283,8 @@ void processFile(const std::string &repoName,
             result = trimResult(result);
             // Write the extracted result
             if (!result.empty()) {
-                saveResult(repoName, filePath, outCodeFile, outDatasetFile, component, generator, intervention,
-                           language, prompt, chatId, outChatIdPath, result);
+                saveResult(repoName, directoryPath, filePath, outCodeFile, outDatasetFile, component, generator,
+                           intervention, language, prompt, chatId, outChatIdPath, result);
             }
 
             std::cout << (!repoName.empty() ? repoName + ": " : repoName)
@@ -358,8 +362,8 @@ void processFile(const std::string &repoName,
             result = trimResult(result);
             // Write the extracted result
             if (!result.empty()) {
-                saveResult(repoName, filePath, outCodeFile, outDatasetFile, component, generator, intervention,
-                           language, prompt, chatId, outChatIdPath, result);
+                saveResult(repoName, directoryPath, filePath, outCodeFile, outDatasetFile, component, generator,
+                           intervention, language, prompt, chatId, outChatIdPath, result);
             }
 
             continue;
@@ -385,8 +389,8 @@ void processFile(const std::string &repoName,
         result = trimResult(result);
         // Write the extracted result
         if (!result.empty()) {
-            saveResult(repoName, filePath, outCodeFile, outDatasetFile, component, generator, intervention,
-                       language, prompt, chatId, outChatIdPath, result);
+            saveResult(repoName, directoryPath, filePath, outCodeFile, outDatasetFile, component, generator,
+                       intervention, language, prompt, chatId, outChatIdPath, result);
         }
 
         std::cout << (!repoName.empty() ? repoName + ": " : repoName)
@@ -408,6 +412,7 @@ std::string trimResult(const std::string &result) {
 }
 
 void saveResult(const std::string &repoName,
+                const std::string &directoryPath,
                 const std::string &filePath,
                 std::ofstream &outCodeFile,
                 std::ofstream &outDatasetFile,
@@ -434,7 +439,10 @@ void saveResult(const std::string &repoName,
                       << "\n";
         }
     }
-    outCodeFile << "File: " << filePath << "\n";
+    std::string trimmedFilePath = filePath;
+    trimmedFilePath.erase(0, (directoryPath + "/").length());
+    outCodeFile << "RepoName: " << repoName << "\n";
+    outCodeFile << "File: " << trimmedFilePath << "\n";
     outCodeFile << "Generator: " << generator << "\n"; // Output 'generator'
     outCodeFile << "Intervention: " << intervention << "\n"; // Output 'intervention'
     outCodeFile << "Language: " << language << "\n"; // Output 'language'
@@ -445,7 +453,7 @@ void saveResult(const std::string &repoName,
     outCodeFile << std::string(20, '-') + "\n"; // Separator between results
     outDatasetFile << repoName << ","
                    << component << ","
-                   << filePath << ","
+                   << trimmedFilePath << ","
                    << generator << ","
                    << intervention << ","
                    << language << ","

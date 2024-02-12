@@ -1,4 +1,5 @@
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/pkb/PKB.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/pkb/PKB.h
 Generator: gpt
 Intervention: 1
 Language: e
@@ -11,7 +12,8 @@ std::shared_ptr<PkbWriter> pkbWriter;
     std::shared_ptr<PatternManager> patternManager;
     std::shared_ptr<RelationshipManager> relationshipManager;
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/pkb/PKB.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/pkb/PKB.h
 Generator: copilot
 Intervention: 2
 Language: c
@@ -22,7 +24,8 @@ inline const std::shared_ptr<PkbWriter> &getPkbWriter() {
         return pkbWriter;
     }
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/pkb/PKB.cpp
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/pkb/PKB.cpp
 Generator: copilot
 Intervention: 0
 Language: c
@@ -36,7 +39,8 @@ pkbWriter = std::make_shared<PkbWriter>(entityManager,
                                             patternManager,
                                             relationshipManager);
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/pkb/PKB.cpp
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/pkb/PKB.cpp
 Generator: copilot
 Intervention: 1
 Language: e
@@ -45,7 +49,8 @@ ChatId:
 Code:
 foo = foo * bar;
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Types.h
 Generator: gpt
 Intervention: 0
 Language: e
@@ -86,7 +91,8 @@ struct TokenTypeHash {
     }
 };
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Types.h
 Generator: copilot
 Intervention: 2
 Language: e
@@ -153,7 +159,8 @@ inline std::unordered_map<const TokenType, const std::string, TokenTypeHash>
                             {TokenType::STRING, "String"},
                             {TokenType::UNDERSCORE, "Underscore"}};
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Types.h
 Generator: copilot
 Intervention: 2
 Language: c
@@ -166,7 +173,8 @@ inline std::ostream& operator<<(std::ostream& os,
     return os;
 }
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Types.h
 Generator: gpt
 Intervention: 0
 Language: e
@@ -179,7 +187,8 @@ inline std::ostream& operator<<(std::ostream& os,
     return os;
 }
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Types.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Types.h
 Generator: gpt
 Intervention: 0
 Language: e
@@ -191,7 +200,8 @@ inline std::ostream& operator<<(std::ostream& os, const TokenType& token_type) {
     return os;
 }
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Errors.h
 Generator: copilot
 Intervention: 2
 Language: e
@@ -208,7 +218,8 @@ class FileError final : public Exception {
         : Exception("File error: " + err, value) {}
 };
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Errors.h
 Generator: gpt
 Intervention: 0
 Language: e
@@ -225,7 +236,8 @@ class SyntaxError final : public Exception {
         : Exception("Syntax error: " + err, value) {}
 };
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Errors.h
 Generator: copilot
 Intervention: 1
 Language: c
@@ -255,7 +267,8 @@ class SourceParsingError final : public Exception {
         : Exception("Source parsing error: " + err, value) {}
 };
 --------------------
-File: ../sample/repo/23s2-cp-spa-team-00/Team00/Code00/src/spa/src/utils/Errors.h
+RepoName: 23s2-cp-spa-team-00
+File: Team00/Code00/src/spa/src/utils/Errors.h
 Generator: copilot
 Intervention: 1
 Language: e
