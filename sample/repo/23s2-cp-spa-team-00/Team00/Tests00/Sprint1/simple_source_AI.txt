@@ -1,0 +1,6 @@
+procedure main {
+read a;
+read b;
+read print;
+read read;
+print print; }

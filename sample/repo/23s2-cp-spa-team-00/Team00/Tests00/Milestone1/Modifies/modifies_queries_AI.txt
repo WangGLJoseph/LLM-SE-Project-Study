@@ -1,0 +1,15 @@
+1 - Modifies (stmt, var) [selected synonym unrelated, relationship exists]
+stmt s, s1; variable v;
+Select s1 such that Modifies (s, v)
+1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,
+5000
+2 - Modifies (stmt, var) [selected synonym related, relationship exists]
+stmt s; variable v;
+Select s such that Modifies (s, v)
+1,2,3,4,5,6,7,8,12,13,14,15,16,17,18,20,21,22,23,24,25,26,27,29,
+5000
+3 - Modifies (read, var) [selected synonym related, relationship nonexistent]
+read r; variable v;
+Select r such that Modifies (r, v)
+13,14,16,17,20,27,
+5000

@@ -25,6 +25,7 @@ void processDirectory(const std::string &repoName,
                       std::ofstream &outCodeFile,
                       std::ofstream &outDatasetFile,
                       const std::string &outChatPath,
+                      const std::string &outTestPath,
                       int &totalGeneratedSnippets,
                       int &totalGeneratedLines);
 
@@ -55,31 +56,35 @@ void saveResult(const std::string &repoName,
 
 int main(int argc, char **argv) {
     // Check if the correct number of command-line arguments (input path and output file) is provided
-    if (argc != 5) {
+    if (argc != 6) {
         std::cout << "Wrong input parameters, input should consist of an input repository, "
-                     "an output code txt file, an output chat directory and an output dataset file"
+                     "an output code txt file, an output chat directory, an output test directory "
+                     "and an output dataset file"
                   << "\n";
         return 1; // Return an error code to indicate failure
     }
 
     // Get the input path from the first argument
-    std::string inputPath = argv[1];
+    const std::string inputPath = argv[1];
 
     // Get the repository name from the input path
-    int lastSlashPos = inputPath.find_last_of("/");
+    const int lastSlashPos = inputPath.find_last_of("/");
     std::string repoName;
     if (lastSlashPos != std::string::npos) {
         repoName = inputPath.substr(lastSlashPos + 1);
     }
 
     // Get the output txt file path from the second argument
-    std::string outputCodeTxtPath = argv[2];
+    const std::string outputCodeTxtPath = argv[2];
 
     // Get the output chat file path from the third argument
-    std::string outputChatPath = argv[3];
+    const std::string outputChatPath = argv[3];
 
-    // Get the output dataset file path from the fourth argument
-    std::string outputDatasetPath = argv[4];
+    // Get the output test file path from the fourth argument
+    const std::string outputTestPath = argv[4];
+
+    // Get the output dataset file path from the fifth argument
+    const std::string outputDatasetPath = argv[5];
 
     // Check if the output code txt file has a .txt extension
     // If not, display an error message and return
@@ -110,7 +115,7 @@ int main(int argc, char **argv) {
     }
 
     // Check if the output dataset file exists
-    bool outDatasetFileExists = fs::exists(outputDatasetPath);
+    const bool outDatasetFileExists = fs::exists(outputDatasetPath);
 
     // Open the output dataset file for appending (to aggregate results from multiple files)
     std::ofstream outDatasetFile(outputDatasetPath, std::ios::app);
@@ -137,6 +142,7 @@ int main(int argc, char **argv) {
                          outCodeFile,
                          outDatasetFile,
                          outputChatPath,
+                         outputTestPath,
                          totalGeneratedSnippets,
                          totalGeneratedLines);
     } else {
@@ -187,13 +193,15 @@ void processDirectory(const std::string &repoName,
                       std::ofstream &outCodeFile,
                       std::ofstream &outDatasetFile,
                       const std::string &outChatPath,
+                      const std::string &outTestPath,
                       int &totalGeneratedSnippets,
                       int &totalGeneratedLines) {
+    const std::string teamNumber = outTestPath.substr(outTestPath.length() - 2, 2);
     for (const auto &entry : fs::recursive_directory_iterator(directoryPath)) {
         if (entry.is_regular_file()) {
             const std::string filePath = entry.path().string();
             // Check if the file has a valid extension (.cpp, .h, or .hpp)
-            std::string extension = fs::path(filePath).extension().string();
+            const std::string extension = toLowercase(fs::path(filePath).extension().string());
             if (extension == ".cpp" || extension == ".h" || extension == ".hpp") {
                 processFile(repoName,
                             directoryPath,
@@ -203,6 +211,20 @@ void processDirectory(const std::string &repoName,
                             outChatPath,
                             totalGeneratedSnippets,
                             totalGeneratedLines);
+            }
+            if (extension == ".txt" && toLowercase(filePath).find("_ai") != std::string::npos) {
+                const std::string testDirectory = "Tests" + teamNumber;
+                const auto pos = fs::path(filePath).string().find(testDirectory);
+                if (pos == std::string::npos) {
+                    std::cout << (!repoName.empty() ? repoName + ": " : repoName)
+                              << testDirectory << " is not found"
+                              << "\n";
+                    continue;
+                }
+                const fs::path relativePath = filePath.substr(pos + testDirectory.size() + 1); // 'TestsXX/'
+                const fs::path targetPath = outTestPath / relativePath;
+                fs::create_directories(targetPath.parent_path());
+                fs::copy_file(filePath, targetPath);
             }
         }
     }
@@ -223,7 +245,7 @@ void processFile(const std::string &repoName,
     std::string component;
 
     // Convert file path to lower case for case-insensitive comparison
-    std::string lowerFilePath = toLowercase(filePath);
+    const std::string lowerFilePath = toLowercase(filePath);
 
     // Check if the file path contains 'sp', 'pkb', or 'qps' in any case and update counts and snippets
     // Need to manually check if the file path does not contain 'sp', 'pkb', or 'qps'
@@ -266,13 +288,13 @@ void processFile(const std::string &repoName,
     // '([^,]+?)': Match and capture any sequence of characters before a comma, up until the next comma
     // '([^)]+?)': Match and capture any sequence of characters until before a closing parenthesis
     // '\)': Match the character ')' literally
-    std::regex startTagRegex(
+    const std::regex startTagRegex(
             R"(ai-gen\s*start\s*\(\s*([^,]+?)\s*,\s*([^,]+?)\s*,\s*([^)]+?)\s*\))",
             std::regex_constants::icase
     );
     // '(.*)': Match and capture any sequence of characters
-    std::regex promptTagRegex(R"(prompt\s*:\s*(.*))", std::regex_constants::icase);
-    std::regex endTagRegex(R"(ai-gen\s*end)", std::regex_constants::icase);
+    const std::regex promptTagRegex(R"(prompt\s*:\s*(.*))", std::regex_constants::icase);
+    const std::regex endTagRegex(R"(ai-gen\s*end)", std::regex_constants::icase);
 
     while (std::getline(inFile, line)) {
         std::smatch match;
@@ -319,11 +341,11 @@ void processFile(const std::string &repoName,
             // Remove all the whitespace characters from both ends of the string
             prompt = std::regex_replace(prompt, std::regex("^\\s+|\\s+$"), "");
             // Match the string starting with http:// or https://
-            std::regex urlRegex(R"(^https?:\/\/[^\s\/$.?#].[^\s]*$)", std::regex_constants::icase);
+            const std::regex urlRegex(R"(^https?:\/\/[^\s\/$.?#].[^\s]*$)", std::regex_constants::icase);
             if (std::regex_match(prompt, urlRegex)) {
                 std::smatch chatIdMatch;
                 // Extract the chat id inside the URL
-                std::regex chatIdRegex(R"(/p/([^/?]+))");
+                const std::regex chatIdRegex(R"(/p/([^/?]+))");
                 if (std::regex_search(prompt, chatIdMatch, chatIdRegex) && chatIdMatch.size() > 1) {
                     chatId = chatIdMatch[1].str();
                     // Create chat id directory
@@ -425,8 +447,8 @@ void saveResult(const std::string &repoName,
                 std::string &outChatIdPath,
                 std::string &result) {
     if (!outChatIdPath.empty()) {
-        int snippetId = countFilesInDirectory(outChatIdPath) + 1;
-        std::string outSnippetPath = outChatIdPath + "/" + std::to_string(snippetId) + ".txt";
+        const int snippetId = countFilesInDirectory(outChatIdPath) + 1;
+        const std::string outSnippetPath = outChatIdPath + "/" + std::to_string(snippetId) + ".txt";
         // Open the output snippet file for appending
         std::ofstream outChatFile(outSnippetPath, std::ios::app);
         if (outChatFile) {

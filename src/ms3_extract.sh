@@ -21,6 +21,9 @@ code_dir="$data_dir/code"
 # The destination directory where AI chat will be extracted (replace this with your chat path)
 chat_dir="$data_dir/chat"
 
+# The destination directory where AI test cases will be extracted (replace this with your test path)
+test_dir="$data_dir/test"
+
 # Define the dataset file path (replace with your dataset file path)
 dataset="$data_dir/dataset.csv"
 
@@ -35,6 +38,11 @@ fi
 # Clear the chat directory
 if [ -d "$chat_dir" ]; then
     rm -rf "$chat_dir"/*
+fi
+
+# Clear the test directory
+if [ -d "$test_dir" ]; then
+    rm -rf "$test_dir"/*
 fi
 
 # Remove the dataset file if exists
@@ -53,6 +61,9 @@ for team_number in $(seq 1 $team_numbers); do
   formatted_team_number=$(printf "%02d" $team_number)
   output="T$formatted_team_number.txt"
 
+  # Ensure the test directory exists or create it
+  mkdir -p "$test_dir/T$formatted_team_number"
+
   # Team numbers 08, 18, and 29 have different suffixes (replace with your team names)
   if [ "$formatted_team_number" == "08" ]; then
     team_type="java"
@@ -66,5 +77,5 @@ for team_number in $(seq 1 $team_numbers); do
 
   # Extract for each team, redirect output and error to error log
   echo "Extracting $source_dir/$repo_name into $destination_dir/$output"
-  ./ace "$source_dir/$repo_name" "$code_dir/$output" "$chat_dir" "$dataset" 2>&1 | tee -a "$error_log"
+  ./ace "$source_dir/$repo_name" "$code_dir/$output" "$chat_dir" "$test_dir/T$formatted_team_number" "$dataset" 2>&1 | tee -a "$error_log"
 done

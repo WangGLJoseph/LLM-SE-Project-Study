@@ -1,0 +1,10 @@
+1 - Pass Test
+variable v;
+Select v
+a, b, print, read
+5000
+2 - Pass with different variable
+variable x;
+Select x
+print, read, a, b
+5000

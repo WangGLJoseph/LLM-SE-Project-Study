@@ -1,0 +1,15 @@
+1 - select all statement
+stmt s;
+Select s
+1,2,3,4
+5000
+2 - select all read
+read r;
+Select r
+1
+5000
+3 - select all print
+print pn;
+Select pn
+4
+5000
