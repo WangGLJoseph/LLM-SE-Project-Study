@@ -1,0 +1,190 @@
+RepoName: 23s2-cp-spa-team-10
+File: Team10/Code10/src/spa/QPS/src/tokenizer/Tokenizer.cpp
+Generator: gpt3.5
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/eee4ab57-c5f0-44ca-9fe9-885abf9a14cc
+ChatId: 
+Code:
+// Used my own paid subscription for gpt4 because I was used to it.
+// Reverted to gpt3.5 because it somehow gave me better code.
+std::pair<std::string, std::string> Tokenizer::splitStringByRegex(
+    const std::string& input, const std::regex& pattern) {
+  std::smatch match;
+  if (std::regex_search(input, match, pattern)) {
+    auto matchPos = static_cast<size_t>(match.position());
+    std::string first = input.substr(0, matchPos);
+    std::string second =
+        input.substr(matchPos + static_cast<size_t>(match.length()));
+    return {first, second};
+  }
+  return {input, ""};
+}
+--------------------
+RepoName: 23s2-cp-spa-team-10
+File: Team10/Code10/src/spa/PKB/include/PKB.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
+ChatId: 
+Code:
+private:
+  PKB();
+  PKB(const PKB&) = delete;
+  PKB& operator=(const PKB&) = delete;
+  EntityManager entityManager;
+  PatternManager patternManager;
+  RelationshipManager relationshipManager;
+
+ public:
+  static PKB& getPKB();
+--------------------
+RepoName: 23s2-cp-spa-team-10
+File: Team10/Code10/src/spa/PKB/include/pattern_manager/AssignExpPatternStore.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/feedba04-6fd0-4e9b-8b5a-c7826127fa4f
+ChatId: 
+Code:
+struct pairHash {
+  std::size_t operator()(const std::pair<int, std::string>& p) const {
+    std::size_t hashInt = std::hash<int>{}(p.first);
+    std::size_t hashStr = std::hash<std::string>{}(p.second);
+    return hashInt ^ (hashStr + 0x9e3779b9 + (hashInt << 6) + (hashInt >> 2));
+  }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-10
+File: Team10/Code10/src/spa/PKB/src/entity_manager/EntitySetStore.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/79929c11-45e4-4e55-9996-cc966fd74a80
+ChatId: 
+Code:
+template <typename T>
+void EntitySetStore<T>::insert(const T& element) {
+  set.insert(element);
+}
+
+template <typename T>
+std::unordered_set<T>& EntitySetStore<T>::getAll() {
+  return set;
+}
+
+template class EntitySetStore<int>;
+template class EntitySetStore<std::string>;
+--------------------
+RepoName: 23s2-cp-spa-team-10
+File: Team10/Code10/src/spa/PKB/src/PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
+ChatId: 
+Code:
+PKB::PKB() {}
+
+PKB& PKB::getPKB() {
+  static PKB pkb;
+  return pkb;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-10
+File: Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://chat.openai.com/share/56b8ba1c-5884-47db-aca8-3d4cc2a7634a
+    auto& leftToRightMapSecond = arrayAtIndexLeftToRight->second;
+    if (std::find(leftToRightMapSecond.begin(), leftToRightMapSecond.end(),
+                  value) == leftToRightMapSecond.end()) {
+      leftToRightMapSecond.push_back(value);
+      // ai-get end
+    }
+  }
+
+  if (arrayAtIndexRightToLeft == rightToLeftMap.end()) {
+    rightToLeftMap[value] = std::vector<K>{key};
+  } else {
+--------------------
+RepoName: 23s2-cp-spa-team-10
+File: Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://chat.openai.com/share/56b8ba1c-5884-47db-aca8-3d4cc2a7634a
+    auto& rightToLeftMapSecond = arrayAtIndexRightToLeft->second;
+    if (std::find(rightToLeftMapSecond.begin(), rightToLeftMapSecond.end(),
+                  key) == rightToLeftMapSecond.end()) {
+      rightToLeftMapSecond.push_back(key);
+      // ai-get end
+    }
+  }
+}
+
+template <typename K, typename V>
+const std::vector<V>& RelationshipMapManager<K, V>::getLeftToRight(K& key) {
+  auto it = leftToRightMap.find(key);
+  if (it != leftToRightMap.end()) {
+    return it->second;
+  }
+  const std::vector<V>* emptyVector = {};
+  return *emptyVector;
+}
+
+template <typename K, typename V>
+const std::vector<K>& RelationshipMapManager<K, V>::getRightToLeft(V& key) {
+  auto it = rightToLeftMap.find(key);
+  if (it != rightToLeftMap.end()) {
+    return it->second;
+  }
+  const std::vector<K>* emptyVector = {};
+  return *emptyVector;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-10
+File: Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/70c84b62-2943-4870-898b-3659df332b23
+ChatId: 
+Code:
+template <typename K, typename V>
+const std::vector<std::pair<K, V>>&
+RelationshipMapManager<K, V>::getAllPairs() {
+  auto* pairs = new std::vector<std::pair<K, V>>();
+  // Check if the map is empty before attempting to iterate over it
+  if (leftToRightMap.empty()) {
+    return *pairs;  // Return the dynamically allocated empty vector
+  }
+
+  // Iterate over the key-value pairs in the map
+  for (const auto& kvp : leftToRightMap) {
+    const auto key = kvp.first;
+    const auto arr = kvp.second;
+    for (const auto& val : arr) {
+      pairs->push_back({key, val});
+    }
+  }
+  return *pairs;
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-10
+Total Snippets: 8
+Total lines: 110
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 7
+PKB lines: 96
+QPS Snippets: 1
+QPS lines: 14

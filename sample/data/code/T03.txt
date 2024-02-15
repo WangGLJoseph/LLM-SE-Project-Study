@@ -1,0 +1,718 @@
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/QueryEvaluationContext.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
+ChatId: 
+Code:
+#include "QueryEvaluationContext.h"
+#include <algorithm>
+#include <string>
+#include <sstream>
+
+void QueryEvaluationContext::addSynonymValues(const SynonymValues& synonymValues) {
+    synonymValuesList.push_back(synonymValues);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
+ChatId: 
+Code:
+#pragma once
+
+#include "qps/entity/query/Synonym.h"
+#include "common/Entity.h"
+#include <vector>
+#include <memory>
+
+// Represents a list of possible values for a synonym.
+class SynonymValues {
+private:
+    shared_ptr<Synonym> synonym;
+    std::vector<std::shared_ptr<Entity>> values;
+
+public:
+    explicit SynonymValues(const shared_ptr<Synonym> &syn) : synonym(syn) {}
+    void addValue(const std::shared_ptr<Entity>& value);
+    [[nodiscard]] const std::vector<std::shared_ptr<Entity>>& getValues() const;
+    [[nodiscard]] shared_ptr<Synonym> getSynonym() const { return synonym; }
+    [[nodiscard]] vector<string> toStringList() const;
+    bool operator==(const SynonymValues &rhs) const;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
+ChatId: 
+Code:
+#include "SynonymValues.h"
+#include "common/Entity.h"
+#include <algorithm>
+
+
+void SynonymValues::addValue(const std::shared_ptr<Entity>& value) {
+    values.push_back(value);
+}
+
+const std::vector<std::shared_ptr<Entity>>& SynonymValues::getValues() const {
+    return values;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/dc4fa5ec-550d-4bf8-b28d-2d6a9d8bf4a2
+ChatId: 
+Code:
+bool SynonymValues::operator==(const SynonymValues &rhs) const {
+    // First, check if the synonyms are different
+    if (synonym != rhs.synonym) {
+        return false;
+    }
+
+    // No need to sort the original vectors if they are of different sizes
+    if (values.size() != rhs.values.size()) {
+        return false;
+    }
+
+    // Sort a copy of the vectors based on the names of the entities
+    auto sortedValues = values; // Make a copy to sort
+    auto sortedRhsValues = rhs.values; // Make a copy to sort
+
+    std::sort(sortedValues.begin(), sortedValues.end(),
+              [](const std::shared_ptr<Entity>& a, const std::shared_ptr<Entity>& b) {
+                  return a->getName() < b->getName();
+              });
+
+    std::sort(sortedRhsValues.begin(), sortedRhsValues.end(),
+              [](const std::shared_ptr<Entity>& a, const std::shared_ptr<Entity>& b) {
+                  return a->getName() < b->getName();
+              });
+
+    // Now that both are sorted, compare element by element
+    for (size_t i = 0; i < sortedValues.size(); ++i) {
+        if (!(sortedValues[i]->getName() == sortedRhsValues[i]->getName())) {
+            return false;
+        }
+    }
+    return true;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/QueryEvaluationContext.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
+ChatId: 
+Code:
+#pragma once
+
+#include "SynonymValues.h"
+#include "pkb/QueryPKB.h"
+#include <list>
+
+class QueryEvaluationContext {
+private:
+    std::list<SynonymValues> synonymValuesList;
+    shared_ptr<QueryManager> queryManager;
+
+public:
+    QueryEvaluationContext();
+    void addSynonymValues(const SynonymValues& synonymValues);
+    void clearSynonymValuesList();
+    [[nodiscard]] SynonymValues getSynonymValues(const Synonym& synonym) const;
+    [[nodiscard]] bool containsSynonym(const Synonym& synonym) const;
+    [[nodiscard]] std::list<Synonym> getSynonyms() const;
+    [[nodiscard]] shared_ptr<QueryManager> getQueryManager() const;
+    [[nodiscard]] vector<string>getResults() const;
+    void setQueryManager(const shared_ptr<QueryManager>& queryManager1);
+};
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/strategy/ProjectionStrategy.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758
+ChatId: 
+Code:
+#include "ProjectionStrategy.h"
+#include <algorithm>
+
+ProjectionStrategy::ProjectionStrategy(std::shared_ptr<Synonym> synonym) : targetSynonym(std::move(synonym)) {}
+
+void ProjectionStrategy::execute(QueryEvaluationContext &context) {
+    if (!context.containsSynonym(*targetSynonym)) {
+        return; // If the target synonym is not present, no action is needed.
+    }
+
+    auto targetSynonymValues = context.getSynonymValues(*targetSynonym);
+
+    std::list<SynonymValues> updatedList;
+    updatedList.push_back(targetSynonymValues); // Add only the target synonym values to the list.
+
+    // Replace the existing list with the updated one.
+    context.clearSynonymValuesList();
+    for (const auto& synonymValues : updatedList) {
+        context.addSynonymValues(synonymValues);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/strategy/ProjectionStrategy.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758
+ChatId: 
+Code:
+#ifndef PROJECTIONSTRATEGY_H
+#define PROJECTIONSTRATEGY_H
+
+#include <memory>
+#include <list>
+#include "Strategy.h"
+
+class ProjectionStrategy : public Strategy {
+public:
+    explicit ProjectionStrategy(std::shared_ptr<Synonym> synonym);
+    void execute(QueryEvaluationContext &context) override;
+
+private:
+    std::shared_ptr<Synonym> targetSynonym;
+};
+
+#endif // PROJECTIONSTRATEGY_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/strategy/DeclarationStrategy.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// prompt 1: https://chat.openai.com/share/f0da3797-ca97-4fe7-938b-ca4e00bbe8e1
+// prompt 2: https://chat.openai.com/share/90842ec5-59d1-44c7-b7cc-52c6bfa1c405
+#include "DeclarationStrategy.h"
+#include "pkb/QueryPKB.h"
+#include <memory>
+#include <vector>
+
+
+DeclarationStrategy::DeclarationStrategy(const std::vector<shared_ptr<Synonym>>& synonyms)
+        : synonyms(synonyms) {}
+
+std::vector<std::shared_ptr<Entity>> DeclarationStrategy::getEntitiesByType(EntityType entityType, QueryManager &queryManager) {
+    std::vector<std::shared_ptr<Entity>> baseClassEntities;
+
+    switch (entityType) {
+        case EntityType::Procedure: {
+            auto entities = queryManager.getAllProcedures();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        case EntityType::Stmt: {
+            auto entities = queryManager.getAllStatements();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        case EntityType::Assign: {
+            auto entities = queryManager.getAllAssignStatements();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        case EntityType::Print: {
+            auto entities = queryManager.getAllPrintStatements();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        case EntityType::Read: {
+            auto entities = queryManager.getAllReadStatements();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        case EntityType::Call: {
+            auto entities = queryManager.getAllCallStatements();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        case EntityType::If: {
+            auto entities = queryManager.getAllIfStatements();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        case EntityType::While: {
+            auto entities = queryManager.getAllWhileStatements();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        case EntityType::Variable: {
+            auto entities = queryManager.getAllVariables();
+            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
+            break;
+        }
+        default:
+            // Raise exception for unknown entity type
+            throw std::invalid_argument("Unknown entity type");
+    }
+
+    return baseClassEntities;
+}
+
+
+/**
+ * Execute the declaration strategy. For each synonym, get all entities of the type and add them to the context.
+ * @param context the query evaluation context that provides the query manager and stores the synonym values.
+ */
+void DeclarationStrategy::execute(QueryEvaluationContext &context) {
+    shared_ptr<QueryManager> queryManager = context.getQueryManager();
+    for (const auto& synonym : synonyms) {
+        auto entities = getEntitiesByType(synonym->getType(), *queryManager);
+        SynonymValues synonymValues(synonym);
+        for (const auto& entity : entities) {
+            synonymValues.addValue(entity);
+        }
+        context.addSynonymValues(synonymValues);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/QueryParser.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://chat.openai.com/share/56b9766f-27cb-4a36-a0ed-188e5b5a598a
+
+    EntityType entityType{};
+
+    if (curr == "stmt") {
+        entityType = EntityType::Stmt;
+    }
+    else if (curr == "read") {
+        entityType = EntityType::Read;
+    }
+    else if (curr == "print") {
+        entityType = EntityType::Print;
+    }
+    else if (curr == "call") {
+        entityType = EntityType::Call;
+    }
+    else if (curr == "while") {
+        entityType = EntityType::While;
+    }
+    else if (curr == "if") {
+        entityType = EntityType::If;
+    }
+    else if (curr == "assign") {
+        entityType = EntityType::Assign;
+    }
+    else if (curr == "variable") {
+        entityType = EntityType::Variable;
+    }
+    else if (curr == "constant") {
+        entityType = EntityType::Constant;
+    }
+    else if (curr == "procedure") {
+        entityType = EntityType::Procedure;
+    }
+    else {
+        //None of the above, gives a Unknown Entity type
+        entityType = EntityType::Unknown;
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/common/EntityType.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: i can't get the link, got 'sharing conversations with images is not yet supported'.
+ChatId: 
+Code:
+enum class EntityType {
+    Stmt,       // Represents all statements
+    Read,       // Represents read statements
+    Print,      // Represents print statements
+    Call,       // Represents call statements
+    While,      // Represents while loops
+    If,         // Represents if statements
+    Assign,     // Represents assignment statements
+    Variable,   // Represents variables
+    Constant,   // Represents constants
+    Procedure,   // Represents procedures
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/TestQueryEvaluationContext.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
+ChatId: 
+Code:
+#include <catch.hpp>
+
+#include "common/Entity.h"
+#include "qps/entity/query/Synonym.h"
+#include "qps/entity/evaluation/SynonymValues.h"
+#include "qps/entity/evaluation/QueryEvaluationContext.h"
+#include <memory>
+
+// MockEntity inheriting from Entity for test purposes
+class MockEntity : public Entity {
+    std::string name;
+public:
+    explicit MockEntity(const std::string& name) : name(name) {}
+    std::string getName() const override { return name; } // Assuming Entity has getName()
+    void accept(shared_ptr<Visitor> visitor) override {}
+};
+
+TEST_CASE("QueryEvaluationContext::resultToString throws when multiple SynonymValues are present", "[QueryEvaluationContext]") {
+    QueryEvaluationContext qec;
+
+    auto synonym1 = std::make_shared<Synonym>(EntityType::Stmt, "s1");
+    SynonymValues sv1(synonym1);
+    sv1.addValue(std::make_shared<MockEntity>("value1"));
+
+    auto synonym2 = std::make_shared<Synonym>(EntityType::Stmt, "s2");
+    SynonymValues sv2(synonym2);
+    sv2.addValue(std::make_shared<MockEntity>("value2"));
+
+    qec.addSynonymValues(sv1);
+    qec.addSynonymValues(sv2);
+
+    REQUIRE_THROWS_AS(qec.getResults(), std::runtime_error);
+}
+
+TEST_CASE("QueryEvaluationContext::resultToString throws when no SynonymValues are present", "[QueryEvaluationContext]") {
+    QueryEvaluationContext qec;
+
+    REQUIRE_THROWS_AS(qec.getResults(), std::runtime_error);
+}
+
+TEST_CASE("QueryEvaluationContext::resultToString returns empty string for empty SynonymValues", "[QueryEvaluationContext]") {
+    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
+    SynonymValues sv(synonym);
+
+    QueryEvaluationContext qec;
+    qec.addSynonymValues(sv);
+
+    vector<std::string> result = qec.getResults();
+    REQUIRE(result.empty());
+}
+TEST_CASE("QueryEvaluationContext::resultToString handles special characters in entity names", "[QueryEvaluationContext]") {
+    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
+    SynonymValues sv(synonym);
+    sv.addValue(std::make_shared<MockEntity>("$1"));
+    sv.addValue(std::make_shared<MockEntity>("value#2"));
+    sv.addValue(std::make_shared<MockEntity>("value, 3"));
+
+    QueryEvaluationContext qec;
+    qec.addSynonymValues(sv);
+
+    vector<std::string> result = qec.getResults();
+//    REQUIRE(result == "$1, value#2, value, 3");
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/TestQueryParser.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+//https://chat.openai.com/share/72133ed9-d959-44ae-9c81-143998296122
+
+TEST_CASE("convertStringToEntityType should produce accurate entity type") {
+	QueryParser queryParser;
+
+	SECTION("Test valid entity types") {
+		REQUIRE(queryParser.convertStringToEntityType("stmt") == EntityType::Stmt);
+		REQUIRE(queryParser.convertStringToEntityType("read") == EntityType::Read);
+		REQUIRE(queryParser.convertStringToEntityType("print") == EntityType::Print);
+		REQUIRE(queryParser.convertStringToEntityType("call") == EntityType::Call);
+		REQUIRE(queryParser.convertStringToEntityType("while") == EntityType::While);
+		REQUIRE(queryParser.convertStringToEntityType("if") == EntityType::If);
+		REQUIRE(queryParser.convertStringToEntityType("assign") == EntityType::Assign);
+		REQUIRE(queryParser.convertStringToEntityType("variable") == EntityType::Variable);
+		REQUIRE(queryParser.convertStringToEntityType("constant") == EntityType::Constant);
+		REQUIRE(queryParser.convertStringToEntityType("procedure") == EntityType::Procedure);
+	}
+
+	SECTION("Test unknown entity type") {
+		REQUIRE(queryParser.convertStringToEntityType("unknown") == EntityType::Unknown);
+	}
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/strategy/TestProjectionStrategy.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+#include "catch.hpp"
+#include "FakeQueryManager.cpp"
+#include "qps/entity/evaluation/QueryEvaluationContext.h"
+#include "qps/entity/strategy/ProjectionStrategy.h"
+#include "qps/entity/query/Synonym.h"
+
+TEST_CASE("ProjectionStrategy updates context with only targeted SynonymValues", "[ProjectionStrategy]") {
+    auto queryManager = std::make_shared<FakeQueryManager>();
+    QueryEvaluationContext context;
+    context.setQueryManager(queryManager);
+
+    // Setup fake entities for testing
+    auto targetSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
+    auto otherSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
+    auto targetEntity = std::make_shared<Variable>("x");
+    auto otherEntity = std::make_shared<Procedure>("Main");
+
+    // Setup initial SynonymValues in context
+    SynonymValues targetSynonymValues(targetSynonym);
+    targetSynonymValues.addValue(targetEntity);
+    context.addSynonymValues(targetSynonymValues);
+
+    SynonymValues otherSynonymValues(otherSynonym);
+    otherSynonymValues.addValue(otherEntity);
+    context.addSynonymValues(otherSynonymValues);
+
+    // Execute ProjectionStrategy targeting "v"
+    ProjectionStrategy strategy(targetSynonym);
+    strategy.execute(context);
+
+    SECTION("Context should only contain SynonymValues for targeted synonym 'v'") {
+        REQUIRE(context.containsSynonym(*targetSynonym));
+        REQUIRE_FALSE(context.containsSynonym(*otherSynonym));
+    }
+
+    SECTION("Targeted SynonymValues should remain intact") {
+        auto resultingSynonymValues = context.getSynonymValues(*targetSynonym);
+        REQUIRE(resultingSynonymValues.getValues().size() == 1);
+        REQUIRE(*(resultingSynonymValues.getValues().front()) == *targetEntity);
+    }
+}
+
+TEST_CASE("ProjectionStrategy with non-existing target synonym does not alter context", "[ProjectionStrategy]") {
+    auto queryManager = std::make_shared<FakeQueryManager>();
+    QueryEvaluationContext context;
+    context.setQueryManager(queryManager);
+
+    // Setup a Synonym and SynonymValues that are not targeted
+    auto nonTargetSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
+    auto nonTargetEntity = std::make_shared<Procedure>("Main");
+    SynonymValues nonTargetSynonymValues(nonTargetSynonym);
+    nonTargetSynonymValues.addValue(nonTargetEntity);
+    context.addSynonymValues(nonTargetSynonymValues);
+
+    // Execute ProjectionStrategy with a synonym that does not exist in context
+    auto nonexistentSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
+    ProjectionStrategy strategy(nonexistentSynonym);
+    strategy.execute(context);
+
+    SECTION("Context should remain unchanged when targeted synonym does not exist") {
+        REQUIRE(context.containsSynonym(*nonTargetSynonym));
+        REQUIRE(context.getSynonymValues(*nonTargetSynonym).getValues().size() == 1);
+        REQUIRE(*(context.getSynonymValues(*nonTargetSynonym).getValues().front()) == *nonTargetEntity);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/strategy/TestDeclarationStrategy.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517
+ChatId: 
+Code:
+TEST_CASE("DeclarationStrategy processes synonyms and updates context with SynonymValues", "[DeclarationStrategy]") {
+    auto queryManager = std::make_shared<FakeQueryManager>();
+    QueryEvaluationContext context = QueryEvaluationContext();
+    context.setQueryManager(queryManager);
+
+    // Setup fake responses in FakeQueryManager
+    std::vector<std::shared_ptr<Procedure>> fakeProcedures = {std::make_shared<Procedure>("Main"), std::make_shared<Procedure>("Helper")};
+    std::vector<std::shared_ptr<Variable>> fakeVariables = {std::make_shared<Variable>("x"), std::make_shared<Variable>("y")};
+    queryManager->addFakeResponse("Procedure", fakeProcedures);
+    queryManager->addFakeResponse("Variable", fakeVariables);
+
+    // Synonyms setup
+    auto procSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
+    auto varSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
+    std::vector<std::shared_ptr<Synonym>> synonyms = {procSynonym, varSynonym};
+
+    // DeclarationStrategy execution
+    DeclarationStrategy strategy(synonyms);
+    strategy.execute(context);
+
+    // Assertions
+    SECTION("Context should contain SynonymValues for each synonym") {
+        REQUIRE(context.containsSynonym(*procSynonym));
+        REQUIRE(context.containsSynonym(*varSynonym));
+    }
+
+    SECTION("SynonymValues should contain correct entities") {
+        auto procSynonymValues = context.getSynonymValues(*procSynonym);
+        auto expectedSynonymValues = SynonymValues(procSynonym);
+        expectedSynonymValues.addValue(fakeProcedures[0]);
+        expectedSynonymValues.addValue(fakeProcedures[1]);
+
+
+        auto varSynonymValues = context.getSynonymValues(*varSynonym);
+        auto expectedVarSynonymValues = SynonymValues(varSynonym);
+        expectedVarSynonymValues.addValue(fakeVariables[0]);
+        expectedVarSynonymValues.addValue(fakeVariables[1]);
+
+        REQUIRE(procSynonymValues == expectedSynonymValues);
+        REQUIRE(varSynonymValues == expectedVarSynonymValues);
+    }
+}
+
+
+TEST_CASE("DeclarationStrategy Comprehensive Tests", "[DeclarationStrategy]") {
+    auto queryManager = std::make_shared<FakeQueryManager>();
+    QueryEvaluationContext context;
+    context.setQueryManager(queryManager);
+
+    SECTION("No declared synonyms") {
+        std::vector<std::shared_ptr<Synonym>> synonyms = {}; // Explicitly declared empty vector
+
+        DeclarationStrategy strategy(synonyms);
+        strategy.execute(context);
+
+        REQUIRE(context.getSynonyms().empty());
+    }
+
+    SECTION("Declared synonyms but no entities returned") {
+        std::vector<std::shared_ptr<Procedure>> emptyProcedures; // Explicitly declare empty vector
+        std::vector<std::shared_ptr<Variable>> emptyVariables; // Explicitly declare empty vector
+        queryManager->addFakeResponse("Procedure", emptyProcedures);
+        queryManager->addFakeResponse("Variable", emptyVariables);
+
+        auto procSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
+        auto varSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
+        std::vector<std::shared_ptr<Synonym>> synonyms = {procSynonym, varSynonym};
+
+        DeclarationStrategy strategy(synonyms);
+        strategy.execute(context);
+
+        REQUIRE(context.getSynonymValues(*procSynonym).getValues().empty());
+        REQUIRE(context.getSynonymValues(*varSynonym).getValues().empty());
+    }
+
+    SECTION("Mixed entity availability for declared synonyms") {
+        std::vector<std::shared_ptr<Procedure>> proceduresWithEntities = {std::make_shared<Procedure>("Main")}; // Procedures with entities
+        std::vector<std::shared_ptr<Variable>> emptyVariables; // Explicitly declare empty vector for Variables
+        queryManager->addFakeResponse("Procedure", proceduresWithEntities);
+        queryManager->addFakeResponse("Variable", emptyVariables);
+
+        auto procSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
+        auto varSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
+        std::vector<std::shared_ptr<Synonym>> synonyms = {procSynonym, varSynonym};
+
+        DeclarationStrategy strategy(synonyms);
+        strategy.execute(context);
+
+        REQUIRE(context.getSynonymValues(*procSynonym).getValues().size() == 1);
+        REQUIRE(context.getSynonymValues(*varSynonym).getValues().empty());
+    }
+
+    SECTION("All declared synonyms with entities returned") {
+        std::vector<std::shared_ptr<Procedure>> proceduresWithEntities = {std::make_shared<Procedure>("Main"), std::make_shared<Procedure>("Helper")};
+        std::vector<std::shared_ptr<Variable>> variablesWithEntities = {std::make_shared<Variable>("x"), std::make_shared<Variable>("y")};
+        queryManager->addFakeResponse("Procedure", proceduresWithEntities);
+        queryManager->addFakeResponse("Variable", variablesWithEntities);
+
+        auto procSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
+        auto varSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
+        std::vector<std::shared_ptr<Synonym>> synonyms = {procSynonym, varSynonym};
+
+        DeclarationStrategy strategy(synonyms);
+        strategy.execute(context);
+
+        REQUIRE(context.containsSynonym(*procSynonym));
+        REQUIRE(context.containsSynonym(*varSynonym));
+        REQUIRE(context.getSynonymValues(*procSynonym).getValues().size() == 2);
+        REQUIRE(context.getSynonymValues(*varSynonym).getValues().size() == 2);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/strategy/FakeQueryManager.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517
+ChatId: 
+Code:
+class FakeQueryManager : public QueryManager {
+private:
+    std::map<std::string, std::vector<std::shared_ptr<Entity>>> fakeResponses;
+
+public:
+    FakeQueryManager() = default;
+
+    // Template method remains unchanged, as it's generic enough
+    template<typename T>
+    void addFakeResponse(const std::string& entityType, std::vector<std::shared_ptr<T>> response) {
+        std::vector<std::shared_ptr<Entity>> genericResponse;
+        for (auto& item : response) {
+            genericResponse.push_back(std::static_pointer_cast<Entity>(item));
+        }
+        fakeResponses[entityType] = genericResponse;
+    }
+
+    // Specific overrides for Procedure and Variable
+    std::vector<std::shared_ptr<Procedure>> getAllProcedures() override {
+        auto it = fakeResponses.find("Procedure");
+        if (it != fakeResponses.end()) {
+            // Convert back to specific shared_ptr type
+            std::vector<std::shared_ptr<Procedure>> specificResponse;
+            for (auto& entity : it->second) {
+                specificResponse.push_back(std::static_pointer_cast<Procedure>(entity));
+            }
+            return specificResponse;
+        }
+        return {};
+    }
+
+    std::vector<std::shared_ptr<Variable>> getAllVariables() override {
+        auto it = fakeResponses.find("Variable");
+        if (it != fakeResponses.end()) {
+            // Convert back to specific shared_ptr type
+            std::vector<std::shared_ptr<Variable>> specificResponse;
+            for (auto& entity : it->second) {
+                specificResponse.push_back(std::static_pointer_cast<Variable>(entity));
+            }
+            return specificResponse;
+        }
+        return {};
+    }
+
+    // Optionally, implement other getAll* methods if needed, returning empty vectors
+};
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-03
+Total Snippets: 15
+Total lines: 585
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 0
+PKB lines: 0
+QPS Snippets: 14
+QPS lines: 574

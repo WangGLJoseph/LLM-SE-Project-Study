@@ -1,0 +1,9 @@
+#include "DesignExtractor.h"
+#include "SP/Parser/TNode.h"
+
+DesignExtractor::DesignExtractor(std::shared_ptr<PKBWriter> pkb) : pkbWriter(pkb) {}
+DesignExtractor::~DesignExtractor() {}
+
+void DesignExtractor::extractData(TNode *node) {
+    this->extractData(node);
+}

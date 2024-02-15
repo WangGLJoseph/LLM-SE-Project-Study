@@ -1,0 +1,19 @@
+TEST_CASE("Testing PrintStmt::buildTree()", "[PrintStmt]") {
+	// Generate test file
+	const std::string testFileName = "../../../../../tests/sp/ParserTest/PrintStmt1.txt";
+	REQUIRE(std::filesystem::exists(testFileName));
+	SimpleParser parser(testFileName);
+	std::shared_ptr<ASTNode> tree_ptr = parser.parsePrint();
+
+	REQUIRE(tree_ptr->type == ASTNodeType::PRINT);
+	REQUIRE(tree_ptr->lineNumber == 1);
+	REQUIRE(tree_ptr->value == Utility::getASTNodeType(ASTNodeType::PRINT));
+
+	SECTION("Testing tree child node") {
+		const auto& children = tree_ptr->children;
+		REQUIRE(children.size() == 1);
+		REQUIRE(children[0]->type == ASTNodeType::VARIABLE);
+		REQUIRE(children[0]->lineNumber == 1);
+		REQUIRE(children[0]->value == "x");
+	}
+}

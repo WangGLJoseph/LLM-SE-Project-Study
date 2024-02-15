@@ -1,0 +1,14 @@
+#include "PKB/PKBWriter.h"
+#include "SP/Parser/TNode.h"
+
+#pragma once
+
+class DesignExtractor {
+protected:
+    std::shared_ptr<PKBWriter> pkbWriter;
+
+public:
+    DesignExtractor(std::shared_ptr<PKBWriter> pkb);
+    virtual ~DesignExtractor();
+    virtual void extractData(TNode *node) = 0; // pure virtual function
+};

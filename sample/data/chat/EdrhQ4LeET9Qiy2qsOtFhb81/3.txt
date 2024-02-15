@@ -1,0 +1,27 @@
+/**
+ * Base class for symbol tables: VariableTable, ProcedureTable, ConstantTable
+ */
+class SymbolTable {
+public:
+    SymbolTable() {};
+
+    // Adds a symbol to table
+    void addSymbol(const std::string& symbol) {
+        symbols.insert(symbol);
+    }
+
+    // Checks if a symbol exists in table
+    bool symbolExists(const std::string& symbol) const {
+        return symbols.count(symbol) > 0;
+    }
+
+    // Returns all symbols
+    std::unordered_set<std::string> getAllSymbols() const {
+        return symbols;
+    }
+
+protected:
+    std::unordered_set<std::string> symbols;
+};
+
+#endif // SYMBOLTABLE_H

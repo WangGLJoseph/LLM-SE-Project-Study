@@ -1,0 +1,424 @@
+RepoName: 23s2-cp-spa-team-02
+File: Team02/Code02/src/unit_testing/src/SP/Tokenizer/TestTokenizer.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground?assistant=asst_bB5WL2lLMsCHPP9OedD9H5kM&thread=thread_GWNyhjQk9MCMNoiUH2R6yz0B
+// test && and ||
+TEST_CASE("Tokenize logical operators") {
+  std::string input = "&& ||";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  auto tokens = tokenizer.tokenize();
+
+  REQUIRE(tokens.getLength() == 2);
+
+  REQUIRE(tokens.at(0).getType() == AND);
+  REQUIRE(tokens.at(0).getValue() == "&&");
+
+  REQUIRE(tokens.at(1).getType() == OR);
+  REQUIRE(tokens.at(1).getValue() == "||");
+}
+
+TEST_CASE("Tokenize complex arithmetic expression") {
+  std::string input = "(a + b) * (c - d) / (e % f)";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  auto tokens = tokenizer.tokenize();
+
+  REQUIRE(tokens.getLength() == 17);
+
+  REQUIRE(tokens.at(0).getType() == LEFT_PARENTHESIS);
+  REQUIRE(tokens.at(0).getValue() == "(");
+
+  REQUIRE(tokens.at(1).getType() == NAME);
+  REQUIRE(tokens.at(1).getValue() == "a");
+
+  REQUIRE(tokens.at(2).getType() == PLUS);
+  REQUIRE(tokens.at(2).getValue() == "+");
+
+  REQUIRE(tokens.at(3).getType() == NAME);
+  REQUIRE(tokens.at(3).getValue() == "b");
+
+  REQUIRE(tokens.at(4).getType() == RIGHT_PARENTHESIS);
+  REQUIRE(tokens.at(4).getValue() == ")");
+
+  REQUIRE(tokens.at(5).getType() == TIMES);
+  REQUIRE(tokens.at(5).getValue() == "*");
+
+  REQUIRE(tokens.at(6).getType() == LEFT_PARENTHESIS);
+  REQUIRE(tokens.at(6).getValue() == "(");
+
+  REQUIRE(tokens.at(7).getType() == NAME);
+  REQUIRE(tokens.at(7).getValue() == "c");
+
+  REQUIRE(tokens.at(8).getType() == MINUS);
+  REQUIRE(tokens.at(8).getValue() == "-");
+
+  REQUIRE(tokens.at(9).getType() == NAME);
+  REQUIRE(tokens.at(9).getValue() == "d");
+
+  REQUIRE(tokens.at(10).getType() == RIGHT_PARENTHESIS);
+  REQUIRE(tokens.at(10).getValue() == ")");
+
+  REQUIRE(tokens.at(11).getType() == DIVIDE);
+  REQUIRE(tokens.at(11).getValue() == "/");
+
+  REQUIRE(tokens.at(12).getType() == LEFT_PARENTHESIS);
+  REQUIRE(tokens.at(12).getValue() == "(");
+
+  REQUIRE(tokens.at(13).getType() == NAME);
+  REQUIRE(tokens.at(13).getValue() == "e");
+
+  REQUIRE(tokens.at(14).getType() == MODULO);
+  REQUIRE(tokens.at(14).getValue() == "%");
+
+  REQUIRE(tokens.at(15).getType() == NAME);
+  REQUIRE(tokens.at(15).getValue() == "f");
+
+  REQUIRE(tokens.at(16).getType() == RIGHT_PARENTHESIS);
+  REQUIRE(tokens.at(16).getValue() == ")");
+}
+
+TEST_CASE("Tokenize program with multiple procedures") {
+  std::string input = R"(
+        procedure Proc1 {
+            x = 10 + y;
+        }
+
+        procedure Proc2 {
+            if (z > 0) {
+                print z;
+            }
+        }
+    )";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  auto tokens = tokenizer.tokenize();
+  REQUIRE(tokens.getLength() == 25);
+
+  REQUIRE(tokens.getLength() == 25);
+
+  REQUIRE(tokens.at(0).getType() == PROCEDURE);
+  REQUIRE(tokens.at(0).getValue() == "procedure");
+
+  REQUIRE(tokens.at(1).getType() == NAME);
+  REQUIRE(tokens.at(1).getValue() == "Proc1");
+
+  REQUIRE(tokens.at(2).getType() == LEFT_CURLY_BRACKET);
+  REQUIRE(tokens.at(2).getValue() == "{");
+
+  REQUIRE(tokens.at(3).getType() == NAME);
+  REQUIRE(tokens.at(3).getValue() == "x");
+
+  REQUIRE(tokens.at(4).getType() == ASSIGN);
+  REQUIRE(tokens.at(4).getValue() == "=");
+
+  REQUIRE(tokens.at(5).getType() == INTEGER);
+  REQUIRE(tokens.at(5).getValue() == "10");
+
+  REQUIRE(tokens.at(6).getType() == PLUS);
+  REQUIRE(tokens.at(6).getValue() == "+");
+
+  REQUIRE(tokens.at(7).getType() == NAME);
+  REQUIRE(tokens.at(7).getValue() == "y");
+
+  REQUIRE(tokens.at(8).getType() == SEMICOLON);
+  REQUIRE(tokens.at(8).getValue() == ";");
+
+  REQUIRE(tokens.at(9).getType() == RIGHT_CURLY_BRACKET);
+  REQUIRE(tokens.at(9).getValue() == "}");
+
+  REQUIRE(tokens.at(10).getType() == PROCEDURE);
+  REQUIRE(tokens.at(10).getValue() == "procedure");
+
+  REQUIRE(tokens.at(11).getType() == NAME);
+  REQUIRE(tokens.at(11).getValue() == "Proc2");
+
+  REQUIRE(tokens.at(12).getType() == LEFT_CURLY_BRACKET);
+  REQUIRE(tokens.at(12).getValue() == "{");
+
+  REQUIRE(tokens.at(13).getType() == IF);
+  REQUIRE(tokens.at(13).getValue() == "if");
+
+  REQUIRE(tokens.at(14).getType() == LEFT_PARENTHESIS);
+  REQUIRE(tokens.at(14).getValue() == "(");
+
+  REQUIRE(tokens.at(15).getType() == NAME);
+  REQUIRE(tokens.at(15).getValue() == "z");
+
+  REQUIRE(tokens.at(16).getType() == GREATER_THAN);
+  REQUIRE(tokens.at(16).getValue() == ">");
+
+  REQUIRE(tokens.at(17).getType() == INTEGER);
+  REQUIRE(tokens.at(17).getValue() == "0");
+
+  REQUIRE(tokens.at(18).getType() == RIGHT_PARENTHESIS);
+  REQUIRE(tokens.at(18).getValue() == ")");
+
+  REQUIRE(tokens.at(19).getType() == LEFT_CURLY_BRACKET);
+  REQUIRE(tokens.at(19).getValue() == "{");
+
+  REQUIRE(tokens.at(20).getType() == PRINT);
+  REQUIRE(tokens.at(20).getValue() == "print");
+
+  REQUIRE(tokens.at(21).getType() == NAME);
+  REQUIRE(tokens.at(21).getValue() == "z");
+
+  REQUIRE(tokens.at(22).getType() == SEMICOLON);
+  REQUIRE(tokens.at(22).getValue() == ";");
+
+  REQUIRE(tokens.at(23).getType() == RIGHT_CURLY_BRACKET);
+  REQUIRE(tokens.at(23).getValue() == "}");
+
+  REQUIRE(tokens.at(24).getType() == RIGHT_CURLY_BRACKET);
+  REQUIRE(tokens.at(24).getValue() == "}");
+}
+
+TEST_CASE("Tokenize program with invalid character") {
+  std::string input = "procedure Invalid { $ = x + y; }";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+
+  REQUIRE_THROWS_AS(tokenizer.tokenize(), SyntaxErrorException);
+}
+
+TEST_CASE("Tokenize program with invalid keyword") {
+  std::string input = "procedure Invalid { if (x &&& y) { print z; } }";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+
+  REQUIRE_THROWS_AS(tokenizer.tokenize(), SyntaxErrorException);
+}
+
+TEST_CASE("Tokenize program with invalid number format") {
+  std::string input = "procedure Invalid { num = 123.45; }";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+
+  REQUIRE_THROWS_AS(tokenizer.tokenize(), SyntaxErrorException);
+}
+
+// Testing if-else condition
+TEST_CASE("Tokenize if-else statements") {
+  std::string input = "if (a == b) { call x; } else { call y; }";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  auto tokens = tokenizer.tokenize();
+  REQUIRE(tokens.getLength() == 17);
+
+  REQUIRE(tokens.at(0).getType() == IF);
+  REQUIRE(tokens.at(0).getValue() == "if");
+
+  REQUIRE(tokens.at(1).getType() == LEFT_PARENTHESIS);
+  REQUIRE(tokens.at(1).getValue() == "(");
+
+  REQUIRE(tokens.at(2).getType() == NAME);
+  REQUIRE(tokens.at(2).getValue() == "a");
+
+  REQUIRE(tokens.at(3).getType() == DOUBLE_EQUALS);
+  REQUIRE(tokens.at(3).getValue() == "==");
+
+  REQUIRE(tokens.at(4).getType() == NAME);
+  REQUIRE(tokens.at(4).getValue() == "b");
+
+  REQUIRE(tokens.at(5).getType() == RIGHT_PARENTHESIS);
+  REQUIRE(tokens.at(5).getValue() == ")");
+
+  REQUIRE(tokens.at(6).getType() == LEFT_CURLY_BRACKET);
+  REQUIRE(tokens.at(6).getValue() == "{");
+
+  REQUIRE(tokens.at(7).getType() == CALL);
+  REQUIRE(tokens.at(7).getValue() == "call");
+
+  REQUIRE(tokens.at(8).getType() == NAME);
+  REQUIRE(tokens.at(8).getValue() == "x");
+
+  REQUIRE(tokens.at(9).getType() == SEMICOLON);
+  REQUIRE(tokens.at(9).getValue() == ";");
+
+  REQUIRE(tokens.at(10).getType() == RIGHT_CURLY_BRACKET);
+  REQUIRE(tokens.at(10).getValue() == "}");
+
+  REQUIRE(tokens.at(11).getType() == ELSE);
+  REQUIRE(tokens.at(11).getValue() == "else");
+
+  REQUIRE(tokens.at(12).getType() == LEFT_CURLY_BRACKET);
+  REQUIRE(tokens.at(12).getValue() == "{");
+
+  REQUIRE(tokens.at(13).getType() == CALL);
+  REQUIRE(tokens.at(13).getValue() == "call");
+
+  REQUIRE(tokens.at(14).getType() == NAME);
+  REQUIRE(tokens.at(14).getValue() == "y");
+
+  REQUIRE(tokens.at(15).getType() == SEMICOLON);
+  REQUIRE(tokens.at(15).getValue() == ";");
+
+  REQUIRE(tokens.at(16).getType() == RIGHT_CURLY_BRACKET);
+  REQUIRE(tokens.at(16).getValue() == "}");
+}
+
+TEST_CASE("Tokenize maths expressions with whitespace") {
+  std::string input = "a =   1+ 2   - 3    *4;";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  auto tokens = tokenizer.tokenize();
+
+  REQUIRE(tokens.getLength() == 10);
+
+  REQUIRE(tokens.at(0).getType() == NAME);
+  REQUIRE(tokens.at(0).getValue() == "a");
+
+  REQUIRE(tokens.at(1).getType() == ASSIGN);
+  REQUIRE(tokens.at(1).getValue() == "=");
+
+  REQUIRE(tokens.at(2).getType() == INTEGER);
+  REQUIRE(tokens.at(2).getValue() == "1");
+
+  REQUIRE(tokens.at(3).getType() == PLUS);
+  REQUIRE(tokens.at(3).getValue() == "+");
+
+  REQUIRE(tokens.at(4).getType() == INTEGER);
+  REQUIRE(tokens.at(4).getValue() == "2");
+
+  REQUIRE(tokens.at(5).getType() == MINUS);
+  REQUIRE(tokens.at(5).getValue() == "-");
+
+  REQUIRE(tokens.at(6).getType() == INTEGER);
+  REQUIRE(tokens.at(6).getValue() == "3");
+
+  REQUIRE(tokens.at(7).getType() == TIMES);
+  REQUIRE(tokens.at(7).getValue() == "*");
+
+  REQUIRE(tokens.at(8).getType() == INTEGER);
+  REQUIRE(tokens.at(8).getValue() == "4");
+
+  REQUIRE(tokens.at(9).getType() == SEMICOLON);
+  REQUIRE(tokens.at(9).getValue() == ";");
+}
+
+TEST_CASE("Tokenize function call with whitespace") {
+  std::string input = "call   functionName   ;";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  auto tokens = tokenizer.tokenize();
+
+  REQUIRE(tokens.getLength() == 3);
+
+  REQUIRE(tokens.at(0).getType() == CALL);
+  REQUIRE(tokens.at(0).getValue() == "call");
+
+  REQUIRE(tokens.at(1).getType() == NAME);
+  REQUIRE(tokens.at(1).getValue() == "functionName");
+
+  REQUIRE(tokens.at(2).getType() == SEMICOLON);
+  REQUIRE(tokens.at(2).getValue() == ";");
+}
+
+TEST_CASE("Tokenize if-else statements with whitespace") {
+  std::string input =
+      "if    ( a  == b     )   { call   x ;  }   else   { call y   ; }";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  auto tokens = tokenizer.tokenize();
+
+  REQUIRE(tokens.getLength() == 17);
+
+  REQUIRE(tokens.at(0).getType() == IF);
+  REQUIRE(tokens.at(0).getValue() == "if");
+
+  REQUIRE(tokens.at(1).getType() == LEFT_PARENTHESIS);
+  REQUIRE(tokens.at(1).getValue() == "(");
+
+  REQUIRE(tokens.at(2).getType() == NAME);
+  REQUIRE(tokens.at(2).getValue() == "a");
+
+  REQUIRE(tokens.at(3).getType() == DOUBLE_EQUALS);
+  REQUIRE(tokens.at(3).getValue() == "==");
+
+  REQUIRE(tokens.at(4).getType() == NAME);
+  REQUIRE(tokens.at(4).getValue() == "b");
+
+  REQUIRE(tokens.at(5).getType() == RIGHT_PARENTHESIS);
+  REQUIRE(tokens.at(5).getValue() == ")");
+
+  REQUIRE(tokens.at(6).getType() == LEFT_CURLY_BRACKET);
+  REQUIRE(tokens.at(6).getValue() == "{");
+
+  REQUIRE(tokens.at(7).getType() == CALL);
+  REQUIRE(tokens.at(7).getValue() == "call");
+
+  REQUIRE(tokens.at(8).getType() == NAME);
+  REQUIRE(tokens.at(8).getValue() == "x");
+
+  REQUIRE(tokens.at(9).getType() == SEMICOLON);
+  REQUIRE(tokens.at(9).getValue() == ";");
+
+  REQUIRE(tokens.at(10).getType() == RIGHT_CURLY_BRACKET);
+  REQUIRE(tokens.at(10).getValue() == "}");
+
+  REQUIRE(tokens.at(11).getType() == ELSE);
+  REQUIRE(tokens.at(11).getValue() == "else");
+
+  REQUIRE(tokens.at(12).getType() == LEFT_CURLY_BRACKET);
+  REQUIRE(tokens.at(12).getValue() == "{");
+
+  REQUIRE(tokens.at(13).getType() == CALL);
+  REQUIRE(tokens.at(13).getValue() == "call");
+
+  REQUIRE(tokens.at(14).getType() == NAME);
+  REQUIRE(tokens.at(14).getValue() == "y");
+
+  REQUIRE(tokens.at(15).getType() == SEMICOLON);
+  REQUIRE(tokens.at(15).getValue() == ";");
+
+  REQUIRE(tokens.at(16).getType() == RIGHT_CURLY_BRACKET);
+  REQUIRE(tokens.at(16).getValue() == "}");
+}
+
+TEST_CASE("Tokenize procedures with whitespace") {
+  std::string input = "procedure   procName  { a  =    1 ;    }";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  auto tokens = tokenizer.tokenize();
+
+  REQUIRE(tokens.getLength() == 8);
+
+  REQUIRE(tokens.at(0).getType() == PROCEDURE);
+  REQUIRE(tokens.at(0).getValue() == "procedure");
+
+  REQUIRE(tokens.at(1).getType() == NAME);
+  REQUIRE(tokens.at(1).getValue() == "procName");
+
+  REQUIRE(tokens.at(2).getType() == LEFT_CURLY_BRACKET);
+  REQUIRE(tokens.at(2).getValue() == "{");
+
+  REQUIRE(tokens.at(3).getType() == NAME);
+  REQUIRE(tokens.at(3).getValue() == "a");
+
+  REQUIRE(tokens.at(4).getType() == ASSIGN);
+  REQUIRE(tokens.at(4).getValue() == "=");
+
+  REQUIRE(tokens.at(5).getType() == INTEGER);
+  REQUIRE(tokens.at(5).getValue() == "1");
+
+  REQUIRE(tokens.at(6).getType() == SEMICOLON);
+  REQUIRE(tokens.at(6).getValue() == ";");
+
+  REQUIRE(tokens.at(7).getType() == RIGHT_CURLY_BRACKET);
+  REQUIRE(tokens.at(7).getValue() == "}");
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-02
+Total Snippets: 1
+Total lines: 406
+SP Snippets: 1
+SP lines: 406
+PKB Snippets: 0
+PKB lines: 0
+QPS Snippets: 0
+QPS lines: 0

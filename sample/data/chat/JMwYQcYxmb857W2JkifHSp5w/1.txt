@@ -1,0 +1,26 @@
+const std::unordered_set<Stmt>& StatementStore::getStatements() const {
+    return statementSet;
+}
+
+void StatementStore::setStatements(const std::unordered_set<Stmt> &inputStmts) {
+    statementSet.insert(inputStmts.begin(), inputStmts.end());
+}
+
+Stmt* StatementStore::getStatementByStmtNum(StmtNum stmtNum) const {
+    for (const auto& stmt : statementSet) {
+        if (stmt.stmtNum == stmtNum) {
+            return const_cast<Stmt*>(&stmt);
+        }
+    }
+    return nullptr;
+}
+
+std::vector<Stmt*> StatementStore::getStatementsByType(StatementType type) const {
+    std::vector<Stmt*> stmts;
+    for (const auto& stmt : statementSet) {
+        if (stmt.type == type) {
+            stmts.push_back(const_cast<Stmt*>(&stmt));
+        }
+    }
+    return stmts;
+}

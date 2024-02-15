@@ -1,0 +1,13 @@
+VariableTable::VariableTable() = default;
+
+void VariableTable::addVariable(const std::string& variable) {
+    addSymbol(variable);
+}
+
+bool VariableTable::variableExists(const std::string& variable) const {
+    return symbolExists(variable);
+}
+
+std::unordered_set<std::string> VariableTable::getAllVariables() const {
+    return symbols;
+}

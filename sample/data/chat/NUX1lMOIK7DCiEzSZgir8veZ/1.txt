@@ -1,0 +1,67 @@
+int Parser::precedence(string s) {
+    if (s == "+"  || s == "-") {
+        return 1;
+    }
+    if (s == "*" || s == "/" || s == "%") {
+        return 2;
+    }
+    return 0;
+}
+
+vector<Token> Parser::infixToPostfix(vector<Token>& infix){
+    stack<Token> stk;
+    vector<Token> postfix;
+    for (int i = 0; i < infix.size(); i++) {
+        Token token = infix[i];
+        if(token.getTokenType() == INTEGER || token.getTokenType() == NAME){
+            postfix.push_back(token);
+        }
+        else if(token.getValue() == "("){
+            stk.push(token);
+        }
+        else if(token.getValue() == ")"){
+            while(!stk.empty() && stk.top().getValue() != "("){
+                postfix.push_back(stk.top());
+                stk.pop();
+            }
+            stk.pop(); // Removing the opening bracket "("
+        }
+        else{
+            while(!stk.empty() && precedence(token.getValue()) <= precedence(stk.top().getValue())){
+                postfix.push_back(stk.top());
+                stk.pop();
+            }
+            stk.push(infix[i]);
+        }
+    }
+    while(!stk.empty()){
+        postfix.push_back(stk.top());
+        stk.pop();
+    }
+    return postfix;
+}
+
+ASTNode* Parser::parsePostfixAST(vector<Token>& tokens, int lineNum) {
+    stack<ASTNode*> st;
+    for(Token token: tokens) {
+        ASTNode* node;
+        if(token.getTokenType() == INTEGER) {
+            node = new ConstantNode(lineNum, token.getValue());
+            st.push(node);
+        } else if (token.getTokenType() == NAME) {
+            node = new VariableNode(lineNum, token.getValue());
+            st.push(node);
+        }
+        else {
+            node = new ExprNode(lineNum, token.getValue());
+            ASTNode* secondChild = st.top();
+            st.pop();
+            ASTNode* firstChild = st.top();
+            st.pop();
+            node->children.push_back(firstChild);
+            node->children.push_back(secondChild);
+            st.push(node);
+        }
+    }
+    return st.top();
+}

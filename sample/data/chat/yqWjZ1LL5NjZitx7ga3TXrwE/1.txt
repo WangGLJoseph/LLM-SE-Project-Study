@@ -1,0 +1,24 @@
+void SPFacade::storeVariable(string& variableName)
+{
+    return PopulateHandler::storeVariable(variableName);
+}
+
+void SPFacade::storeCall(int lineNumber)
+{
+    return PopulateHandler::storeCall(lineNumber);
+}
+
+void SPFacade::storeRead(int lineNumber)
+{
+    return PopulateHandler::storeRead(lineNumber);
+}
+
+void SPFacade::storePrint(int lineNumber)
+{
+    return PopulateHandler::storePrint(lineNumber);
+}
+
+void SPFacade::storeProcedure(string& procedureName)
+{
+    return PopulateHandler::storeProcedure(procedureName);
+}

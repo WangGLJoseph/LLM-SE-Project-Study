@@ -1,0 +1,12 @@
+class PKBStub {
+private:
+    std::shared_ptr<QueryResult> result;
+public:
+    PKBStub() = default;
+    PKBStub(std::vector<std::string>& stringList)
+            : result(std::make_shared<StringResult>(stringList)) {}
+
+    std::shared_ptr<QueryResult> getResult(Returnable& r, Constraint& c){
+        return result;
+    }
+};

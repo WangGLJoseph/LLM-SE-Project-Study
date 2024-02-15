@@ -1,0 +1,281 @@
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/PKB/Stores/StatementStore.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
+ChatId: JMwYQcYxmb857W2JkifHSp5w
+Code:
+const std::unordered_set<Stmt>& StatementStore::getStatements() const {
+    return statementSet;
+}
+
+void StatementStore::setStatements(const std::unordered_set<Stmt> &inputStmts) {
+    statementSet.insert(inputStmts.begin(), inputStmts.end());
+}
+
+Stmt* StatementStore::getStatementByStmtNum(StmtNum stmtNum) const {
+    for (const auto& stmt : statementSet) {
+        if (stmt.stmtNum == stmtNum) {
+            return const_cast<Stmt*>(&stmt);
+        }
+    }
+    return nullptr;
+}
+
+std::vector<Stmt*> StatementStore::getStatementsByType(StatementType type) const {
+    std::vector<Stmt*> stmts;
+    for (const auto& stmt : statementSet) {
+        if (stmt.type == type) {
+            stmts.push_back(const_cast<Stmt*>(&stmt));
+        }
+    }
+    return stmts;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/PKB/Stores/StatementStore.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
+ChatId: JMwYQcYxmb857W2JkifHSp5w
+Code:
+class StatementStore {
+public:
+    const std::unordered_set<Stmt>& getStatements() const;
+    void setStatements(const std::unordered_set<Stmt>& inputStmts);
+    Stmt* getStatementByStmtNum(StmtNum stmtNum) const;
+    std::vector<Stmt*> getStatementsByType(StatementType type) const;
+
+private:
+    std::unordered_set<Stmt> statementSet;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/PKB/Stores/EntityStore.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
+ChatId: JMwYQcYxmb857W2JkifHSp5w
+Code:
+template <typename T>
+class EntityStore {
+public:
+    void addEntities(const std::unordered_set<T> &inputEntities);
+    bool hasEntity(const T& entity) const;
+    const std::unordered_set<T>& getAllEntities() const;
+
+private:
+    std::unordered_set<T> entities;
+};
+
+template <typename T>
+void EntityStore<T>::addEntities(const std::unordered_set<T>& inputEntities) {
+    entities.insert(inputEntities.begin(), inputEntities.end());
+}
+
+template <typename T>
+bool EntityStore<T>::hasEntity(const T& entity) const {
+    return entities.count(entity) > 0;
+}
+
+template <typename T>
+const std::unordered_set<T>& EntityStore<T>::getAllEntities() const {
+    return entities;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/JgbVHgb6Vyxb5DJwrkiMKS0k?model=gpt-4&mode=chat
+ChatId: JgbVHgb6Vyxb5DJwrkiMKS0k
+Code:
+enum class StatementType {
+    READ,
+    PRINT,
+    ASSIGN,
+    CALL,
+    WHILE,
+    IF,
+};
+
+typedef std::string Procedure;
+typedef std::string Variable;
+typedef std::string Constant;
+typedef int StmtNum;
+
+struct Stmt {
+    StatementType type;
+    StmtNum stmtNum;
+
+    // must overload the == operator.
+    bool operator==(const Stmt &other) const {
+        return stmtNum == other.stmtNum && type == other.type;
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
+ChatId: JMwYQcYxmb857W2JkifHSp5w
+Code:
+namespace std {
+    template <>
+    struct hash<Stmt> {
+        std::size_t operator()(const Stmt& stmt) const {
+            return ((hash<int>()(stmt.stmtNum)
+                     ^ (hash<int>()(static_cast<int>(stmt.type)) << 1)) >> 1);
+        }
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: test table class
+ChatId: 
+Code:
+TEST_CASE("Test Table extract results") {
+    std::vector<QueryEntity> headers = {
+        createVariable("v"),
+        createConstant("c"),
+        createProcedure("p"),
+    };
+    std::vector<Row> rows = { {"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"} };
+    Table table(headers, rows);
+
+    SECTION("Test extractResults") {
+        std::vector<std::string> results = table.extractResults({ createVariable("v") });
+        REQUIRE(results == std::vector<std::string>{"x", "y", "z"});
+    }
+
+    SECTION("Test isEmpty") {
+        REQUIRE_FALSE(table.isEmpty());
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: try to extract a non-existent query entity. it should return an empty vector
+ChatId: 
+Code:
+TEST_CASE("Test Table extract results with non-existent query entity") {
+    std::vector<QueryEntity> headers = {
+       createVariable("v"),
+       createConstant("c"),
+       createProcedure("p"),
+    };
+    std::vector<Row> rows = { {"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"} };
+    Table table(headers, rows);
+
+    std::vector<std::string> results = table.extractResults({ createVariable("nonExistent") });
+    REQUIRE(results == std::vector<std::string>{});
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestQueryEntity_AI.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: write test cases that creates queryentity objects for each entity type
+ChatId: 
+Code:
+// and checks that the type and name are correctly set
+
+TEST_CASE("Creates QueryEntity for type variable1") {
+    QueryEntity qe{ createVariable("v") };
+    REQUIRE(qe.getType() == EntityType::VARIABLE);
+    REQUIRE(qe.getName() == "v");
+}
+
+
+TEST_CASE("Creates QueryEntity for type procedure") {
+    QueryEntity qe{ createProcedure("p") };
+    REQUIRE(qe.getType() == EntityType::PROCEDURE);
+    REQUIRE(qe.getName() == "p");
+}
+
+TEST_CASE("Creates QueryEntity for type constant") {
+    QueryEntity qe{ createConstant("c") };
+    REQUIRE(qe.getType() == EntityType::CONSTANT);
+    REQUIRE(qe.getName() == "c");
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/PKB/Stores/TestEntityStore.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/yzre7t43UnEzHeaMn64z5jkq?model=gpt-4&mode=chat
+ChatId: yzre7t43UnEzHeaMn64z5jkq
+Code:
+using Procedure = std::string;
+using Variable = std::string;
+using Constant = std::string;
+
+TEST_CASE("EntityStore - Base Test") {
+    EntityStore<Procedure> procedureStore;
+    std::unordered_set<Procedure> procedures = {"yishun", "bedok", "main"};
+
+    SECTION("Test addEntities and getAllEntities") {
+        procedureStore.addEntities(procedures);
+
+        REQUIRE(procedureStore.getAllEntities() == procedures);
+    }
+
+    EntityStore<Variable> variableStore;
+    std::unordered_set<Variable> variables = {"a", "b", "c"};
+
+    SECTION("Test addEntities and hasEntity") {
+        variableStore.addEntities(variables);
+
+        REQUIRE(variableStore.hasEntity("a"));
+        REQUIRE(variableStore.hasEntity("b"));
+        REQUIRE(variableStore.hasEntity("c"));
+        // Test for non-existent variable
+        REQUIRE_FALSE(variableStore.hasEntity("variable4"));
+    }
+
+    EntityStore<Constant> constantStore;
+    std::unordered_set<Constant> constants = {"1", "2", "3"};
+
+    SECTION("Test addEntities and hasEntity") {
+        constantStore.addEntities(constants);
+
+        REQUIRE(constantStore.hasEntity("1"));
+        REQUIRE(constantStore.hasEntity("2"));
+        REQUIRE(constantStore.hasEntity("3"));
+        // Test for non-existent variable
+        REQUIRE_FALSE(constantStore.hasEntity("constant4"));
+    }
+
+    EntityStore<Variable> emptyStore;
+
+    SECTION("Empty EntityStore Test") {
+        REQUIRE(emptyStore.getAllEntities().empty());
+        // Test hasEntity on an empty store
+        REQUIRE_FALSE(emptyStore.hasEntity("randomEntity"));
+    }
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-09
+Total Snippets: 9
+Total lines: 194
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 6
+PKB lines: 143
+QPS Snippets: 3
+QPS lines: 51

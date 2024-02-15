@@ -1,0 +1,32 @@
+class SimpleParser {
+public:
+   SimpleParser(); // Default constructor
+   SimpleParser(std::string filename);
+   std::shared_ptr<ASTNode> parseProgram();
+
+	// private:
+	std::vector<LexicalToken> tokenStream;
+	int tokenIndex;
+	void assertToken(LexicalToken token, LexicalTokenType type) const;
+	bool hasTokensLeft() const;
+	LexicalToken peekToken() const;
+	LexicalToken getToken();
+	std::shared_ptr<ASTNode> parseProcedure();
+	std::shared_ptr<ASTNode> parseStmtLst();
+	std::shared_ptr<ASTNode> parseStmt();
+	std::shared_ptr<ASTNode> parseRead();
+	std::shared_ptr<ASTNode> parsePrint();
+	std::shared_ptr<ASTNode> parseCall();
+	void parseWhile();
+	void parseIf();
+	void parseAssign();
+	void parseCondExpr();
+	void parseRelExpr();
+	void parseRelFactor();
+	void parseExpr();
+	void parseTerm();
+	void parseFactor();
+	void parseVarName();
+	void parseProcName();
+	void parseConstValue();
+};

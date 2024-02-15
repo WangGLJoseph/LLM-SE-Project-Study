@@ -1,0 +1,225 @@
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/pkb/entities/Statement.h
+Generator: gpt-4
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/vq9W243AjR6xwog4KY3Uw2zH?mode=chat
+#pragma once
+#include <functional>
+
+enum StatementType {
+  ASSIGN,
+  CALL,
+  IF,
+  PRINT,
+  READ,
+  WHILE,
+};
+
+class Statement {
+ protected:
+  int lineNumber;  // Line number of the statement in the source code
+  StatementType type;
+
+ public:
+  Statement(int lineNumber, StatementType type)
+      : lineNumber(lineNumber), type(type) {}
+
+  // Getters
+  int getLineNumber() const { return lineNumber; }
+
+  // Virtual destructor for proper cleanup of derived types
+  virtual ~Statement() = default;
+
+  bool operator==(const Statement &stmt) const {
+    return (lineNumber == stmt.lineNumber);
+  }
+
+  Statement &operator=(const Statement &stmt) {
+    lineNumber = stmt.lineNumber;
+    type = stmt.type;
+    return *this;
+  }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/pkb/entities/Statement.h
+Generator: gpt-4
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/CAJRGV0RgoAPNYZ1pdq8yZPk?mode=chat
+namespace std {
+template <>
+struct hash<Statement> {
+  size_t operator()(const Statement &stmt) const {
+    // Custom hash function implementation based on statement's properties
+    return hash<int>()(stmt.getLineNumber());
+  }
+};
+}  // namespace std
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/source_processor/design_extractor/storage_manager/EntityWriter.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+void EntityWriter::insertProcedure(std::shared_ptr<ProcedureNode>& procedureNode) {
+  auto procedure = Procedure(procedureNode->procedureName);
+  pkb->getProcedureManager().insert(procedure);
+}
+
+void EntityWriter::insertRead(std::shared_ptr<ReadNode>& readNode) {
+  auto read = Read(readNode->stmtNum);
+  auto variable = Variable(readNode->varName);
+  pkb->getReadManager().insert(read);
+  pkb->getVariableManager().insert(variable);
+}
+
+void EntityWriter::insertPrint(std::shared_ptr<PrintNode>& printNode) {
+  auto print = Print(printNode->stmtNum);
+  auto variable = Variable(printNode->varName);
+  pkb->getPrintManager().insert(print);
+  pkb->getVariableManager().insert(variable);
+}
+
+bool EntityWriter::containsProcedure(std::string procedureName) {
+  return pkb->getProcedureManager().contains(Procedure(std::move(procedureName)));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/source_processor/design_extractor/storage_manager/StorageManager.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+std::shared_ptr<EntityWriter> StorageManager::getEntityWriter(std::shared_ptr<PKB>& pkb) {
+    if (!entityWriter) {
+        entityWriter = std::make_shared<EntityWriter>(pkb);
+    }
+    return entityWriter;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/source_processor/design_extractor/visitor/EntityVisitor.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+EntityVisitor::EntityVisitor(std::shared_ptr<EntityWriter> entityWriter): entityWriter(std::move(entityWriter)) {}
+
+// entry point into visitor pattern loop
+void EntityVisitor::extractStatement(std::shared_ptr<StmtNode>& node) {
+  node->accept(*this);
+}
+
+void EntityVisitor::extractProcedure(std::shared_ptr<ProcedureNode>& procNode) {
+  // checks if a procedure of the same name already exists
+  if (entityWriter->containsProcedure(procNode->procedureName)) {
+    throw DesignExtractorException(DesignExtractorDuplicateProcName + procNode->procedureName);
+  }
+
+  entityWriter->insertProcedure(procNode);
+  MainExtractor::extractStatementList(procNode->stmtListNode);
+}
+
+void EntityVisitor::visit(std::shared_ptr<ProcedureNode>& procNode) {
+  extractProcedure(procNode);
+}
+
+void EntityVisitor::visit(std::shared_ptr<ReadNode>& readNode) {
+  entityWriter->insertRead(readNode);
+}
+
+void EntityVisitor::visit(std::shared_ptr<PrintNode>& printNode) {
+  entityWriter->insertPrint(printNode);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/utility/validator/SyntaxValidator.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+/* Validates if the given string is an integer.
+ * Strings starting with 0 and containing only digits are not considered valid integers.
+ * @param str - the string to be validated
+ * @return true if the string is an integer, false otherwise
+ */
+bool SyntaxValidator::validateInteger(const std::string& str) {
+    if (str.empty()) {
+        return false;
+    }
+
+    if (str[0] == '0' && str.size() > 1) {
+        return false;
+    }
+
+    return std::all_of(str.begin(), str.end(), isdigit);
+}
+
+/* Validates if the given string is a valid name, which is a string that starts with an alphabet and contains only
+ * alphabets and digits
+ * @param str - the string to be validated
+ * @return true if the string is a valid name, false otherwise
+ */
+bool SyntaxValidator::validateName(const std::string& str) {
+    if (str.empty()) {
+        return false;
+    }
+
+    if (!std::isalpha(str[0])) {
+        return false;
+    }
+
+    return std::all_of(str.begin(), str.end(), isalnum);
+}
+
+/* Validates if the given parentheses are closed properly.
+ * Open parentheses must be closed by the same type of parentheses and in the correct order.
+ * We use a stack to keep track.
+ * @param str - the string to be validated
+ * @return true if the parentheses are closed properly, false otherwise
+ */
+bool SyntaxValidator::validateParentheses(const std::string& str) {
+    std::vector<char> stack;
+    for (char c: str) {
+        if (c == '(' || c == '{') {
+            stack.push_back(c);
+        } else if (c == ')' || c == '}') {
+            if (stack.empty()) {
+                return false;
+            }
+            char top = stack.back();
+            stack.pop_back();
+            if ((c == ')' && top != '(') || (c == '}' && top != '{')) {
+                return false;
+            }
+        }
+    }
+    return stack.empty();
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-12
+Total Snippets: 6
+Total lines: 163
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 2
+PKB lines: 49
+QPS Snippets: 0
+QPS lines: 0

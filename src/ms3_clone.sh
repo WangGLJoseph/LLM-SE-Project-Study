@@ -23,10 +23,8 @@ for team_number in $(seq 1 $team_numbers); do
   # Format team numbers with leading zeros
   formatted_team_number=$(printf "%02d" $team_number)
 
-  # Team numbers 08, 18, and 29 have different suffixes (replace with your team names)
-  if [ "$formatted_team_number" == "08" ]; then
-    team_type="java"
-  elif [ "$formatted_team_number" == "18" ] || [ "$formatted_team_number" == "29" ]; then
+  # Team 14 has different suffix (replace with your team names)
+  if [ "$formatted_team_number" == "14" ]; then
     team_type="win"
   else
     team_type="cp"

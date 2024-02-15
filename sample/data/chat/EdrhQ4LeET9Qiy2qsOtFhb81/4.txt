@@ -1,0 +1,82 @@
+#include <unordered_map>
+#include <unordered_set>
+
+template<typename Type1, typename Type2>
+class RelationshipTable {
+private:
+    std::unordered_map<Type1, std::unordered_set<Type2>> relationships;
+
+public:
+    // Add a relationship between the first and second parameter
+    void addRelationship(const Type1& first, const Type2& second) {
+        // If 'first' is not already a key in relationships, it initializes
+        // a new unordered_set automatically and inserts 'second'.
+        relationships[first].insert(second);
+    }
+
+    // Check if a specific relationship exists
+    bool hasRelationship(const Type1& first, const Type2& second) const {
+        auto iter = relationships.find(first);
+        if (iter == relationships.end()) {
+            // 'first' not found as a key in relationships
+            return false;
+        }
+        // Check if 'second' is in the unordered_set associated with 'first'
+        return iter->second.find(second) != iter->second.end();
+    }
+
+    // Gets all second parameters associated with a given first parameter
+    std::unordered_set<Type2> getRelated(const Type1& first) const {
+        auto iter = relationships.find(first);
+        if (iter != relationships.end()) {
+            return iter->second;
+        }
+        // Return empty unordered_set if 'first' not found
+        return {};
+    }
+
+    // Gets all second parameters associated with any parameter
+    std::unordered_set<Type2> getAllRelated() const {
+        std::unordered_set<Type2> allRelated;
+        for (const auto& pair : relationships) {
+            allRelated.insert(pair.second.begin(), pair.second.end());
+        }
+        return allRelated;
+    }
+
+    // Returns all relationships
+    std::unordered_map<Type1, std::unordered_set<Type2>> getAllRelationships() const {
+        return relationships;
+    }
+
+    std::unordered_set<Type1> getKeys() const {
+        std::unordered_set<Type1> keys;
+        for (const auto& pair : relationships) {
+            keys.insert(pair.first);
+        }
+        return keys;
+    }
+
+    // Optional: Clear all stored relationships
+    void clear() {
+        relationships.clear();
+    }
+
+    // Optional: Remove specific relationship
+    bool removeRelationship(const Type1& first, const Type2& second) {
+        auto iter = relationships.find(first);
+        if (iter != relationships.end()) {
+            auto& values = iter->second;
+            auto pos = values.find(second);
+            if (pos != values.end()) {
+                values.erase(pos);
+                // Optional: Erase the key if no more related items
+                if (values.empty()) {
+                    relationships.erase(iter);
+                }
+                return true; // Successfully removed
+            }
+        }
+        return false; // Relationship not found
+    }
+};

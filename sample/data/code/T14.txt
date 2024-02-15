@@ -1,0 +1,9 @@
+Directory:../sample/repo/23s2-win-spa-team-14
+Total Snippets: 0
+Total lines: 0
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 0
+PKB lines: 0
+QPS Snippets: 0
+QPS lines: 0

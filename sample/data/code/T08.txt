@@ -1,0 +1,157 @@
+RepoName: 23s2-cp-spa-team-08
+File: Team00/Code00/src/spa/src/sp/tnode/ProcedureNode.h
+Generator: copilot
+Intervention: 3
+Language: e
+Prompt: 
+ChatId: 
+Code:
+ProcedureNode() : TNode(TNodeType::PROCEDURE) {};
+    void setProcedureName(string procedureName) {
+        this->procedureName = procedureName;
+    }
+    void setStatementList(StatementListNode* statementListNode) {
+        statementList = statementListNode;
+    }
+    void setStartLine(int startLine) {
+        this->startLine = startLine;
+    }
+    void setEndLine(int endLine) {
+        this->endLine = endLine;
+    }
+    string getProcedureName() {
+        return procedureName;
+    }
+    StatementListNode* getStatementList() {
+        return statementList;
+    }
+    int getStartLine() {
+        return startLine;
+    }
+    int getEndLine() {
+        return endLine;
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+while (source[stringIndex] == ' ' || source[stringIndex] == '\t' || source[stringIndex] == '\n') {
+            if (source[stringIndex] == '\n') {
+                line++;
+            }
+            stringIndex++;
+        }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: 
+ChatId: 
+Code:
+if (isalpha(source[stringIndex])) {
+            string value;
+            while (isalnum(source[stringIndex]) && stringIndex < source.size()) {
+                value += source[stringIndex];
+                stringIndex++;
+            }
+            if (value == "procedure") {
+                return {Token::TokenType::PROCEDURE, value, line};
+            } else if (value == "read") {
+                return {Token::TokenType::READ, value, line};
+            } else if (value == "print") {
+                return {Token::TokenType::PRINT, value, line};
+            } else if (value == "call") {
+                return {Token::TokenType::CALL, value, line};
+            } else if (value == "while") {
+                return {Token::TokenType::WHILE, value, line};
+            } else if (value == "if") {
+                return {Token::TokenType::IF, value, line};
+            } else if (value == "then") {
+                return {Token::TokenType::THEN, value, line};
+            } else if (value == "else") {
+                return {Token::TokenType::ELSE, value, line};
+            } else {
+                return {Token::TokenType::IDENTIFIER, value, line};
+            }
+        }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+Generator: copilot
+Intervention: 3
+Language: e
+Prompt: 
+ChatId: 
+Code:
+if (isdigit(source[stringIndex])) {
+            string value;
+            while (isdigit(source[stringIndex]) && stringIndex < source.size()) {
+                value += source[stringIndex];
+                stringIndex++;
+            }
+            //if next character is letter, it is an invalid token
+            if (isalpha(source[stringIndex])) {
+                while (isalnum(source[stringIndex]) && stringIndex < source.size()) {
+                    value += source[stringIndex];
+                    stringIndex++;
+                }
+                return {Token::TokenType::INVALID, value, line};
+            }
+            return {Token::TokenType::NUMBER, value, line};
+        }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+switch (c) {
+            case ';':
+                return {Token::TokenType::SEMICOLON, ";", line};
+            case '(':
+                return {Token::TokenType::OPEN_BRACKET, "(", line};
+            case ')':
+                return {Token::TokenType::CLOSE_BRACKET, ")", line};
+            case '{':
+                return {Token::TokenType::OPEN_BRACE, "{", line};
+            case '}':
+                return {Token::TokenType::CLOSE_BRACE, "}", line};
+            case '+':
+                return {Token::TokenType::PLUS, "+", line};
+            case '-':
+                return {Token::TokenType::MINUS, "-", line};
+            case '*':
+                return {Token::TokenType::MULTIPLY, "*", line};
+            case '/':
+                return {Token::TokenType::DIVIDE, "/", line};
+            case '%':
+                return {Token::TokenType::MODULO, "%", line};
+            case '=':
+                return {Token::TokenType::EQUAL, "=", line};
+            case '>':
+                return {Token::TokenType::GREATER, ">", line};
+            case '<':
+                return {Token::TokenType::LESSTHAN, "<", line};
+            default:
+                return {Token::TokenType::INVALID, string(1, source[stringIndex]), line};
+        }
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-08
+Total Snippets: 5
+Total lines: 103
+SP Snippets: 5
+SP lines: 103
+PKB Snippets: 0
+PKB lines: 0
+QPS Snippets: 0
+QPS lines: 0

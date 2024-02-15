@@ -1,0 +1,307 @@
+RepoName: 23s2-cp-spa-team-13
+File: Team13/Code13/src/spa/src/SP/Parser/Parser.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/NUX1lMOIK7DCiEzSZgir8veZ?model=gpt-4&mode=chat
+ChatId: NUX1lMOIK7DCiEzSZgir8veZ
+Code:
+int Parser::precedence(string s) {
+    if (s == "+"  || s == "-") {
+        return 1;
+    }
+    if (s == "*" || s == "/" || s == "%") {
+        return 2;
+    }
+    return 0;
+}
+
+vector<Token> Parser::infixToPostfix(vector<Token>& infix){
+    stack<Token> stk;
+    vector<Token> postfix;
+    for (int i = 0; i < infix.size(); i++) {
+        Token token = infix[i];
+        if(token.getTokenType() == INTEGER || token.getTokenType() == NAME){
+            postfix.push_back(token);
+        }
+        else if(token.getValue() == "("){
+            stk.push(token);
+        }
+        else if(token.getValue() == ")"){
+            while(!stk.empty() && stk.top().getValue() != "("){
+                postfix.push_back(stk.top());
+                stk.pop();
+            }
+            stk.pop(); // Removing the opening bracket "("
+        }
+        else{
+            while(!stk.empty() && precedence(token.getValue()) <= precedence(stk.top().getValue())){
+                postfix.push_back(stk.top());
+                stk.pop();
+            }
+            stk.push(infix[i]);
+        }
+    }
+    while(!stk.empty()){
+        postfix.push_back(stk.top());
+        stk.pop();
+    }
+    return postfix;
+}
+
+ASTNode* Parser::parsePostfixAST(vector<Token>& tokens, int lineNum) {
+    stack<ASTNode*> st;
+    for(Token token: tokens) {
+        ASTNode* node;
+        if(token.getTokenType() == INTEGER) {
+            node = new ConstantNode(lineNum, token.getValue());
+            st.push(node);
+        } else if (token.getTokenType() == NAME) {
+            node = new VariableNode(lineNum, token.getValue());
+            st.push(node);
+        }
+        else {
+            node = new ExprNode(lineNum, token.getValue());
+            ASTNode* secondChild = st.top();
+            st.pop();
+            ASTNode* firstChild = st.top();
+            st.pop();
+            node->children.push_back(firstChild);
+            node->children.push_back(secondChild);
+            st.push(node);
+        }
+    }
+    return st.top();
+}
+--------------------
+RepoName: 23s2-cp-spa-team-13
+File: Team13/Code13/src/spa/src/PKB/Facade/SPTalker.cpp
+Generator: gpt
+Intervention: 3
+Language: e
+Prompt: 
+ChatId: 
+Code:
+//promt: wirte the SPTalker skeleton (given uml)
+
+#include "SPTalker.h"
+
+bool SPTalker::numberOfStmt(int num) {
+    return pkb.setTotalNumStmt(num);
+}
+
+bool SPTalker::variable(int stmt, std::string variable) {
+    return pkb.addVariable(stmt, variable);
+}
+
+bool SPTalker::ifStmt(int stmt) {
+    return pkb.addIfs(stmt);
+}
+
+bool SPTalker::whileStmt(int stmt) {
+    return pkb.addWhile(stmt);
+}
+
+bool SPTalker::assignStmt(int stmt) {
+    return pkb.addAssign(stmt);
+}
+
+bool SPTalker::followStmt(int stmt1, int stmt2) {
+    pkb.addFollows(stmt1, stmt2);
+    return true;
+}
+
+bool SPTalker::parentStmt(int stmt, std::vector<int> list) {
+    for (int i = 0; i < list.size(); i++) {
+        pkb.addParentAndChild(stmt, list[i]);
+    }
+    return true;
+}
+
+bool SPTalker::parentStarStmt(int stmt, std::vector<int> list) {
+    pkb.addParentAndChildStar(stmt, list);
+    return true;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-13
+File: Team13/Code13/src/spa/src/PKB/ParentRelation.cpp
+Generator: gpt
+Intervention: 3
+Language: e
+Prompt: write the parentrelation class; write doxygen comments for class
+ChatId: 
+Code:
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include "ParentRelation.h"
+
+    void ParentRelation::addParentAndChild(int stmt1, int stmt2) {
+        parent[stmt1].push_back(stmt2);
+        child.insert({ stmt2, stmt1 });
+    }
+
+
+    bool ParentRelation::isParent(int stmt1, int stmt2) {
+        if (parent.count(stmt1) > 0 && !parent[stmt1].empty()) {
+            std::vector<int> childList = parent[stmt1];
+            auto it = std::find(childList.begin(), childList.end(), stmt2);
+            return it != childList.end();
+        }
+        return false;
+    }
+
+    int ParentRelation::whoParent(int stmt) {
+        return child[stmt];
+    }
+
+    std::vector<int> ParentRelation::whoChild(int stmt) {
+        return parent[stmt];
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-13
+File: Team13/Code13/src/spa/src/PKB/ParentRelationStar.cpp
+Generator: gpt
+Intervention: 3
+Language: e
+Prompt: 
+ChatId: 
+Code:
+//promt: wirte the ParentRelationStar class;
+
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include "ParentRelationStar.h"
+
+void ParentRelationStar::addParentAndChild(int stmt1, int stmt2) {
+    parentStar[stmt1].push_back(stmt2);
+    childStar[stmt2].push_back(stmt1);
+}
+
+
+bool ParentRelationStar::isParent(int stmt1, int stmt2) {
+    if (parentStar.count(stmt1) > 0 && !parentStar[stmt1].empty()) {
+        std::vector<int> childList = parentStar[stmt1];
+        auto it = std::find(childList.begin(), childList.end(), stmt2);
+        return it != childList.end();
+    }
+    return false;
+}
+
+std::vector<int> ParentRelationStar::whoChild(int stmt) {
+    return parentStar[stmt];
+}
+
+
+void ParentRelationStar::parseParentList(int stmt, std::vector<int> list) {
+    for (int i = 0; i < list.size(); i++) {
+        if (!isParent(stmt, list[i])) {
+            addParentAndChild(stmt, list[i]);
+        }
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-13
+File: Team13/Code13/src/spa/src/PKB/FollowsRelation.cpp
+Generator: gpt
+Intervention: 3
+Language: e
+Prompt: 
+ChatId: 
+Code:
+//promt: write the followsrelation class;
+
+#include <unordered_map>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+#include <list>
+#include "FollowsRelation.h"
+
+    void FollowsRelation::addFollows(int stmt1, int stmt2) {
+        if (inSeen(stmt1)) {
+            int stmtToAdd = stmt1;
+            while (seen.find(stmtToAdd) != seen.end()) {
+                follows[rootSeen(stmtToAdd)].push_back(stmt2);
+                stmtToAdd = rootSeen(stmtToAdd);
+            }
+            follows[stmt1].push_back(stmt2);
+            addSeen(stmt1, stmt2);
+        } else {
+            follows[stmt1].push_back(stmt2);
+            addSeen(stmt1, stmt2);
+        }
+
+        if (inSeenReversed(stmt2)) {
+            followed[rootSeenReversed(stmt2)].push_back(stmt1);
+            followed[stmt2].push_back(stmt1);
+            addSeenReversed(stmt1, stmt2);
+        } else {
+            followed[stmt2].push_back(stmt1);
+            addSeenReversed(stmt1, stmt2);
+        }
+    }
+
+    void FollowsRelation::addSeen(int stmt1, int stmt2) {
+        seen.insert({stmt2, stmt1});
+    }
+
+    void FollowsRelation::addSeenReversed(int stmt1, int stmt2) {
+        seenReversed.insert({stmt1, stmt2});
+    }
+
+
+    bool FollowsRelation::inSeen(int stmt) {
+        return seen.find(stmt) != seen.end();
+    }
+
+    bool FollowsRelation::inSeenReversed(int stmt) {
+        return seenReversed.find(stmt) != seenReversed.end();
+    }
+
+
+    int FollowsRelation::rootSeen(int stmt) {
+        if (inSeen(stmt)) {
+            return seen.find(stmt)->second;
+        }
+        return stmt;
+    }
+
+    int FollowsRelation::rootSeenReversed(int stmt) {
+        if (inSeenReversed(stmt)) {
+            return rootSeenReversed(seenReversed.find(stmt)->second);
+        }
+        return stmt;
+    }
+
+    bool FollowsRelation::isFollows(int stmt1, int stmt2) {
+        if (follows.count(stmt1) > 0 && !follows[stmt1].empty()) {
+            std::cout << follows[stmt1][0] << std::endl;
+            return follows[stmt1][0] == stmt2;
+        }
+        return false;
+    }
+
+    int FollowsRelation::whoFollow(int stmt) {
+        std::vector<int> &v = follows[stmt];
+        return *std::min_element(v.begin(), v.end());
+    }
+
+    std::vector<int> FollowsRelation::whoFollowsStar(int stmt) {
+        std::vector<int> v = follows[stmt];
+        std::sort(v.begin(), v.end());
+        return v;
+    }
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-13
+Total Snippets: 5
+Total lines: 259
+SP Snippets: 1
+SP lines: 69
+PKB Snippets: 4
+PKB lines: 190
+QPS Snippets: 0
+QPS lines: 0

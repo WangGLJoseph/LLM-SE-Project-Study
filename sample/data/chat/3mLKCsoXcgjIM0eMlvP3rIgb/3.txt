@@ -1,0 +1,12 @@
+class ReadStmt : public Stmt {
+public:
+    ReadStmt(const LexicalToken& variable, int start, int end);
+
+    std::shared_ptr<ASTNode> buildTree() override;
+    int getStartLine() const override;
+    int getEndLine() const override;
+
+private:
+    LexicalToken variable;
+    std::pair<int, int> lines;
+};

@@ -1,0 +1,8 @@
+TEST_CASE("ReadStmt parsing throws an error with invalid syntax", "[SimpleParser]") {
+	const std::string testFileName = "../../../../../tests/sp/ParserTest/CallStmt1.txt";
+	REQUIRE(std::filesystem::exists(testFileName));
+	SimpleParser parser(testFileName);
+
+	// For this test, we expect parsing to terminate due to erroneous input.
+	CHECK_THROWS_AS(parser.parseRead(), std::runtime_error);
+}

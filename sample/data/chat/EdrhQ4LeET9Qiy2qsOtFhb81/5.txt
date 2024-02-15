@@ -1,0 +1,23 @@
+TEST_CASE("FollowsTable basic functionality", "[FollowsTable]") {
+    FollowsTable followTable;
+
+    SECTION("Adding and checking simple relationships") {
+        // Assumption: "B" follows "A", and "C" doesFollow "B"
+        followTable.addRelationship("A", "B");
+        followTable.addRelationship("B", "C");
+
+        REQUIRE(followTable.doesFollow("A", "B") == true );
+        REQUIRE(followTable.doesFollow("B", "C") == true );
+        REQUIRE(followTable.doesFollow("A", "C") == false ); // "C" does not directly follow "A"
+    }
+
+    SECTION("Retrieving related elements") {
+        followTable.addRelationship("X", "Y");
+        followTable.addRelationship("X", "Z");  // "X" has multiple followers: "Y" and "Z"
+
+        auto related = followTable.getRelated("X");
+        REQUIRE( std::find(related.begin(), related.end(), "Y") != related.end() );
+        REQUIRE( std::find(related.begin(), related.end(), "Z") != related.end() );
+        REQUIRE( related.size() == 2 );  // Only "Y" and "Z" are related to "X"
+    }
+}

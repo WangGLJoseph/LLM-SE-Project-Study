@@ -1,0 +1,454 @@
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/QPS/QueryEvaluator/EResult.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+public:
+    std::vector<std::string> results{};
+
+    EResult();
+
+    std::vector<std::string>& getResults();
+
+    void addResult(const std::string& result);
+
+    void addResults(const std::vector<std::string>& results);
+
+    bool empty() const;
+
+    void clear();
+
+    size_t size() const;
+
+    std::string at(size_t index);
+
+    std::string operator[](size_t index);
+
+    void removeDuplicates();
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/SP/DesignExtractor/EntityExtractor.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+std::vector<std::string> expression = {assignStmt->expressionPtr->representation};
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Tables/FollowsTable.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
+ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
+Code:
+class FollowsTable : public RelationshipTable<std::string, std::string> {
+public:
+    bool doesFollow(const std::string& followee, const std::string& follower) {
+        return RelationshipTable::hasRelationship(followee, follower);
+    }
+};
+
+#endif //SPA_FOLLOWSTABLE_H
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Tables/VariableTable.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
+ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
+Code:
+VariableTable::VariableTable() = default;
+
+void VariableTable::addVariable(const std::string& variable) {
+    addSymbol(variable);
+}
+
+bool VariableTable::variableExists(const std::string& variable) const {
+    return symbolExists(variable);
+}
+
+std::unordered_set<std::string> VariableTable::getAllVariables() const {
+    return symbols;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Tables/Templates/SymbolTable.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
+ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
+Code:
+/**
+ * Base class for symbol tables: VariableTable, ProcedureTable, ConstantTable
+ */
+class SymbolTable {
+public:
+    SymbolTable() {};
+
+    // Adds a symbol to table
+    void addSymbol(const std::string& symbol) {
+        symbols.insert(symbol);
+    }
+
+    // Checks if a symbol exists in table
+    bool symbolExists(const std::string& symbol) const {
+        return symbols.count(symbol) > 0;
+    }
+
+    // Returns all symbols
+    std::unordered_set<std::string> getAllSymbols() const {
+        return symbols;
+    }
+
+protected:
+    std::unordered_set<std::string> symbols;
+};
+
+#endif // SYMBOLTABLE_H
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Tables/Templates/RelationshipTable.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
+ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
+Code:
+#include <unordered_map>
+#include <unordered_set>
+
+template<typename Type1, typename Type2>
+class RelationshipTable {
+private:
+    std::unordered_map<Type1, std::unordered_set<Type2>> relationships;
+
+public:
+    // Add a relationship between the first and second parameter
+    void addRelationship(const Type1& first, const Type2& second) {
+        // If 'first' is not already a key in relationships, it initializes
+        // a new unordered_set automatically and inserts 'second'.
+        relationships[first].insert(second);
+    }
+
+    // Check if a specific relationship exists
+    bool hasRelationship(const Type1& first, const Type2& second) const {
+        auto iter = relationships.find(first);
+        if (iter == relationships.end()) {
+            // 'first' not found as a key in relationships
+            return false;
+        }
+        // Check if 'second' is in the unordered_set associated with 'first'
+        return iter->second.find(second) != iter->second.end();
+    }
+
+    // Gets all second parameters associated with a given first parameter
+    std::unordered_set<Type2> getRelated(const Type1& first) const {
+        auto iter = relationships.find(first);
+        if (iter != relationships.end()) {
+            return iter->second;
+        }
+        // Return empty unordered_set if 'first' not found
+        return {};
+    }
+
+    // Gets all second parameters associated with any parameter
+    std::unordered_set<Type2> getAllRelated() const {
+        std::unordered_set<Type2> allRelated;
+        for (const auto& pair : relationships) {
+            allRelated.insert(pair.second.begin(), pair.second.end());
+        }
+        return allRelated;
+    }
+
+    // Returns all relationships
+    std::unordered_map<Type1, std::unordered_set<Type2>> getAllRelationships() const {
+        return relationships;
+    }
+
+    std::unordered_set<Type1> getKeys() const {
+        std::unordered_set<Type1> keys;
+        for (const auto& pair : relationships) {
+            keys.insert(pair.first);
+        }
+        return keys;
+    }
+
+    // Optional: Clear all stored relationships
+    void clear() {
+        relationships.clear();
+    }
+
+    // Optional: Remove specific relationship
+    bool removeRelationship(const Type1& first, const Type2& second) {
+        auto iter = relationships.find(first);
+        if (iter != relationships.end()) {
+            auto& values = iter->second;
+            auto pos = values.find(second);
+            if (pos != values.end()) {
+                values.erase(pos);
+                // Optional: Erase the key if no more related items
+                if (values.empty()) {
+                    relationships.erase(iter);
+                }
+                return true; // Successfully removed
+            }
+        }
+        return false; // Relationship not found
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Tables/AssignmentTable.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <utility> // Needed for std::pair
+
+class AssignmentTable {
+private:
+    std::unordered_map<std::string, std::vector<std::pair<int, std::vector<std::string>>>> assignments;
+
+public:
+    // Adds a new assignment to the vector of pairs associated with the variable
+    void addAssignment(const std::string& variable, int statementNum, const std::vector<std::string>& valueList) {
+        assignments[variable].emplace_back(statementNum, valueList);
+    }
+
+    // Retrieves the list of assignments (pairs of int and vector of strings) for a variable
+    std::vector<std::pair<int, std::vector<std::string>>> getAssignments(const std::string& variable) const {
+        auto it = assignments.find(variable);
+        if (it != assignments.end()) {
+            return it->second;
+        }
+        return {}; // Return empty if not found
+    }
+
+    // Retrieves all assignments
+    std::unordered_map<std::string, std::vector<std::pair<int, std::vector<std::string>>>> getAllAssignments() const {
+        return assignments;
+    }
+
+    // Checks if a variable has any assignment
+    bool hasAssignment(const std::string& variable) const {
+        return assignments.find(variable) != assignments.end();
+    }
+
+    // Removes all assignments for a variable
+    bool removeAssignments(const std::string& variable) {
+        auto it = assignments.find(variable);
+        if (it != assignments.end()) {
+            assignments.erase(it);
+            return true;
+        }
+        return false;
+    }
+
+    // Clears all assignments
+    void clear() {
+        assignments.clear();
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/unit_testing/src/PKB/TestFollowsTable.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
+ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
+Code:
+TEST_CASE("FollowsTable basic functionality", "[FollowsTable]") {
+    FollowsTable followTable;
+
+    SECTION("Adding and checking simple relationships") {
+        // Assumption: "B" follows "A", and "C" doesFollow "B"
+        followTable.addRelationship("A", "B");
+        followTable.addRelationship("B", "C");
+
+        REQUIRE(followTable.doesFollow("A", "B") == true );
+        REQUIRE(followTable.doesFollow("B", "C") == true );
+        REQUIRE(followTable.doesFollow("A", "C") == false ); // "C" does not directly follow "A"
+    }
+
+    SECTION("Retrieving related elements") {
+        followTable.addRelationship("X", "Y");
+        followTable.addRelationship("X", "Z");  // "X" has multiple followers: "Y" and "Z"
+
+        auto related = followTable.getRelated("X");
+        REQUIRE( std::find(related.begin(), related.end(), "Y") != related.end() );
+        REQUIRE( std::find(related.begin(), related.end(), "Z") != related.end() );
+        REQUIRE( related.size() == 2 );  // Only "Y" and "Z" are related to "X"
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/unit_testing/src/PKB/TestPKB.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
+ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
+Code:
+TEST_CASE("PkbWriteFacade::AddVariable adds a variable successfully", "[PkbWriteFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    SECTION("Add variable") {
+        writeFacade.AddVariable("x");
+        REQUIRE(readFacade.VariableExists("x") == true);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/unit_testing/src/PKB/TestPKB.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+TEST_CASE("PkbWriteFacade::AddReadStatement adds multiple read statements of the same variable successfully", "[PkbWriteFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+    std::string variable = "x";
+
+    SECTION("Add multiple read statements of the same variable") {
+        writeFacade.AddReadStatement(variable, 1);
+        writeFacade.AddReadStatement(variable, 2);
+
+        std::unordered_set<int> statementNums = readFacade.GetReadStatementNums(variable);
+        REQUIRE(statementNums.size() == 2);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/unit_testing/src/PKB/TestGetAllPKB.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+TEST_CASE("PkbReadFacade::GetAllProcedures returns all procedures", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddProcedure("proc1");
+    writeFacade.AddProcedure("proc2");
+
+    auto allProcedures = readFacade.GetAllProcedures();
+    REQUIRE(allProcedures.size() == 2);
+    REQUIRE(allProcedures.find("proc1") != allProcedures.end());
+    REQUIRE(allProcedures.find("proc2") != allProcedures.end());
+}
+
+TEST_CASE("PkbReadFacade::GetAllConstants returns all constants", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddConstant("1");
+    writeFacade.AddConstant("2");
+
+    auto allConstants = readFacade.GetAllConstants();
+    REQUIRE(allConstants.size() == 2);
+    REQUIRE(allConstants.find("1") != allConstants.end());
+    REQUIRE(allConstants.find("2") != allConstants.end());
+}
+
+TEST_CASE("PkbReadFacade::GetAllVariables returns all variables", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddVariable("x");
+    writeFacade.AddVariable("y");
+
+    auto allVariables = readFacade.GetAllVariables();
+    REQUIRE(allVariables.size() == 2);
+    REQUIRE(allVariables.find("x") != allVariables.end());
+    REQUIRE(allVariables.find("y") != allVariables.end());
+}
+
+TEST_CASE("PkbReadFacade::GetAllReadStatementNums returns all read statement numbers", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddReadStatement("x", 1);
+    writeFacade.AddReadStatement("y", 2);
+
+    auto allReadStatementNums = readFacade.GetAllReadStatementNums();
+    REQUIRE(allReadStatementNums.size() == 2);
+    REQUIRE(allReadStatementNums.find(1) != allReadStatementNums.end());
+    REQUIRE(allReadStatementNums.find(2) != allReadStatementNums.end());
+}
+
+TEST_CASE("PkbReadFacade::GetAllReadVariables returns all read variables", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddReadStatement("x", 1);
+    writeFacade.AddReadStatement("y", 2);
+
+    auto allReadVariables = readFacade.GetAllReadVariables();
+    REQUIRE(allReadVariables.size() == 2);
+    REQUIRE(allReadVariables.find("x") != allReadVariables.end());
+    REQUIRE(allReadVariables.find("y") != allReadVariables.end());
+}
+
+TEST_CASE("PkbReadFacade::GetAllPrintStatementNums returns all print statement numbers", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddPrintStatement("x", 1);
+    writeFacade.AddPrintStatement("y", 2);
+
+    auto allPrintStatementNums = readFacade.GetAllPrintStatementNums();
+    REQUIRE(allPrintStatementNums.size() == 2);
+    REQUIRE(allPrintStatementNums.find(1) != allPrintStatementNums.end());
+    REQUIRE(allPrintStatementNums.find(2) != allPrintStatementNums.end());
+}
+
+TEST_CASE("PkbReadFacade::GetAllPrintVariables returns all print variables", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddPrintStatement("x", 1);
+    writeFacade.AddPrintStatement("y", 2);
+
+    auto allPrintVariables = readFacade.GetAllPrintVariables();
+    REQUIRE(allPrintVariables.size() == 2);
+    REQUIRE(allPrintVariables.find("x") != allPrintVariables.end());
+    REQUIRE(allPrintVariables.find("y") != allPrintVariables.end());
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-17
+Total Snippets: 11
+Total lines: 346
+SP Snippets: 1
+SP lines: 1
+PKB Snippets: 9
+PKB lines: 323
+QPS Snippets: 1
+QPS lines: 22

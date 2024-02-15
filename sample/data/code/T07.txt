@@ -1,0 +1,351 @@
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/SP/DesignExtractor/DesignExtractor.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
+ChatId: ZsoRSuHE0htMcUNCW0FDRVqn
+Code:
+#include "PKB/PKBWriter.h"
+#include "SP/Parser/TNode.h"
+
+#pragma once
+
+class DesignExtractor {
+protected:
+    std::shared_ptr<PKBWriter> pkbWriter;
+
+public:
+    DesignExtractor(std::shared_ptr<PKBWriter> pkb);
+    virtual ~DesignExtractor();
+    virtual void extractData(TNode *node) = 0; // pure virtual function
+};
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/SP/DesignExtractor/ConstExtractor.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
+ChatId: ZsoRSuHE0htMcUNCW0FDRVqn
+Code:
+#include "ConstExtractor.h"
+#include "SP/Parser/TNode.h"
+#include <string>
+
+ConstExtractor::ConstExtractor(std::shared_ptr<PKBWriter> pkbWriter) : DesignExtractor(pkbWriter) {}
+ConstExtractor::~ConstExtractor() {}
+
+// TODO: Uncomment when structure to store in PKB is created
+/* void ConstExtractor::extractData(TNode *node) {
+        if (node->getType() == TNode::NodeType::CONSTANT) {
+            std::string value = node->getValue();
+            int intValue = std::stoi(value);
+            int stmtNum = node->getLine();
+            //TODO: add to PKB
+        } else {
+            return;
+        }
+}*/
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/SP/DesignExtractor/DesignExtractor.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
+ChatId: ZsoRSuHE0htMcUNCW0FDRVqn
+Code:
+#include "DesignExtractor.h"
+#include "SP/Parser/TNode.h"
+
+DesignExtractor::DesignExtractor(std::shared_ptr<PKBWriter> pkb) : pkbWriter(pkb) {}
+DesignExtractor::~DesignExtractor() {}
+
+void DesignExtractor::extractData(TNode *node) {
+    this->extractData(node);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbWriterManager.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
+ChatId: bVeV9rb56ugv0wmNcuji4KuH
+Code:
+TEST_CASE("PkbWriterManager adds statements and variables correctly", "[PkbWriterManager]") {
+
+    auto stmtManager = std::make_shared<StatementManager>();
+    auto varManager = std::make_shared<VariableManager>();
+
+    PkbWriterManager writer(stmtManager, varManager);
+
+    // Test adding a statement
+    TNode testNode = TNode(TNode::NodeType::STATEMENT_LIST, "testValue", 1);
+    auto node = std::make_shared<TNode>(testNode);
+    writer.addStatement(EnumType::StatementType::PRINT, 1, node);
+
+    std::map<int, std::shared_ptr<TNode>> stmtMap = stmtManager->getStatement(EnumType::StatementType::PRINT);
+    REQUIRE(stmtMap[1] == node); // Checks if the memory locations are equal
+
+    // Test adding a variable
+    std::string varName = "TestVariable";
+    writer.addVariable(1, varName);
+
+    std::map<int, std::string> varMap = varManager->getAllVariables();
+    REQUIRE(varMap[1] == varName);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestVariableManager.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
+ChatId: bVeV9rb56ugv0wmNcuji4KuH
+Code:
+TEST_CASE("VariableManager is initialized correctly", "[VariableManager]") {
+    VariableManager manager;
+
+    std::map<int, std::string> map = manager.getAllVariables();
+    REQUIRE(map.empty() == true); // Checking that variable map is empty initially
+}
+
+TEST_CASE("VariableManager adds and gets variables correctly", "[VariableManager]") {
+    VariableManager manager;
+
+    int stmtNo = 1;
+    std::string varName = "TestVariable";
+    manager.addVariable(stmtNo, varName);
+
+    std::map<int, std::string> map = manager.getAllVariables();
+
+    REQUIRE(map.empty() == false);   // Checking that variable map is not empty after adding node
+    REQUIRE(map[stmtNo] == varName); // Checking that added variable is retrieved correctly
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbReaderManager.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
+ChatId: bVeV9rb56ugv0wmNcuji4KuH
+Code:
+// Note: The tests assume that adding a nullptr TNode to the StatementManager is fine. If this isn't the case, the tests won't work correctly because we're not giving TNodes much information upon creation. Alternatively, you could give TNode a constructor that takes an integer, which you could then use as part of your assertions.
+TEST_CASE("PkbReaderManager is initialized correctly", "[PkbReaderManager]") {
+
+    auto stmtManager = std::make_shared<StatementManager>();
+    auto varManager = std::make_shared<VariableManager>();
+
+    PkbReaderManager reader(stmtManager, varManager);
+
+    for (auto statementType : {EnumType::StatementType::PRINT, EnumType::StatementType::READ,
+                               EnumType::StatementType::ASSIGN, EnumType::StatementType::WHILE,
+                               EnumType::StatementType::IF}) {
+        INFO("Checking initializer for: " << static_cast<int>(statementType));
+        std::map<int, std::shared_ptr<TNode>> map = reader.getStatement(statementType);
+        REQUIRE(map.empty() == true); // Checking that map is empty initially
+    }
+
+    std::map<int, std::string> varMap = reader.getVariables();
+    REQUIRE(varMap.empty() == true); // Checking that variable map is empty initially
+}
+
+TEST_CASE("PkbReaderManager gets variables correctly", "[PkbReaderManager]") {
+
+    auto stmtManager = std::make_shared<StatementManager>();
+    auto varManager = std::make_shared<VariableManager>();
+    varManager->addVariable(1, "TestVariable");
+
+    PkbReaderManager reader(stmtManager, varManager);
+
+    std::map<int, std::string> varMap = reader.getVariables();
+    REQUIRE(varMap[1] == "TestVariable");
+}
+
+TEST_CASE("PkbReaderManager gets statements correctly", "[PkbReaderManager]") {
+
+    auto stmtManager = std::make_shared<StatementManager>();
+    auto varManager = std::make_shared<VariableManager>();
+    TNode testNode = TNode(TNode::NodeType::STATEMENT_LIST, "testValue", 1);
+    auto node = std::make_shared<TNode>(testNode);
+    stmtManager->addStatement(EnumType::StatementType::PRINT, 1, node);
+
+    PkbReaderManager reader(stmtManager, varManager);
+
+    std::map<int, std::shared_ptr<TNode>> stmtMap = reader.getStatement(EnumType::StatementType::PRINT);
+    REQUIRE(stmtMap[1] == node); // Checks if the memory locations are equal
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestStatementManager.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// link: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
+// Tests
+/*
+TEST_CASE("StatementManager is initialized correctly", "[StatementManager]") {
+    StatementManager manager;
+
+    std::map<int, std::shared_ptr<TNode>> mapPrint = manager.getStatement(EnumType::StatementType::PRINT);
+    REQUIRE(mapPrint.empty() == true); // Checking that PRINT map is empty initially
+
+    std::map<int, std::shared_ptr<TNode>> mapRead = manager.getStatement(EnumType::StatementType::READ);
+    REQUIRE(mapRead.empty() == true); // Checking that READ map is empty initially
+
+    std::map<int, std::shared_ptr<TNode>> mapAssign = manager.getStatement(EnumType::StatementType::ASSIGN);
+    REQUIRE(mapAssign.empty() == true); // Checking that ASSIGN map is empty initially
+
+    std::map<int, std::shared_ptr<TNode>> mapWhile = manager.getStatement(EnumType::StatementType::WHILE);
+    REQUIRE(mapWhile.empty() == true); // Checking that WHILE map is empty initially
+
+    std::map<int, std::shared_ptr<TNode>> mapIf = manager.getStatement(EnumType::StatementType::IF);
+    REQUIRE(mapIf.empty() == true); // Checking that IF map is empty initially
+}
+
+*/
+
+TEST_CASE("StatementManager is initialized correctly", "[StatementManager]") {
+    StatementManager manager;
+
+    for (auto statementType : {EnumType::StatementType::PRINT, EnumType::StatementType::READ,
+                               EnumType::StatementType::ASSIGN, EnumType::StatementType::WHILE,
+                               EnumType::StatementType::IF}) {
+        INFO("Checking initializer for: " << static_cast<int>(statementType));
+        std::map<int, std::shared_ptr<TNode>> map = manager.getStatement(statementType);
+        REQUIRE(map.empty() == true); // Checking that map is empty initially
+    }
+}
+/*
+TEST_CASE("Adding and getting statement nodes functions correctly", "[StatementManager]") {
+    StatementManager manager;
+    auto node = std::make_shared<TNode>(TNode{1, "TestNode"});
+
+    manager.addStatement(EnumType::StatementType::PRINT, 1, node);
+
+    std::map<int, std::shared_ptr<TNode>> mapPrint = manager.getStatement(EnumType::StatementType::PRINT);
+
+    REQUIRE(mapPrint.empty() == false); // Checking that PRINT map is not empty after adding node
+    REQUIRE(mapPrint[1] == node);       // Checking that added node is retreived correctly
+
+    // Repeat similar test for other statement types: READ, ASSIGN, WHILE, IF
+}
+
+*/
+
+TEST_CASE("Adding and getting statement nodes functions correctly", "[StatementManager]") {
+    StatementManager manager;
+    int testStmtNo = 1;
+
+    for (auto statementType : {EnumType::StatementType::PRINT, EnumType::StatementType::READ,
+                               EnumType::StatementType::ASSIGN, EnumType::StatementType::WHILE,
+                               EnumType::StatementType::IF}) {
+        INFO("Adding/getting to/from statement manager for: " << static_cast<int>(statementType));
+
+        // Add statement to the manager
+        TNode node = TNode(TNode::NodeType::STATEMENT_LIST, "testValue", testStmtNo);
+        auto nodePrt = std::make_shared<TNode>(node);
+        manager.addStatement(statementType, testStmtNo, nodePrt);
+
+        // Get statement from manager
+        std::map<int, std::shared_ptr<TNode>> map = manager.getStatement(statementType);
+
+        // Verify that map is not empty after adding node
+        REQUIRE(map.empty() == false);
+        // Verify that added node is retrieved correctly
+        REQUIRE(map[testStmtNo] == nodePrt);
+        // Reset testStmtNo
+        testStmtNo++;
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/TestPKB.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
+ChatId: bVeV9rb56ugv0wmNcuji4KuH
+Code:
+TEST_CASE("Pkb is initialized correctly", "[Pkb]") {
+    Pkb pkb;
+
+    REQUIRE(pkb.createPkbWriter() != nullptr); // Checking that PkbWriter is not null
+    REQUIRE(pkb.createPkbReader() != nullptr); // Checking that PkbReader is not null
+}
+
+TEST_CASE("Pkb creates PkbWriter correctly", "[Pkb]") {
+    Pkb pkb;
+    auto writer = pkb.createPkbWriter();
+
+    REQUIRE(writer != nullptr); // Checks if the returned pointer is not null
+    // Here you can add more REQUIRE statements to verify the state of the writer, which totally depends on your needs
+}
+
+TEST_CASE("Pkb creates PkbReader correctly", "[Pkb]") {
+    Pkb pkb;
+    auto reader = pkb.createPkbReader();
+
+    REQUIRE(reader != nullptr); // Checks if the returned pointer is not null
+    // Here you can add more REQUIRE statements to verify the state of the reader, which totally depends on your needs
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/TestPKBWriter.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// link: https://platform.openai.com/playground/p/wcjKOEZyyOQFegkpA2u4xlaA?model=gpt-4&mode=chat
+
+TEST_CASE("PKBWriter and PKBReader work together correctly", "[PKB]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+
+    auto writerManager = std::make_shared<PkbWriterManager>(statementManager, variableManager);
+    PKBWriter writer(writerManager);
+
+    auto readerManager = std::make_shared<PkbReaderManager>(statementManager, variableManager);
+    PKBReader reader(readerManager);
+
+    int stmtNo = 1;
+    std::string varName = "TestVariable";
+    TNode node = TNode(TNode::NodeType::STATEMENT_LIST, "testValue", stmtNo);
+    auto nodePtr = std::make_shared<TNode>(node);
+
+    SECTION("PKBWriter adds variable and PKBReader gets it") {
+        writer.addVariable(stmtNo, varName);
+        std::vector<std::string> vars = reader.getAllVariables();
+
+        REQUIRE(vars.size() == 1);
+        REQUIRE(std::find(vars.begin(), vars.end(), varName) != vars.end());
+    }
+
+    SECTION("PKBWriter adds print statement and PKBReader gets it") {
+        writer.addPrintStatement(stmtNo, nodePtr);
+        std::vector<int> printStatements = reader.getAllPrintStatements();
+
+        REQUIRE(printStatements.size() == 1);
+        REQUIRE(std::find(printStatements.begin(), printStatements.end(), stmtNo) != printStatements.end());
+    }
+
+    // Repeat similar tests for read, assign, while, if statements
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-07
+Total Snippets: 9
+Total lines: 268
+SP Snippets: 3
+SP lines: 42
+PKB Snippets: 6
+PKB lines: 226
+QPS Snippets: 0
+QPS lines: 0

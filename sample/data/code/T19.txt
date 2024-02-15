@@ -1,0 +1,1253 @@
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/Procedure.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
+ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Code:
+class Procedure : public Grammar {
+public:
+	Procedure(int start, int end, std::shared_ptr<ASTNode> statementListTree);
+	int getStartLine() const override;
+	int getEndLine() const override;
+	std::shared_ptr<ASTNode> buildTree() override;
+
+private:
+	std::shared_ptr<ASTNode> statementListTree;
+	std::pair<int, int> lines;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/Program.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
+ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Code:
+Program::Program(int end, std::vector<std::shared_ptr<ASTNode>> procedures) {
+	this->lines = std::make_pair(1, end);
+	this->procedures = procedures;
+}
+
+int Program::getStartLine() const {
+	return this->lines.first;
+}
+
+int Program::getEndLine() const {
+	return this->lines.second;
+}
+
+std::shared_ptr<ASTNode> Program::buildTree() {
+	std::shared_ptr<ASTNode> tree = std::make_shared<ASTNode>(
+		ASTNodeType::PROGRAMS, this->lines.first, Utility::getASTNodeType(ASTNodeType::PROGRAMS)
+	);
+
+	for (auto child : this->procedures) {
+		tree.get()->addChild(child);
+	}
+
+	return tree;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/ReadStmt.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
+ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Code:
+class ReadStmt : public Stmt {
+public:
+    ReadStmt(const LexicalToken& variable, int start, int end);
+
+    std::shared_ptr<ASTNode> buildTree() override;
+    int getStartLine() const override;
+    int getEndLine() const override;
+
+private:
+    LexicalToken variable;
+    std::pair<int, int> lines;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/CallStmt.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
+ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Code:
+class CallStmt : public Stmt {
+public:
+    CallStmt(const LexicalToken& variable, int start, int end);
+
+    std::shared_ptr<ASTNode> buildTree() override;
+    int getStartLine() const override;
+    int getEndLine() const override;
+
+private:
+    LexicalToken variable;
+    std::pair<int, int> lines;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/SimpleParser.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/cJLjmmneCEs4z6ms7ZkBSxJB?model=gpt-4&mode=chat
+ChatId: cJLjmmneCEs4z6ms7ZkBSxJB
+Code:
+class SimpleParser {
+public:
+   SimpleParser(); // Default constructor
+   SimpleParser(std::string filename);
+   std::shared_ptr<ASTNode> parseProgram();
+
+	// private:
+	std::vector<LexicalToken> tokenStream;
+	int tokenIndex;
+	void assertToken(LexicalToken token, LexicalTokenType type) const;
+	bool hasTokensLeft() const;
+	LexicalToken peekToken() const;
+	LexicalToken getToken();
+	std::shared_ptr<ASTNode> parseProcedure();
+	std::shared_ptr<ASTNode> parseStmtLst();
+	std::shared_ptr<ASTNode> parseStmt();
+	std::shared_ptr<ASTNode> parseRead();
+	std::shared_ptr<ASTNode> parsePrint();
+	std::shared_ptr<ASTNode> parseCall();
+	void parseWhile();
+	void parseIf();
+	void parseAssign();
+	void parseCondExpr();
+	void parseRelExpr();
+	void parseRelFactor();
+	void parseExpr();
+	void parseTerm();
+	void parseFactor();
+	void parseVarName();
+	void parseProcName();
+	void parseConstValue();
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/Grammar.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
+ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Code:
+#include <utility> // Include necessary header for std::pair
+#include <memory>
+#include "sp/Utility.h"
+#include "sp/AST/ast.h"
+
+// Define the Grammar class
+class Grammar {
+protected:
+    // Virtual function returning a pair of integers
+    std::pair<int, int> lines;
+
+public:
+    virtual ~Grammar() {} // Virtual destructor
+
+    // Virtual function for building the tree
+    virtual std::shared_ptr<ASTNode> buildTree() = 0;
+    virtual int getStartLine() const = 0;
+    virtual int getEndLine() const = 0;
+
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/PrintStmt.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
+ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Code:
+class PrintStmt : public Stmt {
+public:
+    PrintStmt(const LexicalToken& variable, int start, int end);
+
+    std::shared_ptr<ASTNode> buildTree() override;
+    int getStartLine() const override;
+    int getEndLine() const override;
+
+private:
+    LexicalToken variable;
+    std::pair<int, int> lines;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/SimpleParser.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/cJLjmmneCEs4z6ms7ZkBSxJB?model=gpt-4&mode=chat
+ChatId: cJLjmmneCEs4z6ms7ZkBSxJB
+Code:
+SimpleParser::SimpleParser() {
+	
+}
+
+SimpleParser::SimpleParser(std::string filename) {
+	this->tokenStream = SPTokenizer::tokenize(SPTokenizer::readFileToString(filename));
+	this->tokenIndex = 0;
+}
+
+std::shared_ptr<ASTNode> SimpleParser::parseProgram() {
+	std::vector<std::shared_ptr<ASTNode>> procedures;
+
+	while (this->hasTokensLeft()) {
+		if (this->peekToken().getTokenType() == LexicalTokenType::WHITESPACE) {
+			this->getToken();
+			continue;
+		}
+
+		procedures.push_back(this->parseProcedure());
+	}
+
+	// Depending on how important the the number of lines is to the code, find out whether to further go ahead
+	// with finding the number of lines.
+	Program program = Program(-1, procedures);
+
+	return program.buildTree();
+}
+
+bool SimpleParser::hasTokensLeft() const {
+	return this->tokenIndex < this->tokenStream.size();
+}
+
+// Gets token, without advancing the index.
+LexicalToken SimpleParser::peekToken() const {
+	if (this->hasTokensLeft()) {
+		return this->tokenStream[this->tokenIndex];
+	}
+	else {
+		return LexicalToken(LexicalTokenType::NULL_TOKEN);
+	}
+}
+
+// Gets token, and advance the index to look for the next token.
+LexicalToken SimpleParser::getToken() {
+	if (this->hasTokensLeft()) {
+		LexicalToken token = this->tokenStream[this->tokenIndex];
+		this->tokenIndex++;
+		return token;
+	}
+	else {
+		return LexicalToken(LexicalTokenType::NULL_TOKEN);
+	}
+}
+
+void SimpleParser::assertToken(LexicalToken token, LexicalTokenType type) const {
+	if (token.getTokenType() != type) {
+		throw std::runtime_error("Error: Invalid SIMPLE syntax.");
+	}
+}
+
+std::shared_ptr<ASTNode> SimpleParser::parseProcedure() {
+	if (!this->hasTokensLeft()) {
+		throw std::runtime_error("Error: SimpleParser::parseProcedure encounter empty statement.");
+	}
+
+	LexicalToken procedureKeyword = this->getToken();
+	this->assertToken(procedureKeyword, LexicalTokenType::KEYWORD_PROCEDURE);
+
+	LexicalToken procedureName = this->getToken();
+	this->assertToken(procedureName, LexicalTokenType::NAME);
+	this->assertToken(this->getToken(), LexicalTokenType::SYMBOL_OPEN_BRACE);
+
+	// Parse Statement Lists;
+	std::shared_ptr<ASTNode> statementList = this->parseStmtLst();
+
+	LexicalToken closeBrace = this->getToken();
+	this->assertToken(closeBrace, LexicalTokenType::SYMBOL_CLOSE_BRACE);
+
+	Procedure procedure = Procedure(procedureKeyword.getLine(), closeBrace.getLine(), statementList);
+	return procedure.buildTree();
+}
+
+std::shared_ptr<ASTNode> SimpleParser::parseStmtLst() {
+	// Parse every statement until we see a closing bracket.
+	std::vector<std::shared_ptr<ASTNode>> statements;
+	int firstLine = this->peekToken().getLine();
+	while (this->peekToken().getTokenType() != LexicalTokenType::SYMBOL_CLOSE_BRACE) {
+		if (this->peekToken().getTokenType() == LexicalTokenType::WHITESPACE) {
+			this->getToken();
+			continue;
+		}
+		statements.push_back(this->parseStmt());
+	}
+
+	int lastLine = this->peekToken().getLine();
+
+	StmtList stmtList = StmtList(firstLine, lastLine, statements);
+
+	return stmtList.buildTree();
+}
+
+std::shared_ptr<ASTNode> SimpleParser::parseStmt() {
+	// Add parsing logic for statement
+	// If next token is '=', we are assigning. Call assign.
+	// Then, Check keywords read/print/call.
+	// Then, check keywords while/if.
+	// If dont have keyword, this is an invalid statement.
+	if (!this->hasTokensLeft()) {
+		throw std::runtime_error("Error: SimpleParser::parseStmt encounter empty statement.");
+	}
+
+	LexicalToken firstToken = this->peekToken();
+	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_CALL) {
+		return this->parseCall();
+	}
+
+	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_PRINT) {
+		return this->parsePrint();
+	}
+
+	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_READ) {
+		return this->parseRead();
+	}
+
+	throw std::runtime_error("Error: SimpleParser only accepts READ,CALL,PRINT statements now.");
+}
+
+std::shared_ptr<ASTNode> SimpleParser::parseRead() {
+	LexicalToken keyword = this->getToken();
+	this->assertToken(keyword, LexicalTokenType::KEYWORD_READ);
+
+	LexicalToken variable = this->getToken();
+	this->assertToken(variable, LexicalTokenType::NAME);
+
+	LexicalToken semicolon = this->getToken();
+	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
+
+	ReadStmt readStmt = ReadStmt(variable, keyword.getLine(), semicolon.getLine());
+
+	return readStmt.buildTree();
+}
+
+std::shared_ptr<ASTNode> SimpleParser::parsePrint() {
+	LexicalToken keyword = this->getToken();
+	this->assertToken(keyword, LexicalTokenType::KEYWORD_PRINT);
+
+	LexicalToken variable = this->getToken();
+	this->assertToken(variable, LexicalTokenType::NAME);
+
+	LexicalToken semicolon = this->getToken();
+	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
+
+	PrintStmt printStmt = PrintStmt(variable, keyword.getLine(), semicolon.getLine());
+
+	return printStmt.buildTree();
+}
+
+// To change to void later when building trees.
+std::shared_ptr<ASTNode> SimpleParser::parseCall() {
+	LexicalToken keyword = this->getToken();
+	this->assertToken(keyword, LexicalTokenType::KEYWORD_CALL);
+
+	LexicalToken variable = this->getToken();
+	this->assertToken(variable, LexicalTokenType::NAME);
+
+	LexicalToken semicolon = this->getToken();
+	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
+
+	CallStmt callStmt = CallStmt(variable, keyword.getLine(), semicolon.getLine());
+
+	return callStmt.buildTree();
+}
+
+void SimpleParser::parseWhile() {
+	// Add parsing logic for while
+}
+
+void SimpleParser::parseIf() {
+	// Add parsing logic for if statement
+}
+
+void SimpleParser::parseAssign() {
+	// Add parsing logic for assignment
+}
+
+void SimpleParser::parseCondExpr() {
+	// Add parsing logic for condition expression
+}
+
+void SimpleParser::parseRelExpr() {
+	// Add parsing logic for relational expression
+}
+
+void SimpleParser::parseRelFactor() {
+	// Add parsing logic for relational factor (variable name or constant value or expression)
+}
+
+void SimpleParser::parseExpr() {
+	// Add parsing logic for expression (term or expression "+" term or expression "-" term)
+}
+
+void SimpleParser::parseTerm() {
+	// Add parsing logic for term (factor or term "*" factor or term "/" factor or term "%" factor)
+}
+
+void SimpleParser::parseFactor() {
+	// Add parsing logic for factor (variable name or constant value or "(" expr ")")
+}
+
+void SimpleParser::parseVarName() {
+	// Add parsing logic for variable name
+}
+
+void SimpleParser::parseProcName() {
+	// Add parsing logic for procedure name
+}
+
+void SimpleParser::parseConstValue() {
+	// Add parsing logic for constant value parsing
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/Program.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
+ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Code:
+class Program : public Grammar {
+public:
+	Program(int end, std::vector<std::shared_ptr<ASTNode>> procedures);
+
+	int getStartLine() const override;
+	int getEndLine() const override;
+	std::shared_ptr<ASTNode> buildTree() override;
+
+private:
+	std::vector<std::shared_ptr<ASTNode>> procedures;
+	std::pair<int, int> lines;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/AST/AST.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+ChatId: 
+Code:
+AST::AST(std::shared_ptr<ASTNode> root) : root(std::move(root)) {}
+
+const ASTNode* AST::getRoot() const {
+    return root.get();
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/AST/ASTNode.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+ChatId: 
+Code:
+enum class ASTNodeType {
+    PROGRAMS, PROCEDURE, STATEMENT_LIST,
+
+    // Statements
+    READ, PRINT, CALL, WHILE, IF_ELSE_THEN, ASSIGN,
+
+    // Expressions and operators
+    NOT, AND, OR, GREATER, GREATER_OR_EQUAL, LESSER, LESSER_OR_EQUAL,EQUAL, NOT_EQUAL,
+    ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO,
+
+    // Entities
+    VARIABLE, CONSTANT,
+
+    OTHER,
+
+    ERROR,
+};
+
+/**
+ * @brief Represents a node in the Abstract Syntax Tree (AST).
+ */
+class ASTNode {
+public:
+    /**
+     * @brief Default constructor for ASTNode.
+     */
+    ASTNode();
+
+    /**
+     * @brief Constructor for creating an ASTNode with specified type, line number, and value.
+     *
+     * @param type The type of the AST node.
+     * @param lineNumber The line number associated with the AST node.
+     * @param value The value associated with the AST node.
+     */
+    ASTNode(ASTNodeType type, int lineNumber, std::string value);
+    
+    /**
+     * @brief Adds a child node to the current AST node.
+     *
+     * @param child A shared pointer to the child AST node to be added.
+     */
+    void addChild(std::shared_ptr<ASTNode> child);
+    
+    /**
+     * @brief Sets the value of the current AST node.
+     *
+     * @param value The value to be set for the current AST node.
+     */
+    void setValue(std::string value);
+
+    /**
+    * @brief Computes the hash value of the current AST node.
+    *
+    * @return The hash value of the current AST node.
+    */
+    std::size_t hash() const;
+
+    /**
+     * @brief Checks if two AST nodes are equal.
+     *
+     * @param other The AST node to compare with.
+     * @return True if the two AST nodes are equal, otherwise false.
+     */
+    bool operator==(const ASTNode& other) const;
+
+    /**
+     * @brief Converts the AST node to a string representation.
+     *
+     * @return A string representation of the AST node.
+     */
+    std::string toString() const;
+
+    // To be set as private in future
+    ASTNodeType type;
+    std::vector<std::shared_ptr<ASTNode>> children;
+    int lineNumber;
+    std::string value;
+private:
+    std::shared_ptr<ASTNode> root;
+
+    /**
+     * @brief Generates a string representation of the AST node and its children recursively.
+     *
+     * @param tabs The number of tabs to indent the string representation.
+     * @return A string representation of the AST node and its children.
+     */
+    std::string recursiveString(int tabs) const;
+};
+
+
+namespace std {
+    template<> struct hash<ASTNode> {
+        std::size_t operator()(const ASTNode& node) const {
+            // Combine hash values of type, lineNumber, and value
+            return std::hash<long long>{}(node.hash());
+        }
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/AST/ASTNode.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+ChatId: 
+Code:
+ASTNode::ASTNode() {
+	this->type = ASTNodeType::PROGRAMS;
+	this->lineNumber = 0;
+	this->value = "default";
+}
+
+ASTNode::ASTNode(ASTNodeType type, int lineNumber, std::string value) {
+    this->type = type;
+    this->lineNumber = lineNumber;
+    this->value = value;
+}
+
+void ASTNode::addChild(std::shared_ptr<ASTNode> child) {
+    this->children.push_back(std::move(child));
+}
+
+void ASTNode::setValue(std::string value) {
+    this->value = value;
+}
+
+// Implementation of hash function for ASTNode
+std::size_t ASTNode::hash() const {
+    // Concatenate the properties of ASTNode
+    std::stringstream ss;
+    ss << Utility::getASTNodeType(type) << lineNumber << value;
+
+    // Hash the concatenated string
+    std::hash<std::string> hasher;
+    return hasher(ss.str());
+}
+
+// Method to convert AST node to a string
+std::string ASTNode::toString() const {
+    return "String representations: \n" + recursiveString(0);
+}
+
+// Helper method to convert AST node to a string recursively
+std::string ASTNode::recursiveString(int tabs) const {
+    std::ostringstream stringStream;
+
+    // to tab a tree representing the children
+    for (int i = 0; i < tabs; ++i)
+        stringStream << "  ";
+    stringStream << "Type: " << Utility::getASTNodeType(type) << ", Line Number: " << lineNumber << ", Value: " << value << "\n";
+    for (const auto& child : children) {
+        stringStream << child->recursiveString(tabs + 1);
+    }
+    return stringStream.str();
+}
+
+bool ASTNode::operator==(const ASTNode& other) const {
+    return type == other.type &&
+        lineNumber == other.lineNumber &&
+        value == other.value;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractor.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// prompt https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include "pkb/PKBWriterManager.h"
+#include "sp/AST/ASTNode.h" // Assuming you have ASTNode defined in ASTNode.h
+
+class DesignExtractor {
+public:
+    // Constructor taking in the root node of the AST
+    DesignExtractor(std::shared_ptr<ASTNode> root, std::shared_ptr<PKBWriterManager> pkbWriterManager);
+
+    const ASTNode& getRoot() const {
+        return *root;
+    }
+
+    std::unordered_map<std::string, std::unordered_set<std::string>> stringInformation;
+    std::unordered_map<std::string, std::unordered_set<int>> intInformation;
+    void extractAll();
+    void populatePKB();
+
+
+    // all the method below should be private in the future
+    // Method to extract all variables from the AST
+    void extractFollows();
+    void extractFollowsStar();
+    void extractParents();
+    void extractParentsStar();
+    void extractUses();
+    void extractModifies();
+
+    std::unordered_set<int> extractAssigns();
+    std::unordered_set<std::string> extractConstants();
+    std::unordered_set<std::string> extractProcedures();
+    std::unordered_set<int> extractStatements();
+    std::unordered_set<int> extractIf();
+    std::unordered_set<int> extractWhiles();
+    std::unordered_set<int> extractCall();
+    std::unordered_set<int> extractRead();
+    std::unordered_set<int> extractPrint();
+    std::unordered_set<std::string> extractVariables();
+    std::shared_ptr<ASTNode> root;
+    std::shared_ptr<PKBWriterManager> pkbWriterManager;
+
+
+    void printContent();
+
+private:
+    void entityRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& entities, ASTNodeType type);
+    void statementRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& statements, ASTNodeType type);
+    void procedureRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& procedures);
+
+    // To be implemented later
+    // void relationRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& relations, ASTNodeType type);
+
+    // void recursivelyExtractVariables(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& variables);
+	// void recursivelyExtractConstants(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& constants);
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractor.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// prompt https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+
+#include "sp/AST/ASTNode.h"
+#include "sp/Utility.h"
+#include "DesignExtractor.h"
+#include <unordered_set>
+
+DesignExtractor::DesignExtractor(std::shared_ptr<ASTNode> root, std::shared_ptr<PKBWriterManager> pkbWriterManager)
+    : root(std::move(root)), pkbWriterManager(std::move(pkbWriterManager)) {
+    // No need to assign them in the constructor body
+    std::cout << "Initialized" << std::endl;
+}
+
+void DesignExtractor::populatePKB() {
+  std::shared_ptr<ConstantWriter> constantWriter = pkbWriterManager->getConstantWriter();
+    std::shared_ptr<VariableWriter> variableWriter = pkbWriterManager->getVariableWriter();
+    std::shared_ptr<ProcedureWriter> procedureWriter = pkbWriterManager->getProcedureWriter();
+    std::shared_ptr<CallWriter> callWriter = pkbWriterManager->getCallWriter();
+    std::shared_ptr<PrintWriter> printWriter = pkbWriterManager->getPrintWriter();
+    std::shared_ptr<ReadWriter> readWriter = pkbWriterManager->getReadWriter();
+    std::shared_ptr<AssignWriter> assignWriter = pkbWriterManager->getAssignWriter();
+    std::shared_ptr<IfWriter> ifWriter = pkbWriterManager->getIfWriter();
+    std::shared_ptr<WhileWriter> whileWriter = pkbWriterManager->getWhileWriter();
+    std::shared_ptr<StatementWriter> statementWriter = pkbWriterManager->getStatementWriter();
+
+
+    for (const auto& pair : stringInformation) {
+        for (auto value : pair.second) {
+            if (pair.first == Utility::getASTNodeType(ASTNodeType::CONSTANT)) {
+				int intValue = std::stoi(value);
+				constantWriter->insertConstant(intValue);
+            }
+            else if (pair.first == Utility::getASTNodeType(ASTNodeType::VARIABLE)) {
+                variableWriter->insertVariable(value);
+			}
+            else if (pair.first == Utility::getASTNodeType(ASTNodeType::PROCEDURE)) {
+				procedureWriter->insertProcedure(value);
+			}
+		}
+	}
+
+    for (const auto& pair : intInformation) {
+        for (auto value : pair.second) {
+            if (pair.first == Utility::getASTNodeType(ASTNodeType::CALL)) {
+				callWriter->insertCall(value);
+			}
+            else if (pair.first == Utility::getASTNodeType(ASTNodeType::PRINT)) {
+				printWriter->insertPrint(value);
+			}
+            else if (pair.first == Utility::getASTNodeType(ASTNodeType::READ)) {
+				readWriter->insertRead(value);
+			}
+            else if (pair.first == Utility::getASTNodeType(ASTNodeType::ASSIGN)) {
+				assignWriter->insertAssign(value);
+			}
+            else if (pair.first == Utility::getASTNodeType(ASTNodeType::IF_ELSE_THEN)) {
+				ifWriter->insertIf(value);
+			}
+            else if (pair.first == Utility::getASTNodeType(ASTNodeType::WHILE)) {
+				whileWriter->insertWhile(value);
+			}
+            else if (pair.first == Utility::getASTNodeType(ASTNodeType::STATEMENT_LIST)) {
+                statementWriter->insertStatement(value);
+            }
+        }
+    }
+    std::cout << "PKB Populated\n" << std::endl;
+}
+
+
+void DesignExtractor::extractAll() {
+	// Implementation of extractAll method goes here
+	extractFollows();
+	extractFollowsStar();
+	extractParents();
+	extractParentsStar();
+	extractUses();
+	extractModifies();
+
+    this->stringInformation[Utility::getDesignType(ASTNodeType::PROCEDURE)] = extractProcedures();
+
+    this->intInformation[Utility::getDesignType(ASTNodeType::ASSIGN)] = extractAssigns();
+    this->intInformation[Utility::getDesignType(ASTNodeType::IF_ELSE_THEN)] = extractIf();
+    this->intInformation[Utility::getDesignType(ASTNodeType::WHILE)] = extractWhiles();
+    this->intInformation[Utility::getDesignType(ASTNodeType::CALL)] = extractCall();
+    this->intInformation[Utility::getDesignType(ASTNodeType::READ)] = extractRead();
+    this->intInformation[Utility::getDesignType(ASTNodeType::PRINT)] = extractPrint();
+
+    this->intInformation[Utility::getDesignType(ASTNodeType::STATEMENT_LIST)] = extractStatements();
+
+    this->stringInformation[Utility::getDesignType(ASTNodeType::CONSTANT)] = extractConstants();
+    this->stringInformation[Utility::getDesignType(ASTNodeType::VARIABLE)] = extractVariables();
+
+    std::cout << "Information Extracted\n" << std::endl;
+
+    printContent();
+}
+
+
+void DesignExtractor::printContent() {
+    // Print contents of stringInformation
+    std::cout << "Contents of stringInformation:" << std::endl;
+    for (const auto& pair : stringInformation) {
+        std::cout << pair.first << ": {";
+        const auto& set = pair.second;
+        for (const auto& str : set) {
+            std::cout << str << ", ";
+        }
+        std::cout << "}" << std::endl;
+    }
+
+    // Print contents of intInformation
+    std::cout << "Contents of intInformation:" << std::endl;
+    for (const auto& pair : intInformation) {
+        std::cout << pair.first << ": {";
+        const auto& set = pair.second;
+        for (const auto& num : set) {
+            std::cout << num << ", ";
+        }
+        std::cout << "}" << std::endl;
+    }
+}
+
+void DesignExtractor::entityRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& entities, ASTNodeType type) {
+    if (node->type == type) {
+        // If it's a variable node, add it to the set
+        entities.push_back(*node);
+    }
+    // Recursively traverse children
+    for (const auto& child : node->children) {
+        entityRecursiveExtractor(child, entities, type);
+    }
+}
+
+
+void DesignExtractor::statementRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& statements, ASTNodeType type) {
+    if (node->type == type) {
+        // If it's a variable node, add it to the set
+        statements.push_back(*node);
+    }
+    // Recursively traverse children
+    for (const auto& child : node->children) {
+        entityRecursiveExtractor(child, statements, type);
+    }
+}
+
+void DesignExtractor::procedureRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& procedures) {
+    if (node->type == ASTNodeType::PROCEDURE) {
+        // If it's a variable node, add it to the set
+        procedures.push_back(*node);
+    }
+    // Recursively traverse children
+    for (const auto& child : node->children) {
+        procedureRecursiveExtractor(child, procedures);
+    }
+}
+
+
+// Relations
+
+void DesignExtractor::extractFollows() {
+    // Implementation of extractFollows method goes here
+}
+
+void DesignExtractor::extractFollowsStar() {
+    // Implementation of extractFollowsStar method goes here
+}
+
+void DesignExtractor::extractParents() {
+    // Implementation of extractParents method goes here
+}
+
+void DesignExtractor::extractParentsStar() {
+    // Implementation of extractParentsStar method goes here
+}
+
+void DesignExtractor::extractUses() {
+    // Implementation of extractUses method goes here
+}
+
+void DesignExtractor::extractModifies() {
+    // Implementation of extractModifies method goes here
+}
+
+// Programs
+
+std::unordered_set<std::string> DesignExtractor::extractProcedures() {
+    // Implementation of extractProcedures method goes here
+    std::vector<ASTNode> variables;
+    procedureRecursiveExtractor(root, variables);
+
+    std::unordered_set<std::string> procedureNames;
+    for (auto node : variables) {
+        procedureNames.insert(node.value);
+    }
+
+    return procedureNames;
+}
+
+// Statements
+
+std::unordered_set<int> DesignExtractor::extractAssigns() {
+    // Implementation of extractAssigns method goes here
+    return std::unordered_set<int>();
+}
+
+std::unordered_set<int> DesignExtractor::extractStatements() {
+    // Implementation of extractStatements method goes here
+    std::unordered_set<int> allStatements;
+    
+    std::unordered_set<int> assigns = this->intInformation[Utility::getDesignType(ASTNodeType::ASSIGN)];
+    std::unordered_set<int> ifs = this->intInformation[Utility::getDesignType(ASTNodeType::IF_ELSE_THEN)];
+    std::unordered_set<int> whiles = this->intInformation[Utility::getDesignType(ASTNodeType::WHILE)];
+    std::unordered_set<int> calls = this->intInformation[Utility::getDesignType(ASTNodeType::CALL)];
+    std::unordered_set<int> reads = this->intInformation[Utility::getDesignType(ASTNodeType::READ)];
+    std::unordered_set<int> prints = this->intInformation[Utility::getDesignType(ASTNodeType::PRINT)];
+
+    allStatements.insert(assigns.begin(), assigns.end());
+    allStatements.insert(ifs.begin(), ifs.end());
+    allStatements.insert(whiles.begin(), whiles.end());
+    allStatements.insert(calls.begin(), calls.end());
+    allStatements.insert(reads.begin(), reads.end());
+    allStatements.insert(prints.begin(), prints.end());
+    return allStatements;
+}
+
+std::unordered_set<int> DesignExtractor::extractIf() {
+    // Implementation of extractIf method goes here
+    return std::unordered_set<int>();
+}
+
+std::unordered_set<int> DesignExtractor::extractWhiles() {
+    // Implementation of extractWhiles method goes here
+    return std::unordered_set<int>();
+}
+
+std::unordered_set<int> DesignExtractor::extractCall() {
+    // Implementation of extractCall method goes here
+    std::unordered_set<int> callStatements;
+
+    std::vector<ASTNode> prints;
+    statementRecursiveExtractor(root, prints, ASTNodeType::CALL);
+
+    for (auto node : prints) {
+        callStatements.insert(node.lineNumber);
+    }
+
+    return callStatements;
+}
+
+std::unordered_set<int> DesignExtractor::extractRead() {
+    // Implementation of extractRead method goes here
+    std::unordered_set<int> readStatements;
+
+    std::vector<ASTNode> prints;
+    statementRecursiveExtractor(root, prints, ASTNodeType::READ);
+
+    for (auto node : prints) {
+        readStatements.insert(node.lineNumber);
+    }
+
+    return readStatements;
+}
+
+std::unordered_set<int> DesignExtractor::extractPrint() {
+    // Implementation of extractPrint method goes here
+    std::unordered_set<int> printStatements;
+
+    std::vector<ASTNode> prints;
+    statementRecursiveExtractor(root, prints, ASTNodeType::PRINT);
+
+    for (auto node : prints) {
+        printStatements.insert(node.lineNumber);
+    }
+
+    return printStatements;
+}
+
+// Entities
+
+std::unordered_set<std::string> DesignExtractor::extractVariables() {
+    // Recursive function to traverse the AST and extract variables
+    // Implementation of extractVariablesRecursive method goes here
+    std::vector<ASTNode> variables;
+    entityRecursiveExtractor(root, variables, ASTNodeType::VARIABLE);
+
+    std::unordered_set<std::string> variableNames;
+    for (auto node : variables) {
+		variableNames.insert(node.value);
+	}
+
+	return variableNames;
+}
+
+
+std::unordered_set<std::string> DesignExtractor::extractConstants() {
+    // Implementation of extractConstants method goes here
+    std::vector<ASTNode> constants;
+    entityRecursiveExtractor(root, constants, ASTNodeType::CONSTANT);
+
+    std::unordered_set<std::string> constantValues;
+    for (auto node : constants) {
+        constantValues.insert(node.value);
+    }
+
+    return constantValues;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Utility.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+ChatId: 
+Code:
+std::string Utility::getASTNodeType(ASTNodeType t) {
+    switch (t) {
+        case ASTNodeType::PROGRAMS:
+            return "Program";
+        case ASTNodeType::PROCEDURE:
+            return "Procedure";
+        case ASTNodeType::STATEMENT_LIST:
+            return "StatementList";
+        case ASTNodeType::ASSIGN:
+            return "Assign";
+        case ASTNodeType::CALL:
+            return "Call";
+        case ASTNodeType::IF_ELSE_THEN:
+            return "IfElseThen";
+        case ASTNodeType::PRINT:
+            return "Print";
+        case ASTNodeType::READ:
+            return "Read";
+        case ASTNodeType::WHILE:
+            return "While";
+        case ASTNodeType::NOT:
+            return "Not";
+        case ASTNodeType::AND:
+            return "And";
+        case ASTNodeType::OR:
+            return "Or";
+        case ASTNodeType::GREATER:
+            return "Greater";
+        case ASTNodeType::GREATER_OR_EQUAL:
+            return "GreaterOrEqual";
+        case ASTNodeType::LESSER:
+            return "Lesser";
+        case ASTNodeType::LESSER_OR_EQUAL:
+            return "LesserOrEqual";
+        case ASTNodeType::EQUAL:
+            return "EqualEqual";
+        case ASTNodeType::NOT_EQUAL:
+            return "NotEqual";
+        case ASTNodeType::ADD:
+            return "Add";
+        case ASTNodeType::SUBTRACT:
+            return "Subtract";
+        case ASTNodeType::MULTIPLY:
+            return "Multiply";
+        case ASTNodeType::DIVIDE:
+            return "Divide";
+        case ASTNodeType::MODULO:
+            return "Modulo";
+        case ASTNodeType::VARIABLE:
+            return "Variable";
+        case ASTNodeType::CONSTANT:
+            return "Constant";
+        case ASTNodeType::ERROR:
+            return "Error";
+        default:
+            throw "Error";
+    };
+}
+
+std::string Utility::getDesignType(ASTNodeType t) {
+    return getASTNodeType(t);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/unit_testing/src/sp/ParseCallStatement_AI.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat
+ChatId: BL0U9QBHRxSO8JyQGo0KpEUZ
+Code:
+TEST_CASE("CallStmt parsing throws an error with invalid syntax", "[SimpleParser]") {
+	const std::string testFileName = "../../../../../tests/sp/ParserTest/Stmt_Invalid1.txt";
+	REQUIRE(std::filesystem::exists(testFileName));
+	SimpleParser parser(testFileName);
+
+	// For this test, we expect parsing to terminate due to erroneous input.
+	CHECK_THROWS_AS(parser.parseCall(), std::runtime_error);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/unit_testing/src/sp/ParseCallStatement_AI.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat
+ChatId: CRO1bXNAQZB3Adua8DmfPuWb
+Code:
+TEST_CASE("Testing CallStmt::buildTree()", "[CallStmt]") {
+	// Generate test file
+	const std::string testFileName = "../../../../../tests/sp/ParserTest/CallStmt1.txt";
+	REQUIRE(std::filesystem::exists(testFileName));
+	SimpleParser parser(testFileName);
+
+	SECTION("Testing tree root node") {
+		std::shared_ptr<ASTNode> tree_ptr = parser.parseCall();
+
+		REQUIRE(tree_ptr->type == ASTNodeType::CALL);
+		REQUIRE(tree_ptr->lineNumber == 1);
+		REQUIRE(tree_ptr->value == Utility::getASTNodeType(ASTNodeType::CALL));
+
+		SECTION("Testing tree child node") {
+			const auto& children = tree_ptr->children;
+			REQUIRE(children.size() == 1);
+			REQUIRE(children[0]->type == ASTNodeType::VARIABLE);
+			REQUIRE(children[0]->lineNumber == 1);
+			REQUIRE(children[0]->value == "x");
+		}
+	}
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/unit_testing/src/sp/ParsePrintStatement_AI.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat
+ChatId: BL0U9QBHRxSO8JyQGo0KpEUZ
+Code:
+TEST_CASE("PrintStmt parsing throws an error with invalid syntax", "[SimpleParser]") {
+	const std::string testFileName = "../../../../../tests/sp/ParserTest/CallStmt1.txt";
+	REQUIRE(std::filesystem::exists(testFileName));
+	SimpleParser parser(testFileName);
+
+	// For this test, we expect parsing to terminate due to erroneous input.
+	CHECK_THROWS_AS(parser.parsePrint(), std::runtime_error);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/unit_testing/src/sp/ParsePrintStatement_AI.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat
+ChatId: CRO1bXNAQZB3Adua8DmfPuWb
+Code:
+TEST_CASE("Testing PrintStmt::buildTree()", "[PrintStmt]") {
+	// Generate test file
+	const std::string testFileName = "../../../../../tests/sp/ParserTest/PrintStmt1.txt";
+	REQUIRE(std::filesystem::exists(testFileName));
+	SimpleParser parser(testFileName);
+	std::shared_ptr<ASTNode> tree_ptr = parser.parsePrint();
+
+	REQUIRE(tree_ptr->type == ASTNodeType::PRINT);
+	REQUIRE(tree_ptr->lineNumber == 1);
+	REQUIRE(tree_ptr->value == Utility::getASTNodeType(ASTNodeType::PRINT));
+
+	SECTION("Testing tree child node") {
+		const auto& children = tree_ptr->children;
+		REQUIRE(children.size() == 1);
+		REQUIRE(children[0]->type == ASTNodeType::VARIABLE);
+		REQUIRE(children[0]->lineNumber == 1);
+		REQUIRE(children[0]->value == "x");
+	}
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/unit_testing/src/sp/LexicalTokenTest_AI.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/vwMjpyCtExjgJwMs6KZaXnTE?model=gpt-4&mode=chat
+ChatId: vwMjpyCtExjgJwMs6KZaXnTE
+Code:
+#include "catch.hpp"
+#include "sp/LexicalToken.h"
+
+// Test the constructor with only token type.
+TEST_CASE("Constructor with only type", "[LexicalToken]")
+{
+    LexicalToken token(LexicalTokenType::SYMBOL_OPEN_BRACE,1,1,"(");
+    REQUIRE(token.getTokenType() == LexicalTokenType::SYMBOL_OPEN_BRACE);
+}
+
+// Test getting the token type.
+TEST_CASE("Get TokenType", "[LexicalToken]")
+{
+    LexicalToken token(LexicalTokenType::OPERATOR_PLUS,1,1,"+");
+    REQUIRE(token.getTokenType() == LexicalTokenType::OPERATOR_PLUS);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/unit_testing/src/sp/ParseReadStatement_AI.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat
+ChatId: BL0U9QBHRxSO8JyQGo0KpEUZ
+Code:
+TEST_CASE("ReadStmt parsing throws an error with invalid syntax", "[SimpleParser]") {
+	const std::string testFileName = "../../../../../tests/sp/ParserTest/CallStmt1.txt";
+	REQUIRE(std::filesystem::exists(testFileName));
+	SimpleParser parser(testFileName);
+
+	// For this test, we expect parsing to terminate due to erroneous input.
+	CHECK_THROWS_AS(parser.parseRead(), std::runtime_error);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/unit_testing/src/sp/ParseReadStatement_AI.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat
+ChatId: CRO1bXNAQZB3Adua8DmfPuWb
+Code:
+TEST_CASE("Testing ReadStmt::buildTree()", "[ReadStmt]") {
+	// Generate test file
+	const std::string testFileName = "../../../../../tests/sp/ParserTest/ReadStmt1.txt";
+	REQUIRE(std::filesystem::exists(testFileName));
+	SimpleParser parser(testFileName);
+
+	SECTION("Testing tree root node") {
+		std::shared_ptr<ASTNode> tree_ptr = parser.parseRead();
+
+		REQUIRE(tree_ptr->type == ASTNodeType::READ);
+		REQUIRE(tree_ptr->lineNumber == 1);
+		REQUIRE(tree_ptr->value == Utility::getASTNodeType(ASTNodeType::READ));
+
+		SECTION("Testing tree child node") {
+			const auto& children = tree_ptr->children;
+			REQUIRE(children.size() == 1);
+			REQUIRE(children[0]->type == ASTNodeType::VARIABLE);
+			REQUIRE(children[0]->lineNumber == 1);
+			REQUIRE(children[0]->value == "readableVariable");
+		}
+	}
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-19
+Total Snippets: 22
+Total lines: 1052
+SP Snippets: 22
+SP lines: 1052
+PKB Snippets: 0
+PKB lines: 0
+QPS Snippets: 0
+QPS lines: 0

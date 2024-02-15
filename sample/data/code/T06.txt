@@ -1,0 +1,2163 @@
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryTable.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include <unordered_set>
+#include <unordered_map>
+#include <string>
+#include "QueryTable.h"
+
+void QueryTable::addToHashSet(std::string value) {
+    hashSet.insert(value);
+}
+
+bool QueryTable::isInHashSet(std::string value) {
+    return hashSet.count(value) > 0;
+}
+
+void QueryTable::removeFromHashSet(std::string value) {
+    hashSet.erase(value);
+}
+
+std::unordered_set<std::string> QueryTable::getHashSet() {
+    return hashSet;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryTable.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+
+#include <unordered_set>
+#include <string>
+
+class QueryTable {
+public:
+    void addToHashSet(std::string value);
+    bool isInHashSet(std::string value);
+    void removeFromHashSet(std::string value);
+    std::unordered_set<std::string> QueryTable::getHashSet();
+
+private:
+    std::unordered_set<std::string> hashSet;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryGenerators/ClauseEvaluator.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include <vector>
+
+class ClauseEvaluator {
+public:
+    virtual ~ClauseEvaluator() = default;
+    virtual void convertClauseToQuery();
+
+private:
+    virtual void storePKBData();
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryGenerators/VariableClauseToQuery.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "../QueryTable.h"
+#include "ClauseEvaluator.h"
+#include <unordered_set>
+#include <string>
+#include <list>
+#include <string>
+#include <vector>
+#include <memory>
+
+class PKB;
+
+class VariableClauseToQuery : public ClauseEvaluator {
+private:
+    void storePKBData();
+
+public:
+    void convertClauseToQuery() override;
+    void sendData(std::list<std::string>& results, std::shared_ptr<PKB> pkb);
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryProcessors/VariableQueryProcessor.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "QueryProcessor.h"
+
+class VariableQueryProcessor : public QueryProcessor {
+public:
+    void process(std::list<std::string>& results, std::shared_ptr<QueryTable> queryTable);
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryProcessors/QueryProcessorStrategy.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include <vector>
+
+class QueryProcessingStrategy {
+
+public:
+    virtual ~QueryProcessingStrategy() = default;
+    virtual void processQuery();
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryProcessors/QueryProcessor.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+
+#include "../QueryEvaluators/QueryEvaluator.h"
+#include "../QueryGenerators/ClauseEvaluator.h"
+#include "../QueryTable.h"
+#include "QueryProcessorStrategy.h"
+#include <memory>
+#include <unordered_set>
+#include <vector>
+
+class PKB;
+
+/**
+ * @brief Interface of the Strategy pattern for the QueryProcessor
+ * Each strategy consists of a ClauseEvaluator and a QueryEvaluator
+ */
+class QueryProcessor {
+private:
+    std::list<std::string> results;
+    std::shared_ptr<QueryTable> queryTable;
+    std::string result;
+
+public:
+    QueryProcessor(std::string result, std::list<std::string>& results, std::shared_ptr<QueryTable> queryTable);
+    void process(std::list<std::string>& results, std::shared_ptr<PKB> pkb);
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryEvaluators/VariableQueryEvaluator.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+
+#include "QueryEvaluator.h"
+
+class VariableQueryEvaluator : public QueryEvaluator {
+
+public:
+    void evaluate();
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/QPS/QueryEvaluators/QueryEvaluator.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include <vector>
+
+#ifndef QUERYEVALUATOR_H
+#define QUERYEVALUATOR_H
+
+class QueryEvaluator {
+public:
+    virtual ~QueryEvaluator() = default;
+    virtual void evaluate() {};
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/Parser/ParseStrategy.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ParseStrategy {
+public:
+    virtual ~ParseStrategy() = default;
+    virtual std::unique_ptr<ASTNode> parse(SPParser& parser) { return nullptr; };
+};
+
+class ParseReadStrategy : public ParseStrategy {
+public:
+    std::unique_ptr<ASTNode> parse(SPParser& parser) override;
+};
+
+class ParseAssignStrategy : public ParseStrategy {
+public:
+    std::unique_ptr<ASTNode> parse(SPParser& parser) override;
+};
+
+class ParseStmtLstStrategy : public ParseStrategy {
+public:
+    ParseStmtLstStrategy(std::shared_ptr<ParseReadStrategy> readStrategy,
+                         std::shared_ptr<ParseAssignStrategy> assignStrategy)
+        : readStrategy(readStrategy), assignStrategy(assignStrategy) {}
+
+    std::unique_ptr<ASTNode> parse(SPParser& parser) override;
+
+protected:
+    std::shared_ptr<ParseReadStrategy> readStrategy;
+    std::shared_ptr<ParseAssignStrategy> assignStrategy;
+};
+
+class ParseProcedureStrategy : public ParseStrategy {
+public:
+    ParseProcedureStrategy(std::shared_ptr<ParseStmtLstStrategy> stmtLstStrategy) : stmtLstStrategy(stmtLstStrategy) {}
+
+    std::unique_ptr<ASTNode> parse(SPParser& parser) override;
+
+protected:
+    std::shared_ptr<ParseStmtLstStrategy> stmtLstStrategy;
+};
+
+class ParseProgramStrategy : public ParseStrategy {
+public:
+    ParseProgramStrategy(std::shared_ptr<ParseProcedureStrategy> procedureStrategy)
+        : procedureStrategy(procedureStrategy) {}
+    std::unique_ptr<ASTNode> parse(SPParser& parser) override;
+
+protected:
+    std::shared_ptr<ParseProcedureStrategy> procedureStrategy;
+};
+
+// end ai-gen
+
+#endif // SP_PARSER_PARSESTRATEGY_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/Parser/ParseStrategy.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+std::unique_ptr<ASTNode> ParseProgramStrategy::parse(SPParser& parser) {
+    auto programNode = std::make_unique<ASTNodeProgram>("0");
+
+    // Extract procedures until end of file
+    while (!parser.endOfParse()) {
+        parser.setStrategy(procedureStrategy);
+        std::unique_ptr<ASTNode> basePtr = parser.parse();
+        std::shared_ptr<ASTNode> baseShared = std::move(basePtr); // Transfer ownership to shared_ptr
+        std::shared_ptr<ASTNodeProcedure> derivedShared =
+            std::static_pointer_cast<ASTNodeProcedure>(baseShared); // Cast to derived class
+
+        // auto procedureNode = dynamic_cast<ASTNodeProcedure*>((parser.parse()).get());
+        // std::shared_ptr<ASTNodeProcedure> procedureNode =
+        // std::dynamic_pointer_cast<ASTNodeProcedure>(parser.parse());
+        // programNode->addProcedure(std::make_shared<ASTNodeProcedure>(procedureNode));
+        programNode->addProcedure(derivedShared);
+    }
+
+    return programNode;
+}
+
+std::unique_ptr<ASTNode> ParseProcedureStrategy::parse(SPParser& parser) {
+    auto procedureNode = std::make_unique<ASTNodeProcedure>("0");
+
+    // Verify that the next token is a procedure token
+    SPToken& procedureToken = parser.extract();
+    if (procedureToken.getType() != TokenType::PROCEDURE) {
+        throw std::runtime_error("Expected procedure");
+    }
+
+    // Extract procedure name
+    SPToken& procedureNameToken = parser.extract();
+    if (procedureNameToken.getType() != TokenType::NAME) {
+        throw std::runtime_error("Expected procedure name");
+    }
+    procedureNode->setProcedureName(procedureNameToken.getValue());
+
+    // Extract statement list
+    SPToken& openBraces = parser.extract();
+    if (openBraces.getType() != TokenType::OPEN__CURLY_PARENTHESIS) {
+        throw std::runtime_error("Expected { after procedure name");
+    }
+    parser.setStrategy(stmtLstStrategy);
+    std::unique_ptr<ASTNode> basePtr = parser.parse();
+    std::shared_ptr<ASTNode> baseShared = std::move(basePtr); // Transfer ownership to shared_ptr
+    std::shared_ptr<ASTNodeStmtLst> derivedShared =
+        std::static_pointer_cast<ASTNodeStmtLst>(baseShared); // Cast to derived class
+
+    // auto stmtLstNode = dynamic_cast<ASTNodeStmtLst*>((parser.parse()).get());
+    // procedureNode->setStmtLst(std::make_shared<ASTNodeStmtLst>(stmtLstNode));
+    procedureNode->setStmtLst(derivedShared);
+
+    // The CLOSE__CURLY_PARENTHESIS acts as the end of loop token for stmtLstStrategy
+
+    return procedureNode;
+}
+
+std::unique_ptr<ASTNode> ParseStmtLstStrategy::parse(SPParser& parser) {
+    auto stmtLstNode = std::make_unique<ASTNodeStmtLst>("0");
+
+    // Extract statements until end of statement list
+    SPToken& currentToken = parser.extract();
+
+    while (currentToken.getType() != TokenType::CLOSE__CURLY_PARENTHESIS) {
+        switch (currentToken.getType()) {
+        case TokenType::READ: {
+            parser.setStrategy(readStrategy);
+            std::unique_ptr<ASTNode> basePtr = parser.parse();
+            std::shared_ptr<ASTNode> baseShared = std::move(basePtr); // Transfer ownership to shared_ptr
+            std::shared_ptr<ASTNodeStmtRead> derivedShared =
+                std::static_pointer_cast<ASTNodeStmtRead>(baseShared); // Cast to derived class
+
+            // auto readNode = dynamic_cast<ASTNodeStmtRead*>((parser.parse()).get());
+            // stmtLstNode->addStmt(std::make_shared<ASTNodeStmtRead>(readNode));
+            stmtLstNode->addStmt(derivedShared);
+            break;
+        }
+        default:
+            throw std::runtime_error("Expected valid statement type");
+        }
+    }
+
+    return stmtLstNode;
+}
+
+std::unique_ptr<ASTNode> ParseReadStrategy::parse(SPParser& parser) {
+    auto readNode = std::make_unique<ASTNodeStmtRead>("0");
+
+    // read keyword has already been extracted, run the variableStrategy to construct a variable node
+
+    // Extract variable name
+    SPToken& variableNameToken = parser.extract();
+    if (variableNameToken.getType() != TokenType::NAME) {
+        throw std::runtime_error("Expected variable name after read");
+    }
+    readNode->setVarName(variableNameToken.getValue());
+
+    return readNode;
+}
+
+std::unique_ptr<ASTNode> ParseAssignStrategy::parse(SPParser& parser) {
+    auto assignNode = std::make_unique<ASTNodeStmtAssign>("0");
+
+    return assignNode;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtCall.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeStmtCall.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeStmtCall::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractStmtCall(*this);
+    }
+}
+
+void ASTNodeStmtCall::addProcedureName(char* procName) {
+    // TODO: TO BE IMPLEMENTED
+}
+
+const char* ASTNodeStmtCall::getProcName() const {
+    return nullptr; // TODO: TO BE IMPLEMENTED
+}
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtWhile.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+// #include "SP/AST/Expr/ASTNodeExprCond.h"
+#include "../ASTNodeStmtLst.h"
+#include "ASTNodeStmtWhile.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeStmtWhile::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractStmtWhile(*this);
+        if (condExpr) {
+            // condExpr->acceptVisitor(extractor); // TODO: TO BE IMPLEMENTED
+        }
+        if (stmtLst) {
+            stmtLst->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeStmtWhile::addCondExpr(std::shared_ptr<ASTNodeExprCond> condExpr) { this->condExpr = condExpr; }
+
+void ASTNodeStmtWhile::setStmtLst(std::shared_ptr<ASTNodeStmtLst> stmtLst) { this->stmtLst = stmtLst; }
+
+const std::shared_ptr<ASTNodeExprCond>& ASTNodeStmtWhile::getCondExpr() const { return condExpr; }
+
+const std::shared_ptr<ASTNodeStmtLst>& ASTNodeStmtWhile::getStmtLst() const { return stmtLst; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtRead.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeStmtRead.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeStmtRead::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractStmtRead(*this);
+    }
+}
+
+void ASTNodeStmtRead::setVarName(std::string varName) { this->varName = varName; }
+
+const std::string& ASTNodeStmtRead::getVarName() const { return varName; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmt.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_STMT_ASTNODESTMT_H_
+#define SP_AST_STMT_ASTNODESTMT_H_
+
+#include "../ASTNode.h"
+
+class ASTNodeStmt : public ASTNode {
+public:
+    using ASTNode::ASTNode;
+};
+
+#endif // SP_AST_STMT_ASTNODESTMT_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtPrint.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeStmtPrint.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeStmtPrint::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractStmtPrint(*this);
+    }
+}
+
+void ASTNodeStmtPrint::setVarName(char* varName) {
+    // TODO: TO BE IMPLEMENTED
+}
+
+const char* ASTNodeStmtPrint::getVarName() const { return varName; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtCall.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_STMT_ASTNODESTMTCALL_H_
+#define SP_AST_STMT_ASTNODESTMTCALL_H_
+
+#include "ASTNodeStmt.h"
+#include <string>
+
+class ASTNodeStmtCall : public ASTNodeStmt {
+protected:
+    // TODO: Add a representation of the procName
+public:
+    using ASTNodeStmt::ASTNodeStmt;
+    virtual void acceptVisitor(std::weak_ptr<DesignExtractor> extractor) override;
+
+    void addProcedureName(char* procName); // TODO: Change to a more suitable representation of procName
+
+    const char* getProcName() const;
+};
+
+#endif // SP_AST_STMT_ASTNODESTMTCALL_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtAssign.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "../Expr/ASTNodeExpr.h"
+#include "ASTNodeStmtAssign.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeStmtAssign::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractStmtAssign(*this);
+        if (expr) {
+            expr->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeStmtAssign::addVar(char* varName) {
+    // TODO: TO BE IMPLEMENTED
+}
+
+void ASTNodeStmtAssign::addExpr(std::shared_ptr<ASTNodeExpr> expr) { this->expr = expr; }
+
+const char* ASTNodeStmtAssign::getVarName() const {
+    return nullptr; // TODO: TO BE IMPLEMENTED
+}
+
+const std::shared_ptr<ASTNodeExpr>& ASTNodeStmtAssign::getExpr() const { return expr; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtIf.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+// #include "../Expr/ASTNodeExprCond.h"
+#include "../ASTNodeStmtLst.h"
+#include "ASTNodeStmtIf.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeStmtIf::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractStmtIf(*this);
+        if (condExpr) {
+            // condExpr->acceptVisitor(extractor); // TODO: TO BE IMPLEMENTED
+        }
+        if (thenStmtLst) {
+            thenStmtLst->acceptVisitor(extractor);
+        }
+        if (elseStmtLst) {
+            elseStmtLst->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeStmtIf::addCondExpr(std::shared_ptr<ASTNodeExprCond> condExpr) { this->condExpr = condExpr; }
+
+void ASTNodeStmtIf::addThenStmtLst(std::shared_ptr<ASTNodeStmtLst> thenStmtLst) { this->thenStmtLst = thenStmtLst; }
+
+void ASTNodeStmtIf::addElseStmtLst(std::shared_ptr<ASTNodeStmtLst> elseStmtLst) { this->elseStmtLst = elseStmtLst; }
+
+const std::shared_ptr<ASTNodeExprCond>& ASTNodeStmtIf::getCondExpr() const { return condExpr; }
+
+const std::shared_ptr<ASTNodeStmtLst>& ASTNodeStmtIf::getThenStmtLst() const { return thenStmtLst; }
+
+const std::shared_ptr<ASTNodeStmtLst>& ASTNodeStmtIf::getElseStmtLst() const { return elseStmtLst; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/ASTNodeProcedure.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_ASTNODEPROCEDURE_H_
+#define SP_AST_ASTNODEPROCEDURE_H_
+
+#include "ASTNode.h"
+#include <vector>
+
+class ASTNodeStmtLst;
+class DesignExtractor;
+
+class ASTNodeProcedure : public ASTNode {
+protected:
+    std::shared_ptr<ASTNodeStmtLst> stmtLst;
+    std::string procedureName;
+
+public:
+    using ASTNode::ASTNode;
+    virtual void acceptVisitor(std::weak_ptr<DesignExtractor> extractor) override;
+
+    void setStmtLst(std::shared_ptr<ASTNodeStmtLst> stmtLst);
+    void setProcedureName(const std::string& procName);
+
+    const std::shared_ptr<ASTNodeStmtLst>& getStmtLst() const;
+};
+
+#endif // SP_AST_ASTNODEPROCEDURE_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/ASTNodeProgram.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeProcedure.h"
+#include "ASTNodeProgram.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeProgram::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractProgram(*this);
+        for (auto& proc : procs) {
+            proc->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeProgram::addProcedure(std::shared_ptr<ASTNodeProcedure> proc) {
+    if (proc) {
+        procs.push_back(proc);
+    }
+}
+
+const std::vector<std::shared_ptr<ASTNodeProcedure>>& ASTNodeProgram::getProcs() const { return procs; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/ASTNodeProcedure.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeProcedure.h"
+#include "ASTNodeStmtLst.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeProcedure::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractProcedure(*this);
+        if (stmtLst) {
+            stmtLst->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeProcedure::setStmtLst(std::shared_ptr<ASTNodeStmtLst> stmtLst) { this->stmtLst = stmtLst; }
+
+void ASTNodeProcedure::setProcedureName(const std::string& procName) { procedureName = procName; }
+
+const std::shared_ptr<ASTNodeStmtLst>& ASTNodeProcedure::getStmtLst() const { return stmtLst; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/ASTNode.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_ASTNODE_H_
+#define SP_AST_ASTNODE_H_
+
+#include <memory>
+#include <string>
+
+class DesignExtractor;
+
+class ASTNode {
+protected:
+    std::string stmtNo;
+
+public:
+    ASTNode(std::string stmtNo = "0") : stmtNo(stmtNo) {}
+
+    bool operator==(const ASTNode& rhs) { return this->getStmtNo() == rhs.getStmtNo(); }
+
+    virtual ~ASTNode() = default;
+    virtual void acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {}
+    virtual std::string getStmtNo() const { return stmtNo; }
+};
+
+#endif // SP_AST_ASTNODE_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprCondBinary.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeExprCondBinary.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeExprCondBinary::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractExprCondBinary(*this);
+        if (leftExprCond) {
+            leftExprCond->acceptVisitor(extractor);
+        }
+        if (rightExprCond) {
+            rightExprCond->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeExprCondBinary::addCondOp(const char* condOp) {
+    // TODO: TO BE IMPLEMENTED
+}
+
+void ASTNodeExprCondBinary::addLeftExprCond(std::shared_ptr<ASTNodeExprCond> leftExprCond) {
+    this->leftExprCond = leftExprCond;
+}
+
+void ASTNodeExprCondBinary::addRightExprCond(std::shared_ptr<ASTNodeExprCond> rightExprCond) {
+    this->rightExprCond = rightExprCond;
+}
+
+const char* ASTNodeExprCondBinary::getCondOp() const {
+    return nullptr;
+    // TODO: TO BE IMPLEMENTED
+}
+
+const std::shared_ptr<ASTNodeExprCond>& ASTNodeExprCondBinary::getLeftExprCond() const { return leftExprCond; }
+
+const std::shared_ptr<ASTNodeExprCond>& ASTNodeExprCondBinary::getRightExprCond() const { return rightExprCond; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExpr.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_EXPR_ASTNODEEXPR_H_
+#define SP_AST_EXPR_ASTNODEEXPR_H_
+
+#include "../ASTNode.h"
+
+class ASTNodeExpr : public ASTNode {
+public:
+    using ASTNode::ASTNode;
+};
+
+#endif // SP_AST_EXPR_ASTNODEEXPR_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprOpr.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeExprOpr.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeExprOpr::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractExprOpr(*this);
+
+        if (std::holds_alternative<std::shared_ptr<ASTNodeExprOpr>>(leftFactor)) {
+            std::get<std::shared_ptr<ASTNodeExprOpr>>(leftFactor)->acceptVisitor(extractor);
+        }
+
+        if (std::holds_alternative<std::shared_ptr<ASTNodeExprOpr>>(rightFactor)) {
+            std::get<std::shared_ptr<ASTNodeExprOpr>>(rightFactor)->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeExprOpr::addOpr(const char* opr) {
+    // TODO: TO BE IMPLEMENTED
+}
+
+void ASTNodeExprOpr::addLeftFactor(Factor leftFactor) { this->leftFactor = leftFactor; }
+
+void ASTNodeExprOpr::addRightFactor(Factor rightFactor) { this->rightFactor = rightFactor; }
+
+const char* ASTNodeExprOpr::getOpr() const {
+    return nullptr;
+    // TODO: TO BE IMPLEMENTED
+}
+
+Factor ASTNodeExprOpr::getLeftFactor() const { return leftFactor; }
+
+Factor ASTNodeExprOpr::getRightFactor() const { return rightFactor; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprCondUnary.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeExprCondUnary.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeExprCondUnary::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractExprCondUnary(*this);
+        if (exprCond) {
+            exprCond->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeExprCondUnary::addCondOp(const char* condOp) {
+    // TODO: TO BE IMPLEMENTED
+}
+
+void ASTNodeExprCondUnary::addExprCond(std::shared_ptr<ASTNodeExprCond> exprCond) { this->exprCond = exprCond; }
+
+const char* ASTNodeExprCondUnary::getCondOp() const {
+    return nullptr;
+    // TODO: TO BE IMPLEMENTED
+}
+
+const std::shared_ptr<ASTNodeExprCond>& ASTNodeExprCondUnary::getExprCond() const { return exprCond; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprOpr.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_EXPR_ASTNODEEXPROPR_H_
+#define SP_AST_EXPR_ASTNODEEXPROPR_H_
+
+#include "ASTNodeExpr.h"
+#include "Common/Types.h"
+
+class ASTNodeExprOpr : public ASTNodeExpr {
+protected:
+    // Note: Factor is either varName, constVal, Expr
+    char* opr;          // TODO: To change to a more suitable representation
+    Factor leftFactor;  // TODO: Might change to a more suitable representation
+    Factor rightFactor; // TODO: Might change to a more suitable representation
+
+public:
+    using ASTNodeExpr::ASTNodeExpr;
+    virtual void acceptVisitor(std::weak_ptr<DesignExtractor> extractor) override;
+
+    void addOpr(const char* opr);
+    void addLeftFactor(Factor leftFactor);
+    void addRightFactor(Factor rightFactor);
+
+    const char* getOpr() const;
+    Factor getLeftFactor() const;
+    Factor getRightFactor() const;
+};
+
+#endif // SP_AST_EXPR_ASTNODEEXPROPR_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprCondRel.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeExprCondRel.h"
+#include "ASTNodeExprOpr.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+
+void ASTNodeExprCondRel::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractExprCondRel(*this);
+
+        if (std::holds_alternative<std::shared_ptr<ASTNodeExprOpr>>(leftRelFactor)) {
+            std::get<std::shared_ptr<ASTNodeExprOpr>>(leftRelFactor)->acceptVisitor(extractor);
+        }
+
+        if (std::holds_alternative<std::shared_ptr<ASTNodeExprOpr>>(rightRelFactor)) {
+            std::get<std::shared_ptr<ASTNodeExprOpr>>(rightRelFactor)->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeExprCondRel::addRelOp(const char* relOp) {
+    // TODO: TO BE IMPLEMENTED
+}
+
+void ASTNodeExprCondRel::addLeftFactor(Factor leftRelFactor) { this->leftRelFactor = leftRelFactor; }
+
+void ASTNodeExprCondRel::addRightFactor(Factor rightRelFactor) { this->rightRelFactor = rightRelFactor; }
+
+const char* ASTNodeExprCondRel::getRelOp() const {
+    return nullptr;
+    // TODO: TO BE IMPLEMENTED
+}
+
+Factor ASTNodeExprCondRel::getLeftFactor() const { return leftRelFactor; }
+
+Factor ASTNodeExprCondRel::getRightFactor() const { return rightRelFactor; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprCondRel.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_EXPR_ASTNODEEXPRCONDREL_H_
+#define SP_AST_EXPR_ASTNODEEXPRCONDREL_H_
+
+#include "ASTNodeExprCond.h"
+#include "Common/Types.h"
+
+class ASTNodeExprCondRel : public ASTNodeExprCond {
+protected:
+    // Note: RelFactor is either varName, constVal, Expr
+    char* relOp;           // TODO: To change to a more suitable representation
+    Factor leftRelFactor;  // TODO: Might change to a more suitable representation.
+    Factor rightRelFactor; // TODO: Might change to a more suitable representation
+
+public:
+    using ASTNodeExprCond::ASTNodeExprCond;
+    virtual void acceptVisitor(std::weak_ptr<DesignExtractor> extractor) override;
+
+    void addRelOp(const char* relOp);
+    void addLeftFactor(Factor leftRelFactor);
+    void addRightFactor(Factor rightRelFactor);
+
+    const char* getRelOp() const;
+    Factor getLeftFactor() const;
+    Factor getRightFactor() const;
+};
+
+#endif // SP_AST_EXPR_ASTNODEEXPRCONDREL_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/ASTNodeStmtLst.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_ASTNODESTMTLST_H_
+#define SP_AST_ASTNODESTMTLST_H_
+
+#include "ASTNode.h"
+#include <memory>
+#include <vector>
+
+class ASTNodeStmt;
+
+class ASTNodeStmtLst : public ASTNode {
+protected:
+    std::vector<std::shared_ptr<ASTNodeStmt>> stmts;
+
+public:
+    using ASTNode::ASTNode;
+    virtual void acceptVisitor(std::weak_ptr<DesignExtractor> extractor) override;
+
+    void addStmt(std::shared_ptr<ASTNodeStmt> stmt);
+
+    const std::vector<std::shared_ptr<ASTNodeStmt>>& getStmts() const;
+};
+
+#endif // SP_AST_ASTNODESTMTLST_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/ASTNodeProgram.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_AST_ASTNODEPROGRAM_H_
+#define SP_AST_ASTNODEPROGRAM_H_
+
+#include "ASTNode.h"
+#include <memory>
+#include <vector>
+
+class ASTNodeProcedure;
+class DesignExtractor;
+
+class ASTNodeProgram : public ASTNode {
+protected:
+    std::vector<std::shared_ptr<ASTNodeProcedure>> procs;
+
+public:
+    using ASTNode::ASTNode;
+    virtual void acceptVisitor(std::weak_ptr<DesignExtractor> extractor) override;
+
+    void addProcedure(std::shared_ptr<ASTNodeProcedure> proc);
+
+    const std::vector<std::shared_ptr<ASTNodeProcedure>>& getProcs() const;
+};
+
+#endif // SP_AST_ASTNODEPROGRAM_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/AST/ASTNodeStmtLst.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTNodeStmtLst.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+#include "Stmt/ASTNodeStmt.h"
+
+void ASTNodeStmtLst::acceptVisitor(std::weak_ptr<DesignExtractor> extractor) {
+    if (auto extractedShared = extractor.lock(); extractedShared) {
+        extractedShared->extractStmtLst(*this);
+        for (auto stmt : stmts) {
+            stmt->acceptVisitor(extractor);
+        }
+    }
+}
+
+void ASTNodeStmtLst::addStmt(std::shared_ptr<ASTNodeStmt> stmt) {
+    if (stmt) {
+        stmts.push_back(stmt);
+    }
+}
+
+const std::vector<std::shared_ptr<ASTNodeStmt>>& ASTNodeStmtLst::getStmts() const { return stmts; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/DesignExtractor/DesignExtractor.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_DESIGNEXTRACTOR_DESIGNEXTRACTOR_H_
+#define SP_DESIGNEXTRACTOR_DESIGNEXTRACTOR_H_
+
+#include <memory>
+#include <vector>
+
+class ASTNodeProgram;
+class ASTNodeProcedure;
+class ASTNodeStmtLst;
+class ASTNodeStmtRead;
+class ASTNodeStmtPrint;
+class ASTNodeStmtAssign;
+class ASTNodeStmtCall;
+class ASTNodeStmtWhile;
+class ASTNodeStmtIf;
+class ASTNodeExpr;
+class ASTNodeExprCondRel;
+class ASTNodeExprCondBinary;
+class ASTNodeExprCondUnary;
+class ASTNodeExprOpr;
+class NodeExtractor;
+
+class DesignExtractor {
+protected:
+    std::vector<std::shared_ptr<NodeExtractor>> procedureNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> stmtLstNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> readNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> printNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> assignNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> callNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> whileNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> ifNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> exprOprNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> exprCondRelNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> exprCondUnaryNodeExtractors;
+    std::vector<std::shared_ptr<NodeExtractor>> exprCondBinaryNodeExtractors;
+
+public:
+    virtual ~DesignExtractor() = default;
+
+    virtual void extractProgram(const ASTNodeProgram& programNode);
+    virtual void extractProcedure(const ASTNodeProcedure& procedureNode);
+    virtual void extractStmtLst(const ASTNodeStmtLst& stmtLstNode);
+    virtual void extractStmtRead(const ASTNodeStmtRead& readNode);
+    virtual void extractStmtPrint(const ASTNodeStmtPrint& printNode);
+    virtual void extractStmtAssign(const ASTNodeStmtAssign& assignNode);
+    virtual void extractStmtCall(const ASTNodeStmtCall& callNode);
+    virtual void extractStmtWhile(const ASTNodeStmtWhile& whileNode);
+    virtual void extractStmtIf(const ASTNodeStmtIf& ifNode);
+    virtual void extractExprOpr(const ASTNodeExprOpr& exprOprNode);
+    virtual void extractExprCondRel(const ASTNodeExprCondRel& exprCondRelNode);
+    virtual void extractExprCondUnary(const ASTNodeExprCondUnary& exprCondUnaryNode);
+    virtual void extractExprCondBinary(const ASTNodeExprCondBinary& exprCondBinaryNode);
+};
+
+#endif // SP_DESIGNEXTRACTOR_DESIGNEXTRACTOR_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/DesignExtractor/EntityDesignExtractor.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef SP_DESIGNEXTRACTOR_ENTITYDESIGNEXTRACTOR_H_
+#define SP_DESIGNEXTRACTOR_ENTITYDESIGNEXTRACTOR_H_
+
+#include "DesignExtractor.h"
+#include "Extractors/Entities/VariableExtractor.h"
+#include "PKB/PKB.h"
+#include <memory>
+
+class MockWriter;
+
+class EntityDesignExtractor : public DesignExtractor {
+public:
+    EntityDesignExtractor(std::weak_ptr<PKB> pkb) : pkb(pkb) {
+        // Initialize all needed extractors here
+        auto variableExtractor = std::make_shared<VariableExtractor>(pkb);
+
+        exprOprNodeExtractors.emplace_back(variableExtractor);
+        exprCondRelNodeExtractors.emplace_back(variableExtractor);
+    }
+
+private:
+    std::weak_ptr<PKB> pkb;
+};
+
+#endif // SP_DESIGNEXTRACTOR_ENTITYDESIGNEXTRACTOR_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/DesignExtractor/Extractors/Relationships/FollowsExtractor.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "../../DesignExtractorFacade.h" // TODO: Replace with actual location of Writer class to replace MockWriter when available
+#include "Common/Types.h"
+#include "FollowsExtractor.h"
+#include "SP/AST/ASTNodeStmtLst.h"
+#include "SP/AST/Stmt/ASTNodeStmt.h"
+#include <stdexcept>
+#include <string>
+#include <unordered_set>
+#include <utility>
+
+void FollowsExtractor::extractNode(const ASTNodeStmtLst& node) {
+    const auto& stmts = node.getStmts();
+
+    auto it = stmts.begin();
+    auto end = stmts.end();
+
+    // std::unordered_set<std::pair<std::string, std::string>> followsSet;
+
+    if (it != end) {
+        auto prevStmt = *it;
+        ++it;
+
+        for (; it != end; ++it) {
+            auto currStmt = *it;
+            auto followsRelationship =
+                std::make_pair<std::string, std::string>(prevStmt->getStmtNo(), currStmt->getStmtNo());
+
+            // followsSet.insert(followsRelationship);
+
+            prevStmt = currStmt;
+        }
+    }
+
+    if (auto writerShared = pkb.lock(); writerShared) {
+        // writerShared->storeRelationship(followsSet);
+    } else {
+        throw std::runtime_error("Invalid PKB writer reference during extraction of Follows relationship");
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/SP/DesignExtractor/Extractors/Entities/VariableExtractor.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+// TODO: Think about refactoring this another time, this is a bit of a mess right now
+// Note: The second half of the above statement is generated via copilot
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/PatternStorage/PatternStorageBase.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include <unordered_map>
+#include <unordered_set>
+#include <string>
+
+class PatternStorageBase {
+    
+private:
+    std::unordered_map<std::string, std::unordered_set<std::string>> patterns;
+
+public:
+    virtual ~PatternStorageBase();
+    virtual void addPattern(const std::string& key, const std::string& value);
+    virtual bool isEmpty() const;
+    virtual std::unordered_set<std::string> getValue(const std::string& key) const;
+    virtual std::unordered_set<std::string> getKeys() const;
+    virtual bool containsKey(const std::string& key) const;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/ProcedureStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/ProcedureEntity.h"
+
+class ProcedureStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/PrintStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/PrintEntity.h"
+
+class PrintStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/EntityStorageBase.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include<unordered_set>
+#include<string>
+#include "Common/Entities/Entity.h"
+
+class EntityStorageBase {
+
+private:
+    std::unordered_set<std::string> entities;
+
+public:
+    virtual ~EntityStorageBase();
+    virtual void addEntities(Entity& entity);
+    //virtual void addEntity(const std::string& Entity);
+    virtual std::unordered_set<std::string> getEntities();
+    virtual bool isEmpty() const;
+    virtual size_t count() const;
+    virtual bool containsEntity(const std::string& Entity) const;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/IfStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/IfEntity.h"
+
+class IfStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/WhileStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/WhileEntity.h"
+
+class WhileStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/AssignStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/AssignEntity.h"
+
+class AssignStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/CallStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/CallEntity.h"
+
+class CallStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/ReadStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/ReadEntity.h"
+
+class ReadStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/VariableStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/VariableEntity.h"
+
+class VariableStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/ConstantStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/ConstantEntity.h"
+
+class ConstantStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/EntityStorageBase.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "EntityStorageBase.h"
+
+EntityStorageBase::~EntityStorageBase() {}
+
+/*
+void EntityStorageBase::addEntity(const std::string& Entity) {
+    entities.insert(Entity);
+}
+*/
+
+void EntityStorageBase::addEntities(Entity& entity) {
+    std::unordered_set<std::string>* entityAttributes = &entity.getEntityAttributes();
+    entities.insert(entityAttributes->begin(), entityAttributes->end());
+}
+
+std::unordered_set<std::string> EntityStorageBase::getEntities() { return entities; }
+
+bool EntityStorageBase::isEmpty() const { return entities.empty(); }
+
+size_t EntityStorageBase::count() const { return entities.size(); }
+
+bool EntityStorageBase::containsEntity(const std::string& Entity) const { return entities.count(Entity) > 0; }
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/EntityStorage/StatementStorage.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "EntityStorageBase.h"
+#include "Common/Entities/StatementEntity.h"
+
+class StatementStorage : public EntityStorageBase {
+public:
+    // Uses all the methods from EntityStorageBase, no need to redefine them here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/ParentTStorage.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "AbstractionStorageBase.h"
+
+// stores (' stmtRef ', unordered_set<'stmtRef'>) pairs
+class ParentTStorage : public AbstractionStorageBase {
+    // No additional methods
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/AbstractionStorageBase.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include <unordered_map>
+#include <unordered_set>
+#include <string>
+
+class AbstractionStorageBase {
+
+private:
+    std::unordered_map<std::string, std::unordered_set<std::string>> relationship;
+    std::unordered_map<std::string, std::unordered_set<std::string>> inverseRelationship;
+
+public:
+    virtual ~AbstractionStorageBase();
+    virtual void addToRelationship(const std::string& key, const std::string& value);
+    virtual void addToInverseRelationship(const std::string& key, const std::string& value);
+    virtual void addToBoth(const std::string& key, const std::string& value);
+    virtual std::unordered_set<std::string> getValue(const std::string& key) const;
+    virtual std::unordered_set<std::string> getKeys() const;
+    virtual std::unordered_set<std::string> getInvertedValue(const std::string& key) const;
+    virtual std::unordered_set<std::string> getInvertedKeys() const;
+    virtual bool isEmpty() const;
+    virtual bool containsKey(const std::string& key) const;
+    virtual bool containsInvertedKey(const std::string& key) const;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/ModifiesPStorage.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "AbstractionStorageBase.h"
+
+// stores (' entRef ', unordered_set<'entRef'>) pairs
+class ModifiesPStorage : public AbstractionStorageBase {
+    // No additional methods
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/UsesSStorage.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "AbstractionStorageBase.h"
+
+// stores (' stmtRef ', unordered_set<'entRef'>) pairs
+class UsesSStorage : public AbstractionStorageBase {
+    // No additional methods
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/ParentStorage.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "AbstractionStorageBase.h"
+
+// stores (' stmtRef ', unordered_set<'stmtRef'>) pairs
+class ParentStorage : public AbstractionStorageBase {
+    // No additional methods
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/AbstractionStorageBase.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/X0MfnTPRzaKgz1JZaTAPugjk?model=gpt-4&mode=chat
+ChatId: X0MfnTPRzaKgz1JZaTAPugjk
+Code:
+#include "AbstractionStorageBase.h"
+
+AbstractionStorageBase::~AbstractionStorageBase() {}
+
+void AbstractionStorageBase::addToRelationship(const std::string& key, const std::string& value) {
+    relationship[key].insert(value);
+}
+
+void AbstractionStorageBase::addToInverseRelationship(const std::string& key, const std::string& value) {
+    inverseRelationship[key].insert(value);
+}
+
+void AbstractionStorageBase::addToBoth(const std::string& key, const std::string& value) {
+
+    // One relationship is stored in two places, so we need to add it to both
+    addToRelationship(key, value);
+    addToInverseRelationship(value, key);
+}
+
+std::unordered_set<std::string> AbstractionStorageBase::getKeys() const {
+    std::unordered_set<std::string> keys;
+    for (const auto& entry : relationship) {
+        keys.insert(entry.first);
+    }
+    return keys;
+}
+
+std::unordered_set<std::string> AbstractionStorageBase::getValue(const std::string& key) const {
+    if (relationship.find(key) != relationship.end()) {
+        return relationship.at(key);
+    }
+    return std::unordered_set<std::string>();
+}
+
+std::unordered_set<std::string> AbstractionStorageBase::getInvertedKeys() const {
+    std::unordered_set<std::string> keys;
+    for (const auto& entry : inverseRelationship) {
+        keys.insert(entry.first);
+    }
+    return keys;
+}
+
+std::unordered_set<std::string> AbstractionStorageBase::getInvertedValue(const std::string& key) const {
+    if (inverseRelationship.find(key) != inverseRelationship.end()) {
+        return inverseRelationship.at(key);
+    }
+    return std::unordered_set<std::string>();
+}
+
+bool AbstractionStorageBase::isEmpty() const {
+    return relationship.empty();
+}
+
+bool AbstractionStorageBase::containsKey(const std::string& key) const {
+    return relationship.count(key) > 0;
+}
+
+bool AbstractionStorageBase::containsInvertedKey(const std::string& key) const {
+    return inverseRelationship.count(key) > 0;
+}
+
+
+// end ai-gen
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/FollowsTStorage.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "AbstractionStorageBase.h"
+
+// stores (' stmtRef ', unordered_set<'stmtRef'>) pairs
+class FollowsTStorage : public AbstractionStorageBase {
+    // No additional methods
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/UsesPStorage.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "AbstractionStorageBase.h"
+
+// stores (' entRef ', unordered_set<'entRef'>) pairs
+class UsesPStorage : public AbstractionStorageBase {
+    // No additional methods
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/FollowsStorage.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "AbstractionStorageBase.h"
+
+// stores (' stmtRef ', unordered_set<'stmtRef'>) pairs
+class FollowsStorage : public AbstractionStorageBase {
+    // No additional methods
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/PKB/AbstractionStorage/ModifiesSStorage.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+#include "AbstractionStorageBase.h"
+
+// stores (' stmtRef ', unordered_set<'entRef'> ) pairs
+class ModifiesSStorage : public AbstractionStorageBase {
+    // No additional methods
+};
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/Common/ITokenizer/ITokenizer.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// Tokenizer assistant used - THREAD: thread_Wu21Pq3DmbgzHOCkgLlUbx2j
+
+#ifndef ITOKENIZER_H
+#define ITOKENIZER_H
+
+#include <vector>
+#include "../../SP/Tokens/SPToken.h"
+
+class ITokenizer {
+public:
+    // Ensure proper cleanup with a virtual destructor
+    virtual ~ITokenizer() {}
+
+    // Pure virtual function for tokenizing a string
+    virtual std::vector<SPToken> tokenize(std::string input) = 0;
+};
+
+#endif
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/Common/Relationships/Relationship.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "Relationship.h"
+#include <functional> // Add this line
+
+Relationship::~Relationship() {}
+
+/*
+bool Relationship::setRelationshipAttributes(std::unordered_set<std::pair<std::string, std::string>>& attributes) {
+    relationshipAttributes = attributes; 
+    return true;
+}
+
+std::unordered_set<std::pair<std::string, std::string>>& Relationship::getRelationshipAttributes() {
+    return relationshipAttributes; 
+}
+
+bool Relationship::findValue(const std::string& key) {
+    keyHolder = key;
+    return true; 
+}
+
+
+std::string& Relationship::getKey() {
+    return keyHolder;
+}
+*/
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/spa/src/Common/Entities/Entity.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#pragma once
+
+#include "Entity.h"
+#include <unordered_set>
+
+Entity::~Entity() {}
+
+bool Entity::setEntityAttributes(const std::unordered_set<std::string>& attributes) {
+    entityAttributes = attributes; // Assign the attributes directly to the member variable.
+    return true;
+}
+
+std::unordered_set<std::string> Entity::getEntityAttributes() {
+    return entityAttributes; // Return the member variable directly.
+}
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/unit_testing/src/AST/ASTTestUtils.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#ifndef AST_ASTTESTUTILS_H_
+#define AST_ASTTESTUTILS_H_
+
+#include "catch.hpp"
+
+#include "SP/AST/ASTNodeProcedure.h"
+#include "SP/AST/ASTNodeProgram.h"
+#include "SP/AST/ASTNodeStmtLst.h"
+#include "SP/AST/Expr/ASTNodeExprCondBinary.h"
+#include "SP/AST/Expr/ASTNodeExprCondRel.h"
+#include "SP/AST/Expr/ASTNodeExprCondUnary.h"
+#include "SP/AST/Expr/ASTNodeExprOpr.h"
+#include "SP/AST/Stmt/ASTNodeStmtAssign.h"
+#include "SP/AST/Stmt/ASTNodeStmtCall.h"
+#include "SP/AST/Stmt/ASTNodeStmtIf.h"
+#include "SP/AST/Stmt/ASTNodeStmtPrint.h"
+#include "SP/AST/Stmt/ASTNodeStmtRead.h"
+#include "SP/AST/Stmt/ASTNodeStmtWhile.h"
+#include "SP/DesignExtractor/DesignExtractor.h"
+#include <memory>
+
+// Create the mock design extractor
+class MockDesignExtractor : public DesignExtractor, public std::enable_shared_from_this<MockDesignExtractor> {
+public:
+    // Tracks the number of times the design extractor's extract functions were called
+    // This is a proxy for the number of nodes in the AST when designExtractor->extractProgram(programNode) is called
+    int totalNodesTraversed = 0;
+
+    virtual void extractProgram(const ASTNodeProgram& programNode) override { ++totalNodesTraversed; }
+    virtual void extractProcedure(const ASTNodeProcedure& procedureNode) override { ++totalNodesTraversed; }
+    virtual void extractStmtLst(const ASTNodeStmtLst& stmtLstNode) override { ++totalNodesTraversed; }
+    virtual void extractStmtAssign(const ASTNodeStmtAssign& stmtAssignNode) override { ++totalNodesTraversed; }
+    virtual void extractStmtCall(const ASTNodeStmtCall& stmtCallNode) override { ++totalNodesTraversed; }
+    virtual void extractStmtIf(const ASTNodeStmtIf& stmtIfNode) override { ++totalNodesTraversed; }
+    virtual void extractStmtPrint(const ASTNodeStmtPrint& stmtPrintNode) override { ++totalNodesTraversed; }
+    virtual void extractStmtRead(const ASTNodeStmtRead& stmtReadNode) override { ++totalNodesTraversed; }
+    virtual void extractStmtWhile(const ASTNodeStmtWhile& stmtWhileNode) override { ++totalNodesTraversed; }
+    virtual void extractExprOpr(const ASTNodeExprOpr& exprOprNode) override { ++totalNodesTraversed; }
+    virtual void extractExprCondRel(const ASTNodeExprCondRel& exprCondRelNode) override { ++totalNodesTraversed; }
+    virtual void extractExprCondUnary(const ASTNodeExprCondUnary& exprUnaryNode) override { ++totalNodesTraversed; }
+    virtual void extractExprCondBinary(const ASTNodeExprCondBinary& exprBinaryNode) override { ++totalNodesTraversed; }
+};
+
+// Create the mock factory functions for nodes
+class MockNodeFactory {
+public:
+    static std::shared_ptr<ASTNodeProgram> createProgramNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeProgram>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeProcedure> createProcedureNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeProcedure>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeStmtLst> createStmtLstNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeStmtLst>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeStmtAssign> createStmtAssignNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeStmtAssign>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeStmtCall> createStmtCallNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeStmtCall>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeStmtIf> createStmtIfNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeStmtIf>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeStmtPrint> createStmtPrintNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeStmtPrint>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeStmtRead> createStmtReadNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeStmtRead>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeStmtWhile> createStmtWhileNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeStmtWhile>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeExprOpr> createExprOprNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeExprOpr>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeExprCondRel> createExprCondRelNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeExprCondRel>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeExprCondUnary> createExprCondUnaryNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeExprCondUnary>(stmtNo);
+    }
+    static std::shared_ptr<ASTNodeExprCondBinary> createExprCondBinaryNode(std::string stmtNo = "0") {
+        return std::make_shared<ASTNodeExprCondBinary>(stmtNo);
+    }
+};
+
+#endif // AST_ASTTESTUTILS_H_
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/unit_testing/src/AST/TestASTExpr.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTTestUtils.h"
+
+TEST_CASE("Test ASTNodeExpr Nodes") {
+    // Construction of extractor
+    auto designExtractor = std::make_shared<MockDesignExtractor>();
+
+    SECTION("Test ASTNodeExprBinary Construction") {
+        auto exprBinaryNode = MockNodeFactory::createExprCondBinaryNode();
+        exprBinaryNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("Test ASTNodeExprBinary Traversal with Children") {
+        // Create exprBinaryNode with 2 children
+        auto exprBinaryNode = MockNodeFactory::createExprCondBinaryNode();
+        auto exprCondNode1 = MockNodeFactory::createExprCondBinaryNode();
+        auto exprCondNode2 = MockNodeFactory::createExprCondUnaryNode();
+        exprBinaryNode->addLeftExprCond(exprCondNode1);
+        exprBinaryNode->addRightExprCond(exprCondNode2);
+
+        exprBinaryNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 3);
+    }
+
+    SECTION("Test ASTNodeExprRel Construction") {
+        auto exprRelNode = MockNodeFactory::createExprCondRelNode();
+        exprRelNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("Test ASTNodeExprUnary Construction") {
+        auto exprUnaryNode = MockNodeFactory::createExprCondUnaryNode();
+        exprUnaryNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("Test ASTNodeExprUnary Traversal with Child") {
+        // Create exprUnaryNode with 1 child
+        auto exprUnaryNode = MockNodeFactory::createExprCondUnaryNode();
+        auto exprCondNode2 = MockNodeFactory::createExprCondRelNode();
+        exprUnaryNode->addExprCond(exprCondNode2);
+
+        exprUnaryNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 2);
+    }
+
+    SECTION("Test ASTNodeExprOpr Construction") {
+        auto exprOprNode = MockNodeFactory::createExprOprNode();
+        exprOprNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+}
+
+// TODO: Need more test cases for Expr nodes when Factors are implemented
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/unit_testing/src/AST/TestASTStmt.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include "ASTTestUtils.h"
+
+TEST_CASE("ASTNode Construction") {
+    // Construction of extractor and nodes
+    auto designExtractor = std::make_shared<MockDesignExtractor>();
+
+    SECTION("ProgramNode") {
+        auto programNode = MockNodeFactory::createProgramNode();
+        programNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("ProcedureNode") {
+        auto procedureNode = MockNodeFactory::createProcedureNode();
+        procedureNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("StmtLst") {
+        auto stmtLstNode = MockNodeFactory::createStmtLstNode();
+        stmtLstNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+}
+
+TEST_CASE("ASTNodeStmt Construction") {
+    // Construction of extractor and nodes
+    auto designExtractor = std::make_shared<MockDesignExtractor>();
+
+    SECTION("StmtAssign") {
+        auto stmtAssignNode = MockNodeFactory::createStmtAssignNode();
+        stmtAssignNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("StmtCall") {
+        auto stmtCallNode = MockNodeFactory::createStmtCallNode();
+        stmtCallNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("StmtIf") {
+        auto stmtIfNode = MockNodeFactory::createStmtIfNode();
+        stmtIfNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("StmtPrint") {
+        auto stmtPrintNode = MockNodeFactory::createStmtPrintNode();
+        stmtPrintNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("StmtRead") {
+        auto stmtReadNode = MockNodeFactory::createStmtReadNode();
+        stmtReadNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+
+    SECTION("StmtWhile") {
+        auto stmtWhileNode = MockNodeFactory::createStmtWhileNode();
+        stmtWhileNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 1);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/unit_testing/src/AST/TestASTStmt.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+TEST_CASE("Test ASTNode AST Construction and AST Traversal") {
+    // Construction of extractor and nodes
+    auto designExtractor = std::make_shared<MockDesignExtractor>();
+    auto programNode = MockNodeFactory::createProgramNode();
+    auto procedureNode = MockNodeFactory::createProcedureNode();
+    auto stmtLstNode = MockNodeFactory::createStmtLstNode();
+
+    // Linking of nodes to form AST
+    programNode->addProcedure(procedureNode);
+    procedureNode->setStmtLst(stmtLstNode);
+
+    // Verification of number of nodes in AST
+    programNode->acceptVisitor(designExtractor);
+    REQUIRE(designExtractor->totalNodesTraversed == 3);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-06
+File: Team06/Code06/src/unit_testing/src/AST/TestASTStmt.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+TEST_CASE("Test AST Construction and AST Traversal") {
+    // Construction of extractor and nodes
+    auto designExtractor = std::make_shared<MockDesignExtractor>();
+    auto programNode = MockNodeFactory::createProgramNode("0");
+    auto procedureNode1 = MockNodeFactory::createProcedureNode("1");
+    auto stmtLstNode1 = MockNodeFactory::createStmtLstNode("2");
+    auto stmtAssignNode = MockNodeFactory::createStmtAssignNode("3");
+    auto stmtCallNode = MockNodeFactory::createStmtCallNode("4");
+    auto stmtIfNode = MockNodeFactory::createStmtIfNode("5");
+    auto stmtPrintNode = MockNodeFactory::createStmtPrintNode("6");
+    auto stmtReadNode = MockNodeFactory::createStmtReadNode("7");
+    auto stmtWhileNode = MockNodeFactory::createStmtWhileNode("8");
+
+    SECTION("Traversal with All 6 Types of Stmts in 1 Procedure/StmtLst") {
+        // Linking of nodes to form AST
+        programNode->addProcedure(procedureNode1);
+        procedureNode1->setStmtLst(stmtLstNode1);
+        stmtLstNode1->addStmt(stmtAssignNode);
+        stmtLstNode1->addStmt(stmtCallNode);
+        stmtLstNode1->addStmt(stmtIfNode);
+        stmtLstNode1->addStmt(stmtPrintNode);
+        stmtLstNode1->addStmt(stmtReadNode);
+        stmtLstNode1->addStmt(stmtWhileNode);
+
+        // Verification of number of nodes in AST
+        programNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 9);
+    }
+
+    SECTION("Traversal with All 6 Stmt Types in 2 separate Procedures/StmtLsts") {
+        // Additional nodes
+        auto procedureNode2 = MockNodeFactory::createProcedureNode();
+        auto stmtLstNode2 = MockNodeFactory::createStmtLstNode();
+
+        // Linking of nodes to form AST
+        programNode->addProcedure(procedureNode1);
+        programNode->addProcedure(procedureNode2);
+        procedureNode1->setStmtLst(stmtLstNode1);
+        procedureNode2->setStmtLst(stmtLstNode2);
+        stmtLstNode1->addStmt(stmtAssignNode);
+        stmtLstNode1->addStmt(stmtCallNode);
+        stmtLstNode1->addStmt(stmtIfNode);
+        stmtLstNode2->addStmt(stmtPrintNode);
+        stmtLstNode2->addStmt(stmtReadNode);
+        stmtLstNode2->addStmt(stmtWhileNode);
+
+        // Verification of number of nodes in AST
+        programNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 11);
+    }
+
+    SECTION("Traversal with StmtNos Assigned") {
+        // Additional nodes
+        auto procedureNode2 = MockNodeFactory::createProcedureNode("9");
+        auto stmtLstNode2 = MockNodeFactory::createStmtLstNode("10");
+
+        // Linking of nodes to form AST
+        programNode->addProcedure(procedureNode1);
+        programNode->addProcedure(procedureNode2);
+        procedureNode1->setStmtLst(stmtLstNode1);
+        procedureNode2->setStmtLst(stmtLstNode2);
+        stmtLstNode1->addStmt(stmtAssignNode);
+        stmtLstNode1->addStmt(stmtCallNode);
+        stmtLstNode2->addStmt(stmtIfNode);
+        stmtLstNode2->addStmt(stmtPrintNode);
+
+        // Verification of number of nodes in AST
+        // Note: In production, the stmtNo is verified and assigned by the parser
+        programNode->acceptVisitor(designExtractor);
+        REQUIRE(designExtractor->totalNodesTraversed == 9);
+        REQUIRE(programNode->getStmtNo() == "0");
+        REQUIRE(procedureNode1->getStmtNo() == "1");
+        REQUIRE(procedureNode2->getStmtNo() == "9");
+        REQUIRE(stmtLstNode1->getStmtNo() == "2");
+        REQUIRE(stmtLstNode2->getStmtNo() == "10");
+        REQUIRE(stmtAssignNode->getStmtNo() == "3");
+        REQUIRE(stmtCallNode->getStmtNo() == "4");
+        REQUIRE(stmtIfNode->getStmtNo() == "5");
+        REQUIRE(stmtPrintNode->getStmtNo() == "6");
+    }
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-06
+Total Snippets: 68
+Total lines: 1639
+SP Snippets: 28
+SP lines: 829
+PKB Snippets: 23
+PKB lines: 309
+QPS Snippets: 9
+QPS lines: 126

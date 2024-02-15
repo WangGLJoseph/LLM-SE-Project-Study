@@ -1,0 +1,23 @@
+enum class StatementType {
+    READ,
+    PRINT,
+    ASSIGN,
+    CALL,
+    WHILE,
+    IF,
+};
+
+typedef std::string Procedure;
+typedef std::string Variable;
+typedef std::string Constant;
+typedef int StmtNum;
+
+struct Stmt {
+    StatementType type;
+    StmtNum stmtNum;
+
+    // must overload the == operator.
+    bool operator==(const Stmt &other) const {
+        return stmtNum == other.stmtNum && type == other.type;
+    }
+};

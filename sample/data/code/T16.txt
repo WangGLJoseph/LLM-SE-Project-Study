@@ -1,0 +1,282 @@
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/PKB/Tables/Base/IEntityTable.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4d1458e5-2925-4f5a-a6ba-a75fc192c817
+ChatId: 
+Code:
+void addRow(Key key, std::shared_ptr<Value> value) {
+        table[key] = value;
+    }
+
+    std::shared_ptr<Value> getRow(Key key) {
+        auto it = table.find(key);
+        if (it != table.end()) {
+            return it->second;
+        }
+        return nullptr; // Or handle the case where the key is not found
+    }
+
+    std::unordered_map<Key, std::shared_ptr<Value>> getAllRows() {
+        return table;
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/PKB/Storage.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/c/a1320bcd-2185-46c7-b524-c1abe2460879
+ChatId: 
+Code:
+// Getter function to retrieve IPKBTable object from Storage, or create a new one if it does not exist.
+std::shared_ptr<IPKBTable> Storage::getOrCreateTable(const SPADataType key)
+{
+    auto it = tables.find(key);
+    if (it != tables.end()) {
+        return it->second;
+    }
+    else {
+        std::shared_ptr<IPKBTable> newTable = std::make_shared<IPKBTable>(key); // Return new table if key is not found
+        tables[key] = newTable;
+        return newTable;
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/PKB/Facades/PQLFacade.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// prompt used: https://platform.openai.com/playground/p/YFPFUap3B36hOTDzhjSlqnFe?model=gpt-4&mode=chat
+    // Delete the default constructor.
+    PQLFacade() = delete;
+
+    // Delete the copy constructor.
+    PQLFacade(const PQLFacade&) = delete;
+
+    // Delete the assignment operator.
+    PQLFacade& operator=(const PQLFacade&) = delete;
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/PKB/Facades/SPFacade.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/yqWjZ1LL5NjZitx7ga3TXrwE?model=gpt-4&mode=chat
+ChatId: yqWjZ1LL5NjZitx7ga3TXrwE
+Code:
+void SPFacade::storeVariable(string& variableName)
+{
+    return PopulateHandler::storeVariable(variableName);
+}
+
+void SPFacade::storeCall(int lineNumber)
+{
+    return PopulateHandler::storeCall(lineNumber);
+}
+
+void SPFacade::storeRead(int lineNumber)
+{
+    return PopulateHandler::storeRead(lineNumber);
+}
+
+void SPFacade::storePrint(int lineNumber)
+{
+    return PopulateHandler::storePrint(lineNumber);
+}
+
+void SPFacade::storeProcedure(string& procedureName)
+{
+    return PopulateHandler::storeProcedure(procedureName);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/PKB/Handlers/QueryHandler.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+// Helper function to convert a key to string. Default implementation for numeric types
+    template<typename Key>
+    std::string keyToString(const Key& key) {
+        return to_string(key); // Default implementation for numeric types
+    }
+
+    // Specialization for std::string
+    template<>
+    std::string keyToString<std::string>(const std::string& key) {
+        return key; // For std::string, return the key itself
+    }
+
+    // Helper function to iterate through a map and return a string of the keys, comma separated
+    template <typename Key, typename Value>
+    std::string iterateThroughMap(const std::unordered_map<Key, std::shared_ptr<Value>>& map) {
+        std::string resultString;
+        for (const auto& [key, val] : map) {
+            resultString += keyToString(key) + ", ";
+        }
+        // Remove the trailing ", "
+        if (!resultString.empty()) {
+            resultString.erase(resultString.length() - 2);
+        }
+        return resultString;
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/Common/FileReader.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/51d22ff9-c94d-48e5-9158-4b2364c910fe
+ChatId: 
+Code:
+#include <iostream>
+#include <fstream>
+#include <string>
+
+class FileReader {
+private:
+    std::string filepath;
+    std::ifstream filestream;
+
+public:
+    FileReader(const std::string& filepath) : filepath(filepath)
+    {
+        filestream.open(filepath);
+        if (!filestream.is_open()) {
+            std::cerr << "Error: Failed to open file '" << filepath << "'." << std::endl;
+        }
+    }
+
+    ~FileReader() {
+        if (filestream.is_open()) {
+            filestream.close();
+        }
+    }
+
+    std::string getLine() {
+        std::string line;
+        if (std::getline(filestream, line)) {
+            return line;
+        }
+        return ""; // Return empty string if there are no more lines
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/Common/FileReader.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/51d22ff9-c94d-48e5-9158-4b2364c910fe
+ChatId: 
+Code:
+#include <iostream>
+#include <fstream>
+#include <string>
+
+class FileReader {
+private:
+    std::string filepath;
+    std::ifstream filestream;
+
+public:
+    FileReader(const std::string& filepath) : filepath(filepath)
+    {
+        filestream.open(filepath);
+        if (!filestream.is_open()) {
+            std::cerr << "Error: Failed to open file '" << filepath << "'." << std::endl;
+        }
+    }
+
+    ~FileReader() {
+        if (filestream.is_open()) {
+            filestream.close();
+        }
+    }
+
+    std::string getLine();
+};
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/Common/Data/SPADataType.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * A function to convert the SPADataType to a string - each enum value is mapped to a unique string identifier
+ * @throws std::runtime_error if the SPADataType is invalid - not found in the map
+ */
+std::string SPADataTypeConverter::convertDataTypeToString(SPADataType type)
+{
+    auto it = SPADataTypeToStringMap.find(type);
+    if (it == SPADataTypeToStringMap.end())
+    {
+        throw std::runtime_error("Invalid SPADataType for conversion to string");
+    }
+    return it->second;
+}
+
+/**
+ * A function to convert a string to a SPADataType - each string identifier is mapped to a unique enum value
+ * @throws std::runtime_error if the string is invalid - not found in the map or does not match any SPADataType
+ */
+SPADataType SPADataTypeConverter::convertStringToDataType(const std::string &typeStr)
+{
+    auto it = stringToSPADataTypeMap.find(typeStr);
+    if (it == stringToSPADataTypeMap.end())
+    {
+        throw std::runtime_error("Invalid string for conversion to SPADataType: " + typeStr);
+    }
+    return it->second;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/Common/Data/SPADataType.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+inline const std::unordered_map<SPADataType, std::string> SPADataTypeToStringMap = []
+    {
+        std::unordered_map<SPADataType, std::string> reversedMap;
+        for (const auto &pair : stringToSPADataTypeMap)
+        {
+            reversedMap[pair.second] = pair.first;
+        }
+        return reversedMap;
+    }();
+
+    /**
+     * A function to convert the SPADataType to a string - each enum value is mapped to a unique string identifier
+     * @throws std::runtime_error if the SPADataType is invalid - not found in the map
+     */
+    std::string convertDataTypeToString(SPADataType type);
+
+    /**
+     * A function to convert a string to a SPADataType - each string identifier is mapped to a unique enum value
+     * @throws std::runtime_error if the string is invalid - not found in the map or does not match any SPADataType
+     */
+    SPADataType convertStringToDataType(const std::string &typeStr);
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-16
+Total Snippets: 9
+Total lines: 200
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 5
+PKB lines: 89
+QPS Snippets: 0
+QPS lines: 0

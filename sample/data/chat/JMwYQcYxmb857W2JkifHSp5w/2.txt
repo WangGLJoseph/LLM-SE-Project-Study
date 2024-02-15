@@ -1,0 +1,10 @@
+class StatementStore {
+public:
+    const std::unordered_set<Stmt>& getStatements() const;
+    void setStatements(const std::unordered_set<Stmt>& inputStmts);
+    Stmt* getStatementByStmtNum(StmtNum stmtNum) const;
+    std::vector<Stmt*> getStatementsByType(StatementType type) const;
+
+private:
+    std::unordered_set<Stmt> statementSet;
+};

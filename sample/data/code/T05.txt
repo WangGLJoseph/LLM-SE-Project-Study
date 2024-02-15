@@ -1,0 +1,1602 @@
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/qps/QueryEvaluator/PKBStub.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/ErjJuev6dMUJWh9xtwKTTNXx?model=gpt-4&mode=chat
+ChatId: ErjJuev6dMUJWh9xtwKTTNXx
+Code:
+class PKBStub {
+private:
+    std::shared_ptr<QueryResult> result;
+public:
+    PKBStub() = default;
+    PKBStub(std::vector<std::string>& stringList)
+            : result(std::make_shared<StringResult>(stringList)) {}
+
+    std::shared_ptr<QueryResult> getResult(Returnable& r, Constraint& c){
+        return result;
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/pkb/PopulatePKB.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/*
+bool PopulatePKB::addVar() {
+    return false;
+}
+bool PopulatePKB::addConst() {
+    return false;
+}
+bool PopulatePKB::addProcedure() {
+    return false;
+}
+bool PopulatePKB::addStmt(StmtNo stmtNo, Str stmtType, ProcId procIndex) {
+    return false;
+}
+bool PopulatePKB::addFollows() {
+    return false;
+}
+ */
+bool PopulatePKB::addParent(StmtNo parent, StmtNo child) {
+    return pkb->parentTable->addParent(parent, child);
+    //return true;
+}
+/*
+bool PopulatePKB::addUses() {
+    return false;
+}
+bool PopulatePKB::addModifies() {
+    return false;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/pkb/PopulatePKB.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+// -- Add Entities --
+    /*
+    // Adds a variable to the variable table
+    bool addVar();
+
+    // Adds a constant to the constant table
+    bool addConst();
+
+    // Adds a procedure to the procedure table
+    bool addProcedure();
+
+    // Adds a statement to the statement table
+    bool addStmt(StmtNo stmtNo, Str stmtType, ProcId procIndex);
+
+    // -- Add Abstractions --
+    // Adds a follows relationship to the follows table
+    bool addFollows();
+
+    // Adds a parent relationship to the parent table
+     */
+    bool addParent(StmtNo parent, StmtNo child); // parent is s1, child is s2
+
+    // Adds a uses relationship to the uses table
+    /*
+    bool addUses();
+
+    // Adds a modifies relationship to the modifies table
+    bool addModifies();
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/utilSpa/TwoSideFwdVecMap.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+// copilot wrote code according to given comments
+
+template<typename A, typename B>
+bool TwoSideFwdVecMap<A, B>::insert(A key, B value) {
+    // forward map
+    // if key does not exist, create a new vector with the value
+    if (forwardMap.find(key) == forwardMap.end()) {
+        auto v = std::make_shared<B>(value);
+        forwardMap[key] = {v};
+    } else {
+        forwardMap[key].insert(std::make_shared<B>(value));
+    }
+
+    // backward map
+    // if value does not exist, insert key. Else, warn that value already exists
+    if (backwardMap.find(value) == backwardMap.end()) {
+        backwardMap[value] = key;
+    } else {
+        std::cout << "Warning: TwoSideFedVecMap-insert: Value already exists in backward map" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+template<typename A, typename B>
+std::vector<B> TwoSideFwdVecMap<A, B>::getValues(A key) {
+    // guard clause for key not found
+    if (forwardMap.find(key) == forwardMap.end()) {
+        std::cout << "Warning: TwoSideFwdVecMap-getValues: Key not found in forward map" << std::endl;
+        return std::vector<B>();
+    }
+    std::vector<B> result;
+    for (auto ptr : forwardMap[key]) {
+        result.push_back(*ptr);
+    }
+    return result;
+}
+
+template<typename A, typename B>
+std::optional<A> TwoSideFwdVecMap<A, B>::getKey(B value) {
+    // guard clause for value not found
+    if (backwardMap.find(value) == backwardMap.end()) {
+        return std::nullopt;
+    }
+    return backwardMap[value];
+}
+
+template<typename A, typename B>
+bool TwoSideFwdVecMap<A, B>::containsKey(A key) {
+    return forwardMap.find(key) != forwardMap.end();
+}
+
+template<typename A, typename B>
+bool TwoSideFwdVecMap<A, B>::containsValue(B value) {
+    return backwardMap.find(value) != backwardMap.end();
+}
+
+template<typename A, typename B>
+int TwoSideFwdVecMap<A,B>::size() const {
+    return backwardMap.size();
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/utilSpa/DoubleMap.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+template<typename A, typename B>
+void DoubleMap<A, B>::insert(const A& key, const B& value) {
+    forwardMap[key] = value;
+    backwardMap[value] = key;
+}
+
+template<typename A, typename B>
+B DoubleMap<A, B>::getValue(const A& key) {
+    return forwardMap[key];
+}
+
+template<typename A, typename B>
+A DoubleMap<A, B>::getKey(const B& value) {
+    return backwardMap[value];
+}
+
+template<typename A, typename B>
+bool DoubleMap<A, B>::containsKey(const A& key) {
+    return forwardMap.find(key) != forwardMap.end();
+}
+
+template<typename A, typename B>
+bool DoubleMap<A, B>::containsValue(const B& value) {
+    return backwardMap.find(value) != backwardMap.end();
+}
+
+template<typename A, typename B>
+void DoubleMap<A, B>::eraseKey(const A& key) {
+    if (containsKey(key)) {
+        backwardMap.erase(forwardMap[key]);
+        forwardMap.erase(key);
+    }
+}
+
+template<typename A, typename B>
+void DoubleMap<A, B>::eraseValue(const B& value) {
+    if (containsValue(value)) {
+        forwardMap.erase(backwardMap[value]);
+        backwardMap.erase(value);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/utilSpa/DoubleMap.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98
+ChatId: 
+Code:
+#include <iostream>
+
+/**
+ * @brief A double-sided map that allows bidirectional mapping between keys and values.
+ * Used for items in the PKB such as VarTable, ProcTable
+ *
+ * @tparam A The type of the keys.
+ * @tparam B The type of the values.
+ */
+template<typename A, typename B>
+class DoubleMap {
+private:
+    std::unordered_map<A, B> forwardMap;
+    std::unordered_map<B, A> backwardMap;
+
+public:
+    DoubleMap();
+
+    /**
+     * @brief Insert a mapping from key to value.
+     *
+     * @param key The key.
+     * @param value The value.
+     */
+    void insert(const A& key, const B& value);
+
+    /**
+     * @brief Retrieve the value associated with a key.
+     *
+     * @param key The key.
+     * @return The value associated with the key.
+     */
+    B getValue(const A& key);
+
+    /**
+     * @brief Retrieve the key associated with a value.
+     *
+     * @param value The value.
+     * @return The key associated with the value.
+     */
+    A getKey(const B& value);
+
+    /**
+     * @brief Check if a key exists in the map.
+     *
+     * @param key The key to check.
+     * @return True if the key exists, false otherwise.
+     */
+    bool containsKey(const A& key);
+
+    /**
+     * @brief Check if a value exists in the map.
+     *
+     * @param value The value to check.
+     * @return True if the value exists, false otherwise.
+     */
+    bool containsValue(const B& value);
+
+    /**
+     * @brief Remove a mapping by key.
+     *
+     * @param key The key to remove.
+     */
+    void eraseKey(const A& key);
+
+    /**
+     * @brief Remove a mapping by value.
+     *
+     * @param value The value to remove.
+     */
+    void eraseValue(const B& value);
+};
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/utilSpa/TwoSideFwdVecMap.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98
+ChatId: 
+Code:
+#include <iostream>
+#include <set>
+#include <optional>
+#include <memory>
+#include <unordered_map>
+
+/**
+ * @brief A double-sided map that allows bidirectional mapping between keys and values.
+ * Used for tables in the PKB such as ParentTable
+ *
+ * @tparam A The type of the keys. Needs to be hashable.
+ * @tparam B The type of the values. Needs to be hashable.
+ */
+template<typename A, typename B>
+class TwoSideFwdVecMap {
+private:
+    std::unordered_map<A, std::set<std::shared_ptr<B>>> forwardMap;
+    std::unordered_map<B, A> backwardMap;
+
+public:
+    TwoSideFwdVecMap();
+
+    /**
+     * @brief Insert a mapping from key to value.
+     *
+     * @param key The key.
+     * @param value The value.
+     */
+    bool insert(A key, B value);
+
+    /**
+     * @brief Retrieve the value associated with a key.
+     *
+     * @param key The key.
+     * @return The value associated with the key. If not found, returns an empty vector.
+     */
+    std::vector<B> getValues(A key);
+
+    /**
+     * @brief Retrieve the key associated with a value.
+     *
+     * @param value The value.
+     * @return The key associated with the value.
+     */
+    std::optional<A> getKey(B value);
+
+    /**
+     * @brief Check if a key exists in the map.
+     *
+     * @param key The key to check.
+     * @return True if the key exists, false otherwise.
+     */
+    bool containsKey(A key);
+
+    /**
+     * @brief Check if a value exists in the map.
+     *
+     * @param value The value to check.
+     * @return True if the value exists, false otherwise.
+     */
+    bool containsValue(B value);
+
+    [[nodiscard]] int size() const;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/utilSpa/TwoSideDblVecMap.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: copilot used
+ChatId: 
+Code:
+// Make an intermediate of forwardMap and backwardMap
+    auto intermFwdMap = std::unordered_map<A, std::vector<B>>(other.forwardMap);
+
+    // iterating through the intermFwdMap,
+    // while we have not reached the end of the forwardMap,
+    // if the element is a key in the forwardMap,
+    // append its value vector to the intermFwdMap
+    for (auto it = intermFwdMap.begin(); it != intermFwdMap.end(); it++) {
+        // yikes this is O(n log n)
+        // TODO: will this cause never-ending appending?
+        if (intermFwdMap.find(it->first) != intermFwdMap.end()) {
+            intermFwdMap[it->first].insert(intermFwdMap[it->first].end(), it->second.begin(), it->second.end());
+        } else {
+            intermFwdMap[it->first] = it->second; // what does this do?
+        }
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/spa/src/utilSpa/TwoSideDblVecMap.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: copilot used
+ChatId: 
+Code:
+auto intermBkwdMap = std::unordered_map<B, std::vector<A>>();
+    // for each key-value pair in the other backwardMap,
+    // insert a new key-value pair into the intermBkwdMap, where the value is a vector containing the value from the other backwardMap
+    for (auto it = other.backwardMap.begin(); it != other.backwardMap.end(); it++) {
+        intermBkwdMap[it->first] = it->second;
+    }
+    // for each key-value pair in the intermBkwdMap (w, x)
+    // if x is a key y in the intermBkwdMap, its corresponding value vector is z.
+    // append vector z to vector x in intermBkwdMap
+    // TODO: check if generated code does what I want
+    for (auto it = intermBkwdMap.begin(); it != intermBkwdMap.end(); it++) {
+        if (intermBkwdMap.find(it->first) != intermBkwdMap.end()) {
+            intermBkwdMap[it->first].insert(intermBkwdMap[it->first].end(), it->second.begin(), it->second.end());
+        } else {
+            intermBkwdMap[it->first] = it->second;
+        }
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/unit/TestPKB.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+SECTION("Initialise PKB") {
+        /*
+        REQUIRE(pkb.varTable->getSize() == 0);
+        REQUIRE(pkb.constTable->getSize() == 0);
+        REQUIRE(pkb.procTable->getSize() == 0);
+        REQUIRE(pkb.stmtTable->getSize() == 0);
+        REQUIRE(pkb.parentTable->getSize() == 0);
+        REQUIRE(pkb.followsTable->getSize() == 0);
+        REQUIRE(pkb.usesTable->getSize() == 0);
+        REQUIRE(pkb.modifiesTable->getSize() == 0);
+        */
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/unit/TestSP.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/e39e28d1-87dc-410f-918e-2fe030a34c82
+ChatId: 
+Code:
+#include "catch.hpp"
+#include "sp/Scanner.h"
+#include "sp/SingleCharacterStrategy.h"
+#include "sp/DoubleCharacterStrategy.h"
+#include "sp/MultiCharacterStrategy.h"
+#include "sp/TokenList.h"
+#include <sstream>
+
+TEST_CASE("[TestSP] SingleCharacterStrategy tokenization", "[SingleCharacter]") {
+    SingleCharacterStrategy strategy;
+    TokenList tokens;
+    bool prevTokenIsKeyword = true;
+    std::stringstream stream;
+
+    SECTION("Tokenize '{' as LEFT_BRACE") {
+        REQUIRE(strategy.tokenize('{', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::LEFT_BRACE);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '}' as RIGHT_BRACE") {
+        REQUIRE(strategy.tokenize('}', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::RIGHT_BRACE);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize ';' as SEMICOLON") {
+        REQUIRE(strategy.tokenize(';', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::SEMICOLON);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '(' as LEFT_PAREN") {
+        REQUIRE(strategy.tokenize('(', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::LEFT_PAREN);
+        REQUIRE(prevTokenIsKeyword == true);
+    }
+    SECTION("Tokenize ')' as RIGHT_PAREN") {
+        REQUIRE(strategy.tokenize(')', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::RIGHT_PAREN);
+        REQUIRE(prevTokenIsKeyword == true);
+    }
+    SECTION("Tokenize '+' as ADD") {
+        REQUIRE(strategy.tokenize('+', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::ADD);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '-' as SUBTRACT") {
+        REQUIRE(strategy.tokenize('-', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::SUBTRACT);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '*' as MULTIPLY") {
+        REQUIRE(strategy.tokenize('*', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::MULTIPLY);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '%' as MOD") {
+        REQUIRE(strategy.tokenize('%', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::MOD);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '/' as DIVIDE") {
+        REQUIRE(strategy.tokenize('/', stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::DIVIDE);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+}
+
+TEST_CASE("DoubleCharacterStrategy tokenization", "[DoubleCharacter]") {
+    DoubleCharacterStrategy strategy;
+    TokenList tokens;
+    bool prevTokenIsKeyword = true;
+    std::stringstream stream;
+
+    SECTION("Tokenize '==' as EQUAL_EQUAL") {
+        stream.str("==");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::EQUAL_EQUAL);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+
+    SECTION("Tokenize '=' as ASSIGN") {
+        stream.str("=");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::ASSIGN);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+
+    SECTION("Tokenize '>=' as GREATER_EQUAL") {
+        stream.str(">=");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::GREATER_EQUAL);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '>' as GREATER") {
+        stream.str(">");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::GREATER);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '!=' as BANG_EQUAL") {
+        stream.str("!=");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::BANG_EQUAL);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '!' as BANG") {
+        stream.str("!");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::BANG);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '<=' as LESSER_EQUAL") {
+        stream.str("<=");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::LESSER_EQUAL);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '<' as LESSER") {
+        stream.str("<");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::LESSER);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '||' as OR") {
+        stream.str("||");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::OR);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '|' as UNKNOWN") {
+        stream.str("|");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::UNKNOWN);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '&&' as AND") {
+        stream.str("&&");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::AND);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize '&' as UNKNOWN") {
+        stream.str("&");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::UNKNOWN);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+}
+
+TEST_CASE("[TestSP] MultiCharacterStrategy tokenization", "[MultiCharacter]") {
+    MultiCharacterStrategy strategy;
+    TokenList tokens;
+    bool prevTokenIsKeyword = false;
+    std::stringstream stream;
+
+    SECTION("Tokenize program as keyword") {
+        stream.str("program");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::PROGRAM);
+    }
+    SECTION("Tokenize procedure as keyword") {
+        stream.str("procedure");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::PROCEDURE);
+    }
+    SECTION("Tokenize read as keyword") {
+        stream.str("read");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::READ);
+    }
+    SECTION("Tokenize while as keyword") {
+        stream.str("while");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::WHILE);
+    }
+    SECTION("Tokenize if as keyword") {
+        stream.str("if");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::IF);
+    }
+
+    SECTION("Tokenize then as keyword") {
+        stream.str("then");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::THEN);
+    }
+    SECTION("Tokenize else as keyword") {
+        stream.str("else");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::ELSE);
+    }
+    SECTION("Tokenize call as keyword") {
+        stream.str("call");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::CALL);
+    }
+
+    SECTION("Tokenize program as name") {
+        prevTokenIsKeyword = true;
+        stream.str("program");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize procedure as name") {
+        prevTokenIsKeyword = true;
+        stream.str("procedure");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize read as name") {
+        prevTokenIsKeyword = true;
+        stream.str("read");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize while as name") {
+        prevTokenIsKeyword = true;
+        stream.str("while");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize if as name") {
+        prevTokenIsKeyword = true;
+        stream.str("if");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+
+    SECTION("Tokenize then as name") {
+        prevTokenIsKeyword = true;
+        stream.str("then");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize else as name") {
+        prevTokenIsKeyword = true;
+        stream.str("else");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize call as name") {
+        prevTokenIsKeyword = true;
+        stream.str("call");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().at(0) -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+    SECTION("Tokenize digits") {
+        stream.str("13972");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::INTEGER);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+
+    SECTION("Tokenize name") {
+        stream.str("sad13972");
+        char firstChar;
+        stream.get(firstChar);
+        REQUIRE(strategy.tokenize(firstChar, stream, tokens, prevTokenIsKeyword) == true);
+        REQUIRE(tokens.getTokens().back() -> getType().getInfo() == TokenType::NAME);
+        REQUIRE(prevTokenIsKeyword == false);
+    }
+}
+
+TEST_CASE("[TestSP] Scanner tokenization", "[SingleCharacter, DoubleCharacter, MultiCharacter]") {
+    StrategyList strategies;
+    TokenList tokens;
+    std::string codeSnippet = R"(
+            procedure procedure {
+                count = 1123*923/wq;
+                cenX = 0;
+                cenY = 0;
+                call call;
+                while ((while != 0) && (y != 0)) {
+                    count = count + 1;
+                    cenX = cenX + x;
+                    cenY = cenY + y;
+                    call readPoint;
+                }
+                if (count == 0) then {
+                    flag = 1;
+                } else {
+                    cenX = cenX / count;
+                    cenY = cenY / count;
+                }
+                normSq = cenX * cenX + cenY * cenY;
+            }
+            )";
+
+    SECTION("Check for UNKNOWNS") {
+        auto scanner = new Scanner(codeSnippet, strategies, tokens);
+        scanner->scanTokens();
+        REQUIRE(tokens.toString().find("UNKNOWN") == std::string::npos);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/unit/TestUtils.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+SECTION("Test insert, get and contains") {
+        dm.insert(1, "two");
+        REQUIRE(dm.getValue(1) == "two");
+        REQUIRE(dm.getKey("two") == 1);
+        REQUIRE(dm.containsKey(1) == true);
+        REQUIRE(dm.containsValue("two") == true);
+    }
+    SECTION("Test erase") {
+        dm.insert(1, "two");
+        dm.eraseKey(1);
+        REQUIRE(dm.containsKey(1) == false);
+        dm.insert(1, "three");
+        dm.eraseValue("three");
+        REQUIRE(dm.containsValue("three") == false);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/QueryValidatorTestAI.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/b79012a9-d6db-4272-a8f5-d4e4e167dd91
+ChatId: 
+Code:
+TEST_CASE("QueryValidator_ValidateQuery_NoErrors") {
+    // Create a QueryObject with valid unique declarations and no constraint violations
+    QueryObject qo;
+    std::shared_ptr<AssignEntity> assignEntity = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<PrintEntity> printEntity = std::make_shared<PrintEntity>("y");
+
+    qo.addDeclaration(assignEntity);
+    qo.addDeclaration(printEntity);
+
+    std::shared_ptr<ParentConstraint> parentConstraint = std::make_shared<ParentConstraint>(assignEntity, printEntity);
+
+    qo.addConstraint(parentConstraint);
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure no failed rules are returned
+    REQUIRE(failedRules.empty());
+}
+
+TEST_CASE("QueryValidator_ValidateQuery_SingleDeclarationRuleViolation") {
+    // Create a QueryObject violating the SingleDeclarationRule
+    QueryObject qo;
+
+    std::shared_ptr<AssignEntity> assignEntity1 = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<AssignEntity> assignEntity2 = std::make_shared<AssignEntity>("x");
+
+    qo.addDeclaration(assignEntity1);
+    qo.addDeclaration(assignEntity2);
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure SingleDeclarationRule violation is detected
+    REQUIRE(failedRules.size() == 1);
+    REQUIRE(failedRules[0] == VALIDATION_RULE_SINGLE_DECLARATION);
+}
+
+TEST_CASE("QueryValidator_ValidateQuery_NoDeclarationRuleViolation") {
+    // Create a QueryObject violating the NoDeclarationRule
+    QueryObject qo;
+    std::shared_ptr<AssignEntity> assignEntity = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<AssignEntity> printEntity = std::make_shared<AssignEntity>("y");
+
+    std::shared_ptr<ParentConstraint> parentConstraint = std::make_shared<ParentConstraint>(assignEntity, printEntity); // Using undeclared entities
+    qo.addConstraint(parentConstraint);
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure NoDeclarationRule violation is detected
+    REQUIRE(failedRules.size() == 1);
+    REQUIRE(failedRules[0] == VALIDATION_RULE_NO_DECLARATION);
+}
+
+TEST_CASE("QueryValidator_ValidateQuery_MultipleRuleViolations") {
+    // Create a QueryObject violating both SingleDeclarationRule and NoDeclarationRule
+    QueryObject qo;
+
+    std::shared_ptr<AssignEntity> assignEntity1 = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<AssignEntity> assignEntity2 = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<PrintEntity> printEntity = std::make_shared<PrintEntity>("y");
+    std::shared_ptr<ParentConstraint> parentConstraint = std::make_shared<ParentConstraint>(assignEntity1, printEntity); // Using undeclared entities
+
+    qo.addDeclaration(assignEntity1);
+    qo.addDeclaration(assignEntity2);
+    qo.addConstraint(parentConstraint);
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure both SingleDeclarationRule and NoDeclarationRule violations are detected
+    REQUIRE(failedRules.size() == 2);
+    REQUIRE(std::find(failedRules.begin(), failedRules.end(), VALIDATION_RULE_SINGLE_DECLARATION) != failedRules.end());
+    REQUIRE(std::find(failedRules.begin(), failedRules.end(), VALIDATION_RULE_NO_DECLARATION) != failedRules.end());
+}
+
+TEST_CASE("QueryValidator_ValidateQuery_EmptyQueryObject") {
+    // Create an empty QueryObject
+    QueryObject qo;
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure no failed rules are returned for an empty QueryObject
+    REQUIRE(failedRules.empty());
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/QueryObjectTestAI.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/ab543156-156c-4880-9673-2ea97ffd9182
+ChatId: 
+Code:
+TEST_CASE("QueryObject_GetReturnType_ReturnsCorrectValue") {
+    QueryObject queryObj;
+    auto returnType = std::make_shared<PrintEntity>("g");
+    queryObj.setReturnType(returnType);
+    REQUIRE(queryObj.getReturnType() == returnType);
+}
+
+TEST_CASE("QueryObject_Set/GetReturnType_SetsCorrectValue") {
+    QueryObject queryObj;
+    std::shared_ptr<Returnable> returnType = std::make_shared<PrintEntity>("c");
+    queryObj.setReturnType(returnType);
+    REQUIRE(queryObj.getReturnType() == returnType);
+}
+
+TEST_CASE("QueryObject_Get/AddConstraints_ReturnsCorrectVector") {
+    QueryObject queryObj;
+    auto s = std::make_shared<StatementEntity>("a");
+    auto r = std::make_shared<ReadEntity>("z");
+//    FollowsConstraint follows_constraint(s, r);
+    auto follows_constraint = std::make_shared<FollowsConstraint>(s, r);
+    queryObj.addConstraint(follows_constraint);
+    std::vector<std::shared_ptr<Constraint>> constraints = queryObj.getConstraints();
+    REQUIRE(constraints.size() == 1);
+    // Check if the stored pointer is of type FollowsConstraint
+    std::shared_ptr<FollowsConstraint> storedConstraint = dynamic_pointer_cast<FollowsConstraint>(constraints[0]);
+    REQUIRE(storedConstraint != nullptr); // Ensure dynamic_cast succeeded
+    REQUIRE(storedConstraint == follows_constraint); // Address comparison
+}
+
+TEST_CASE("QueryObject_Add/GetConstraint_ReturnsCorrectValues") {
+    QueryObject queryObj;
+    auto s = std::make_shared<StatementEntity>("a");
+    auto r = std::make_shared<ReadEntity>("z");
+    //FollowsConstraint follows_constraint(s, r);
+    auto follows_constraint = std::make_shared<FollowsConstraint>(s, r);
+
+    queryObj.addConstraint(follows_constraint);
+    std::vector<std::shared_ptr<Constraint>> constraints = queryObj.getConstraints();
+    REQUIRE(constraints[0] == follows_constraint); // Address comparison
+}
+
+TEST_CASE("QueryObject_Get/AddDeclarations_ReturnsCorrectValues") {
+    QueryObject queryObj;
+//    PrintEntity declaration1("q"); // Using PrintEntity instead of Entity
+//    PrintEntity declaration2("h"); // Using PrintEntity instead of Entity
+    auto declaration1 = std::make_shared<PrintEntity>("q");
+    auto declaration2 = std::make_shared<PrintEntity>("h");
+    queryObj.addDeclaration(declaration1);
+    queryObj.addDeclaration(declaration2);
+    std::vector<std::shared_ptr<Entity>> declarations = queryObj.getDeclarations();
+    REQUIRE(declarations.size() == 2);
+    // Check if the stored pointers are of type PrintEntity
+
+    std::shared_ptr<PrintEntity> storedDeclaration1 = dynamic_pointer_cast<PrintEntity>(declarations[0]);
+    std::shared_ptr<PrintEntity> storedDeclaration2 = dynamic_pointer_cast<PrintEntity>(declarations[1]);
+
+    REQUIRE(storedDeclaration1 != nullptr); // Ensure dynamic_cast succeeded
+    REQUIRE(storedDeclaration2 != nullptr); // Ensure dynamic_cast succeeded
+    // Address comparison
+    REQUIRE(storedDeclaration1 == declaration1);
+    REQUIRE(storedDeclaration2 == declaration2);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/1d6a042b-6280-4306-abaf-1ec120a9fef4
+ChatId: 
+Code:
+TEST_CASE("entity_statementEntityIsTypeStatement_stringStatement") {
+    StatementEntity en = StatementEntity("q");
+    REQUIRE(en.getEntityType() == RETURN_TYPE_STATEMENT);
+}
+
+TEST_CASE("entity_readEntityIsTypeStatement_stringRead") {
+    ReadEntity en = ReadEntity("o");
+    REQUIRE(en.getEntityType() == RETURN_TYPE_READ);
+}
+
+TEST_CASE("entity_printEntityIsTypePrint_stringPrint") {
+    PrintEntity en = PrintEntity("r");
+    REQUIRE(en.getEntityType() == RETURN_TYPE_PRINT);
+}
+
+TEST_CASE("entity_assignEntityIsTypeAssign_stringAssign") {
+    AssignEntity en = AssignEntity("a");
+    REQUIRE(en.getEntityType() == RETURN_TYPE_ASSIGN);
+}
+
+TEST_CASE("entity_callEntityIsTypeCall_stringCall") {
+    CallEntity en = CallEntity("b");
+    REQUIRE(en.getEntityType() == RETURN_TYPE_CALL);
+}
+
+TEST_CASE("entity_ifEntityIsTypeIf_stringIf") {
+    IfEntity en = IfEntity("c");
+    REQUIRE(en.getEntityType() == RETURN_TYPE_IF);
+}
+
+TEST_CASE("entity_whileEntityIsTypeWhile_stringWhile") {
+    WhileEntity en = WhileEntity("d");
+    REQUIRE(en.getEntityType() == RETURN_TYPE_WHILE);
+}
+
+TEST_CASE("entity_integerArgumentIsTypeInteger_stringInteger") {
+    IntegerArgument en = IntegerArgument();
+    REQUIRE(en.getEntityType() == RETURN_TYPE_INTEGER);
+}
+
+TEST_CASE("entity_wildCardIsTypeWildcard_stringWildcard") {
+    WildCard en = WildCard();
+    REQUIRE(en.getEntityType() == RETURN_TYPE_WILDCARD);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/79d15f08-fd88-453e-943a-261fbef441a6
+ChatId: 
+Code:
+TEST_CASE("Entity_GetIdentifier_Success") {
+    // Arrange
+    std::string identifier = "test_identifier";
+    AssignEntity entity(identifier);
+
+    // Act
+    std::string retrievedIdentifier = entity.getIdentifier();
+
+    // Assert
+    REQUIRE(retrievedIdentifier == identifier);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/09e67ecb-4081-4912-bb8c-023c7e117580
+ChatId: 
+Code:
+TEST_CASE("inheritance_check_statementReference_ReadEntity") {
+    ReadEntity readEntity("v");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&readEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_PrintEntity") {
+    PrintEntity printEntity("p");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&printEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_AssignEntity") {
+    AssignEntity assignEntity("f");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&assignEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_CallEntity") {
+    CallEntity callEntity("c");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&callEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_IfEntity") {
+    IfEntity ifEntity("d");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&ifEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_WhileEntity") {
+    WhileEntity whileEntity("e");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&whileEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_IntegerArgument") {
+    IntegerArgument integerArgument;
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&integerArgument) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_WildCard") {
+    WildCard wildCard;
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&wildCard) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// prompt https://chat.openai.com/share/0b30db75-b64f-47a1-942b-1afdad17f2f3
+
+TEST_CASE("StatementEntity_inheritanceCheck_isTrue") {
+    REQUIRE(std::is_base_of<Entity, StatementEntity>::value);
+}
+
+TEST_CASE("ReadEntity_inheritanceCheck_isTrue") {
+    REQUIRE(std::is_base_of<Entity, ReadEntity>::value);
+}
+
+TEST_CASE("PrintEntity_inheritanceCheck_isTrue") {
+    REQUIRE(std::is_base_of<Entity, PrintEntity>::value);
+}
+
+TEST_CASE("AssignEntity_inheritanceCheck_isTrue") {
+    REQUIRE(std::is_base_of<Entity, AssignEntity>::value);
+}
+
+TEST_CASE("CallEntity_inheritanceCheck_isTrue") {
+    REQUIRE(std::is_base_of<Entity, CallEntity>::value);
+}
+
+TEST_CASE("IfEntity_inheritanceCheck_isTrue") {
+    REQUIRE(std::is_base_of<Entity, IfEntity>::value);
+}
+
+TEST_CASE("WhileEntity_inheritanceCheck_isTrue") {
+    REQUIRE(std::is_base_of<Entity, WhileEntity>::value);
+}
+
+TEST_CASE("IntegerArgument_inheritanceCheck_isFalse") {
+    REQUIRE_FALSE(std::is_base_of<Entity, IntegerArgument>::value);
+}
+
+TEST_CASE("WildCard_inheritanceCheck_isFalse") {
+    REQUIRE_FALSE(std::is_base_of<Entity, WildCard>::value);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/SingleDeclarationRuleTestAI.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/dccb94c8-d4d6-4310-b2f1-2306849865cf
+ChatId: 
+Code:
+TEST_CASE("SingleDeclarationRule_ValidDeclarations_NoError") {
+    // Create a QueryObject with valid unique declarations
+    QueryObject qo;
+
+    auto assignEntity = std::make_shared<AssignEntity>(AssignEntity("z"));
+    auto printEntity = std::make_shared<PrintEntity>(PrintEntity("w"));
+    auto statementEntity = std::make_shared<StatementEntity>(StatementEntity("p"));
+
+    qo.addDeclaration(assignEntity);
+    qo.addDeclaration(printEntity);
+    qo.addDeclaration(statementEntity);
+
+    // Apply the SingleDeclarationRule
+    SingleDeclarationRule rule;
+    std::string result = rule.validate(qo);
+
+    // Ensure no error message is returned
+    REQUIRE(result.empty());
+}
+
+TEST_CASE("SingleDeclarationRule_DuplicateDeclarations_Error") {
+    // Create a QueryObject with duplicate declarations
+    QueryObject qo;
+    auto assignEntity1 = std::make_shared<AssignEntity>(AssignEntity("x"));
+    auto assignEntity2 = std::make_shared<AssignEntity>(AssignEntity("x"));
+    qo.addDeclaration(assignEntity1);
+    qo.addDeclaration(assignEntity2);
+
+    // Apply the SingleDeclarationRule
+    SingleDeclarationRule rule;
+    std::string result = rule.validate(qo);
+
+    // Ensure error message is returned
+    REQUIRE(result == VALIDATION_RULE_SINGLE_DECLARATION);
+}
+
+TEST_CASE("SingleDeclarationRule_MixedDeclarations_Error") {
+    // Create a QueryObject with a mix of unique and duplicate declarations
+    QueryObject qo;
+
+    auto assignEntity1 = std::make_shared<AssignEntity>(AssignEntity("x"));
+    auto printEntity = std::make_shared<PrintEntity>(PrintEntity("y"));
+    auto assignEntity2 = std::make_shared<AssignEntity>(AssignEntity("x"));
+
+    qo.addDeclaration(assignEntity1);
+    qo.addDeclaration(printEntity);
+    qo.addDeclaration(assignEntity2);
+
+    // Apply the SingleDeclarationRule
+    SingleDeclarationRule rule;
+    std::string result = rule.validate(qo);
+
+    // Ensure error message is returned as soon as a duplicate is encountered
+    REQUIRE(result == VALIDATION_RULE_SINGLE_DECLARATION);
+}
+
+TEST_CASE("SingleDeclarationRule_NoDeclarations_NoError") {
+    // Create a QueryObject with no declarations
+    QueryObject qo;
+
+    // Apply the SingleDeclarationRule
+    SingleDeclarationRule rule;
+    std::string result = rule.validate(qo);
+
+    // Ensure no error message is returned
+    REQUIRE(result.empty());
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/TestDoubleMap.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+SECTION("Test insert, get and contains") {
+        dm.insert(1, "two");
+        REQUIRE(dm.getValue(1) == "two");
+        REQUIRE(dm.getKey("two") == 1);
+        REQUIRE(dm.containsKey(1) == true);
+        REQUIRE(dm.containsValue("two") == true);
+    }
+    SECTION("Test erase") {
+        dm.insert(1, "two");
+        dm.eraseKey(1);
+        REQUIRE(dm.containsKey(1) == false);
+        dm.insert(1, "three");
+        dm.eraseValue("three");
+        REQUIRE(dm.containsValue("three") == false);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/ConstraintArgumentTestAI.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/ec225b64-f0c0-4d04-a5c2-9645760d0401
+ChatId: 
+Code:
+TEST_CASE("StatementEntity_inherits_from_ConstraintArgument") {
+    StatementEntity statement("z");
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&statement) != nullptr);
+}
+
+TEST_CASE("ReadEntity_inherits_from_ConstraintArgument") {
+    ReadEntity read("a");
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&read) != nullptr);
+}
+
+TEST_CASE("PrintEntity_inherits_from_ConstraintArgument") {
+    PrintEntity print("b");
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&print) != nullptr);
+}
+
+TEST_CASE("AssignEntity_inherits_from_ConstraintArgument") {
+    AssignEntity assign("c");
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&assign) != nullptr);
+}
+
+TEST_CASE("CallEntity_inherits_from_ConstraintArgument") {
+    CallEntity call("f");
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&call) != nullptr);
+}
+
+TEST_CASE("IfEntity_inherits_from_ConstraintArgument") {
+    IfEntity ifEntity("a");
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&ifEntity) != nullptr);
+}
+
+TEST_CASE("WhileEntity_inherits_from_ConstraintArgument") {
+    WhileEntity whileEntity("q");
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&whileEntity) != nullptr);
+}
+
+TEST_CASE("IntegerArgument_inherits_from_ConstraintArgument") {
+    IntegerArgument integerArg;
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&integerArg) != nullptr);
+}
+
+TEST_CASE("WildCard_inherits_from_ConstraintArgument") {
+    WildCard wildCard;
+    REQUIRE(dynamic_cast<ConstraintArgument*>(&wildCard) != nullptr);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/ConstraintArgumentTestAI.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/c/02a7fbcc-80e0-4cfe-be5f-2f2858ab9b47
+ChatId: 
+Code:
+TEST_CASE("StatementEntity_ReferenceType_StatementReference") {
+    StatementEntity s("q");
+    REQUIRE(s.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+
+TEST_CASE("ReadEntity_ReferenceType_StatementReference") {
+    ReadEntity r("p");
+    REQUIRE(r.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+
+TEST_CASE("PrintEntity_ReferenceType_StatementReference") {
+    PrintEntity p("Q");
+    REQUIRE(p.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+
+TEST_CASE("AssignEntity_ReferenceType_StatementReference") {
+    AssignEntity a("p");
+    REQUIRE(a.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+
+TEST_CASE("CallEntity_ReferenceType_StatementReference") {
+    CallEntity c("i");
+    REQUIRE(c.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+
+TEST_CASE("IfEntity_ReferenceType_StatementReference") {
+    IfEntity i("g");
+    REQUIRE(i.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+
+TEST_CASE("WhileEntity_ReferenceType_StatementReference") {
+    WhileEntity w("v");
+    REQUIRE(w.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+
+TEST_CASE("IntegerArgument_ReferenceType_StatementReference") {
+    IntegerArgument ia;
+    REQUIRE(ia.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+
+TEST_CASE("WildCard_ReferenceType_StatementReference") {
+    WildCard wc;
+    REQUIRE(wc.getReferenceType() == REFERENCE_TYPE_STATEMENT);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/NoDeclarationRuleTestAI.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/58cc37a5-02ca-46fb-8029-ff79056aad6c
+ChatId: 
+Code:
+TEST_CASE("noDeclarationRule_AllEntitiesDeclaredOnce_returnsNoString") {
+    // Create a QueryObject with all entities declared exactly once
+    QueryObject qo;
+    // Add entity declarations
+    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("q"));
+    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("s"));
+
+    qo.addDeclaration(e1);
+    qo.addDeclaration(e2);
+    // Add a constraint with entities as arguments
+    std::shared_ptr<ParentConstraint> pConstraint = std::make_shared<ParentConstraint>(e1, e2);
+    qo.addConstraint(pConstraint);
+    NoDeclarationRule rule;
+    REQUIRE(rule.validate(qo).empty());
+}
+
+TEST_CASE("noDeclarationRule_Missing2EntityDeclaration_returnsString") {
+    // Create a QueryObject with a missing entity declaration
+    QueryObject qo;
+    // Add entity declaration
+    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("j"));
+    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("h"));
+
+    // Add a constraint with an undeclared entity as an argument
+    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2)); // e1, e2 is not declared in qo
+    NoDeclarationRule rule;
+
+    REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
+}
+
+TEST_CASE("noDeclarationRule_Missing1EntityDeclaration_returnsString") {
+    // Create a QueryObject with a missing entity declaration
+    QueryObject qo;
+    // Add entity declaration
+
+    auto e1 = std::make_shared<StatementEntity>(StatementEntity("g"));
+    auto e2 = std::make_shared<PrintEntity>(PrintEntity("f"));
+
+    qo.addDeclaration(e1);
+    // Add a constraint with an undeclared entity as an argument
+    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2));
+    NoDeclarationRule rule;
+
+    REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
+}
+
+
+
+TEST_CASE("noDeclarationRule_MultipleUsageOfMissingEntity_returnsString") {
+    // Create a QueryObject with multiple usage of the same entity
+    QueryObject qo;
+    // Add entity declaration
+    auto e1 = std::make_shared<StatementEntity>(StatementEntity("e"));
+    auto e2 = std::make_shared<PrintEntity>(PrintEntity("e2"));
+    qo.addDeclaration(e1);
+    // Add a constraint with multiple occurrences of the same entity as arguments
+    //auto* p = new ParentConstraint(e2, e2); // e1 is assigned again
+    qo.addConstraint(std::make_shared<ParentConstraint>(e2, e2));
+    NoDeclarationRule rule;
+    REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
+}
+
+TEST_CASE("noDeclarationRule_EmptyQueryObjectPass_returnsNoString") {
+    // Create an empty QueryObject
+    QueryObject qo;
+    NoDeclarationRule rule;
+    REQUIRE(rule.validate(qo).empty());
+}
+
+TEST_CASE("noDeclarationRule_EntitiesUsedAsArgumentsNotDeclared_returnsString") {
+    // Create a QueryObject with entities used as arguments but not declared
+    QueryObject qo;
+    // Add a constraint with an entity as an argument without declaration
+    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("q"));
+    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("s"));
+
+    ParentConstraint p = ParentConstraint(e1, e2); // e1 and e2 is not declared in qo
+    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2));
+    NoDeclarationRule rule;
+    REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-05
+File: Team05/Code05/src/unit_testing/src/ConstraintTestAI.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/f965b299-102c-4b5b-a9df-e2e1a17ded54
+ChatId: 
+Code:
+TEST_CASE("dynamic_cast_inheritance_relationship_constraint") {
+    std::shared_ptr<StatementEntity> s = std::make_shared<StatementEntity>("q");
+    std::shared_ptr<ReadEntity> r = std::make_shared<ReadEntity>("f");
+    FollowsConstraint follows_constraint(s, r);
+    FollowsTConstraint follows_t_constraint(s, r);
+    ParentConstraint parent_constraint(s, r);
+    ParentTConstraint parent_t_constraint(s, r);
+
+    SECTION("FollowsConstraint is a RelationshipConstraint") {
+        Constraint* constraint_ptr = &follows_constraint;
+        REQUIRE(dynamic_cast<RelationshipConstraint*>(constraint_ptr) != nullptr);
+    }
+
+    SECTION("FollowsTConstraint is a RelationshipConstraint") {
+        Constraint* constraint_ptr = &follows_t_constraint;
+        REQUIRE(dynamic_cast<RelationshipConstraint*>(constraint_ptr) != nullptr);
+    }
+
+    SECTION("ParentConstraint is a RelationshipConstraint") {
+        Constraint* constraint_ptr = &parent_constraint;
+        REQUIRE(dynamic_cast<RelationshipConstraint*>(constraint_ptr) != nullptr);
+    }
+
+    SECTION("ParentTConstraint is a RelationshipConstraint") {
+        Constraint* constraint_ptr = &parent_t_constraint;
+        REQUIRE(dynamic_cast<RelationshipConstraint*>(constraint_ptr) != nullptr);
+    }
+}
+
+
+TEST_CASE("getConstraintClass_returns_CONSTRAINT_CLASS_RELATIONSHIP") {
+    std::shared_ptr<StatementEntity> s = std::make_shared<StatementEntity>("o");
+    std::shared_ptr<ReadEntity> r = std::make_shared<ReadEntity>("p");
+
+    SECTION("FollowsConstraint") {
+    FollowsConstraint follows_constraint(s, r);
+    REQUIRE(follows_constraint.getConstraintClass() == CONSTRAINT_CLASS_RELATIONSHIP);
+    }
+
+    SECTION("FollowsTConstraint") {
+    FollowsTConstraint follows_t_constraint(s, r);
+    REQUIRE(follows_t_constraint.getConstraintClass() == CONSTRAINT_CLASS_RELATIONSHIP);
+    }
+
+    SECTION("ParentConstraint") {
+    ParentConstraint parent_constraint(s, r);
+    REQUIRE(parent_constraint.getConstraintClass() == CONSTRAINT_CLASS_RELATIONSHIP);
+    }
+
+    SECTION("ParentTConstraint") {
+    ParentTConstraint parent_t_constraint(s, r);
+    REQUIRE(parent_t_constraint.getConstraintClass() == CONSTRAINT_CLASS_RELATIONSHIP);
+    }
+
+}
+
+
+TEST_CASE("InitializeConstraint_with_StatementReference_subclasses") {
+    // All possible StatementReference subclasses
+    std::vector<std::shared_ptr<StatementReference>> entities;
+
+    entities.push_back(std::make_shared<StatementEntity>("q"));
+    entities.push_back(std::make_shared<ReadEntity>("w"));
+    entities.push_back(std::make_shared<PrintEntity>("e"));
+    entities.push_back(std::make_shared<AssignEntity>("r"));
+    entities.push_back(std::make_shared<CallEntity>("t"));
+    entities.push_back(std::make_shared<IfEntity>("y"));
+    entities.push_back(std::make_shared<WhileEntity>("u"));
+    entities.push_back(std::make_shared<IntegerArgument>());
+    entities.push_back(std::make_shared<WildCard>());
+
+    SECTION("FollowsConstraint") {
+        // Pairwise testing for FollowsConstraint initialization
+        for (auto it1 = std::begin(entities); it1 != std::end(entities); ++it1) {
+            for (auto it2 = it1 + 1; it2 != std::end(entities); ++it2) {
+                REQUIRE_NOTHROW(FollowsConstraint(*it1, *it2));
+            }
+        }
+    }
+
+    SECTION("FollowsTConstraint") {
+        // Pairwise testing for FollowsTConstraint initialization
+        for (auto it1 = std::begin(entities); it1 != std::end(entities); ++it1) {
+            for (auto it2 = it1 + 1; it2 != std::end(entities); ++it2) {
+                REQUIRE_NOTHROW(FollowsTConstraint(*it1, *it2));
+            }
+        }
+    }
+
+    SECTION("ParentConstraint") {
+        // Pairwise testing for ParentConstraint initialization
+        for (auto it1 = std::begin(entities); it1 != std::end(entities); ++it1) {
+            for (auto it2 = it1 + 1; it2 != std::end(entities); ++it2) {
+                REQUIRE_NOTHROW(ParentConstraint(*it1, *it2));
+            }
+        }
+    }
+
+    SECTION("ParentTConstraint") {
+        // Pairwise testing for ParentTConstraint initialization
+        for (auto it1 = std::begin(entities); it1 != std::end(entities); ++it1) {
+            for (auto it2 = it1 + 1; it2 != std::end(entities); ++it2) {
+                REQUIRE_NOTHROW(ParentTConstraint(*it1, *it2));
+            }
+        }
+    }
+
+}
+--------------------
+Directory:../sample/repo/23s2-cp-spa-team-05
+Total Snippets: 25
+Total lines: 1395
+SP Snippets: 0
+SP lines: 0
+PKB Snippets: 2
+PKB lines: 57
+QPS Snippets: 1
+QPS lines: 12

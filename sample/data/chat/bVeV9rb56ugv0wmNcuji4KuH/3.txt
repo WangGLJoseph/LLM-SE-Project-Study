@@ -1,0 +1,45 @@
+// Note: The tests assume that adding a nullptr TNode to the StatementManager is fine. If this isn't the case, the tests won't work correctly because we're not giving TNodes much information upon creation. Alternatively, you could give TNode a constructor that takes an integer, which you could then use as part of your assertions.
+TEST_CASE("PkbReaderManager is initialized correctly", "[PkbReaderManager]") {
+
+    auto stmtManager = std::make_shared<StatementManager>();
+    auto varManager = std::make_shared<VariableManager>();
+
+    PkbReaderManager reader(stmtManager, varManager);
+
+    for (auto statementType : {EnumType::StatementType::PRINT, EnumType::StatementType::READ,
+                               EnumType::StatementType::ASSIGN, EnumType::StatementType::WHILE,
+                               EnumType::StatementType::IF}) {
+        INFO("Checking initializer for: " << static_cast<int>(statementType));
+        std::map<int, std::shared_ptr<TNode>> map = reader.getStatement(statementType);
+        REQUIRE(map.empty() == true); // Checking that map is empty initially
+    }
+
+    std::map<int, std::string> varMap = reader.getVariables();
+    REQUIRE(varMap.empty() == true); // Checking that variable map is empty initially
+}
+
+TEST_CASE("PkbReaderManager gets variables correctly", "[PkbReaderManager]") {
+
+    auto stmtManager = std::make_shared<StatementManager>();
+    auto varManager = std::make_shared<VariableManager>();
+    varManager->addVariable(1, "TestVariable");
+
+    PkbReaderManager reader(stmtManager, varManager);
+
+    std::map<int, std::string> varMap = reader.getVariables();
+    REQUIRE(varMap[1] == "TestVariable");
+}
+
+TEST_CASE("PkbReaderManager gets statements correctly", "[PkbReaderManager]") {
+
+    auto stmtManager = std::make_shared<StatementManager>();
+    auto varManager = std::make_shared<VariableManager>();
+    TNode testNode = TNode(TNode::NodeType::STATEMENT_LIST, "testValue", 1);
+    auto node = std::make_shared<TNode>(testNode);
+    stmtManager->addStatement(EnumType::StatementType::PRINT, 1, node);
+
+    PkbReaderManager reader(stmtManager, varManager);
+
+    std::map<int, std::shared_ptr<TNode>> stmtMap = reader.getStatement(EnumType::StatementType::PRINT);
+    REQUIRE(stmtMap[1] == node); // Checks if the memory locations are equal
+}

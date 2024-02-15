@@ -1,0 +1,8 @@
+class FollowsTable : public RelationshipTable<std::string, std::string> {
+public:
+    bool doesFollow(const std::string& followee, const std::string& follower) {
+        return RelationshipTable::hasRelationship(followee, follower);
+    }
+};
+
+#endif //SPA_FOLLOWSTABLE_H
