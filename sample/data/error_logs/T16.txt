@@ -1,5 +1,2 @@
-23s2-cp-spa-team-16: Chat id error, chat id is not found in URL: https://chat.openai.com/share/4d1458e5-2925-4f5a-a6ba-a75fc192c817
-23s2-cp-spa-team-16: Chat id error, chat id is not found in URL: https://chat.openai.com/c/a1320bcd-2185-46c7-b524-c1abe2460879
+23s2-cp-spa-team-16: Chat id error, chat id is not found in the prompt URL: ../sample/repo/23s2-cp-spa-team-16/Team16/Code16/src/spa/src/PKB/Storage.cpp
 23s2-cp-spa-team-16: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-16/Team16/Code16/src/spa/src/PKB/Facades/PQLFacade.h
-23s2-cp-spa-team-16: Chat id error, chat id is not found in URL: https://chat.openai.com/share/51d22ff9-c94d-48e5-9158-4b2364c910fe
-23s2-cp-spa-team-16: Chat id error, chat id is not found in URL: https://chat.openai.com/share/51d22ff9-c94d-48e5-9158-4b2364c910fe

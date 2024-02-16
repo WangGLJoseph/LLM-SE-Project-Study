@@ -1,14 +1,4 @@
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/dc4fa5ec-550d-4bf8-b28d-2d6a9d8bf4a2
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758
 23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/spa/src/qps/entity/strategy/DeclarationStrategy.cpp
 23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/spa/src/qps/QueryParser.cpp
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/unit_testing/src/QPS/TestQueryParser.cpp
 23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/unit_testing/src/QPS/strategy/TestProjectionStrategy.cpp
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517
-23s2-cp-spa-team-03: Chat id error, chat id is not found in URL: https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517

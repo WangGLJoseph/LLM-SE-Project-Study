@@ -367,18 +367,12 @@ void processFile(const std::string &repoName,
                     }
                 } else {
                     std::smatch chatUrlMatch;
-                    // Match the string starting with https://chat.openai.com/
-                    const std::regex chatUrlRegex(R"(https:\/\/platform\.openai\.com\/[^\s]*)",
+                    // Match the string starting with https://chat.openai.com/share/
+                    const std::regex chatUrlRegex(R"(https:\/\/chat\.openai\.com\/share\/[^\s]*)",
                                                   std::regex_constants::icase);
-                    if (std::regex_search(prompt, chatUrlMatch, chatUrlRegex) && chatUrlMatch.size() > 1) {
+                    if (!std::regex_search(prompt, chatUrlMatch, chatUrlRegex) || chatUrlMatch.empty()) {
                         std::cout << (!repoName.empty() ? repoName + ": " : repoName)
-                                  << "Prompt URL error, URL should start with 'https://platform.openai.com/' "
-                                  << "instead of : "
-                                  << prompt
-                                  << "\n";
-                    } else {
-                        std::cout << (!repoName.empty() ? repoName + ": " : repoName)
-                                  << "Chat id error, chat id is not found in URL: " << prompt
+                                  << "Chat id error, chat id is not found in the prompt URL: " << filePath
                                   << "\n";
                     }
                 }

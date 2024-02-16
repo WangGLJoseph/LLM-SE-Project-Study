@@ -1,18 +1,5 @@
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98
 23s2-cp-spa-team-05: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/spa/src/utilSpa/TwoSideFwdVecMap.cpp
 23s2-cp-spa-team-05: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/spa/src/utilSpa/DoubleMap.cpp
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/e39e28d1-87dc-410f-918e-2fe030a34c82
 23s2-cp-spa-team-05: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/unit_testing/src/unit/TestSP.cpp
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/b79012a9-d6db-4272-a8f5-d4e4e167dd91
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/ab543156-156c-4880-9673-2ea97ffd9182
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/1d6a042b-6280-4306-abaf-1ec120a9fef4
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/79d15f08-fd88-453e-943a-261fbef441a6
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/09e67ecb-4081-4912-bb8c-023c7e117580
 23s2-cp-spa-team-05: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/dccb94c8-d4d6-4310-b2f1-2306849865cf
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/ec225b64-f0c0-4d04-a5c2-9645760d0401
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/c/02a7fbcc-80e0-4cfe-be5f-2f2858ab9b47
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/58cc37a5-02ca-46fb-8029-ff79056aad6c
-23s2-cp-spa-team-05: Chat id error, chat id is not found in URL: https://chat.openai.com/share/f965b299-102c-4b5b-a9df-e2e1a17ded54
+23s2-cp-spa-team-05: Chat id error, chat id is not found in the prompt URL: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/unit_testing/src/ConstraintArgumentTestAI.cpp
