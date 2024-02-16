@@ -27,8 +27,8 @@ test_dir="$data_dir/test"
 # Define the dataset file path (replace with your dataset file path)
 dataset="$data_dir/dataset.csv"
 
-# Define the error log file path (replace with your error log file path)
-error_log="$data_dir/error_log.txt"
+# The error logs directory (replace this with your error logs path)
+error_logs_dir="$data_dir/error_logs"
 
 # Clear the code directory
 if [ -d "$code_dir" ]; then
@@ -50,13 +50,13 @@ if [ -f "$dataset" ]; then
     rm "$dataset"
 fi
 
-# Remove the error log file if exists
-if [ -f "$error_log" ]; then
-    rm "$error_log"
+# Clear the error logs directory
+if [ -d "$error_logs_dir" ]; then
+    rm -rf "$error_logs_dir"/*
 fi
 
 # Loop through all teams
-for team_number in $(seq 1 $team_numbers); do
+for team_number in $(seq 0 $team_numbers); do
   # Format team numbers with leading zeros
   formatted_team_number=$(printf "%02d" $team_number)
   output="T$formatted_team_number.txt"
@@ -75,5 +75,5 @@ for team_number in $(seq 1 $team_numbers); do
 
   # Extract for each team, redirect output and error to error log
   echo "Extracting $source_dir/$repo_name into $destination_dir/$output"
-  ./ace "$source_dir/$repo_name" "$code_dir/$output" "$chat_dir" "$test_dir/T$formatted_team_number" "$dataset" 2>&1 | tee -a "$error_log"
+  ./ace "$source_dir/$repo_name" "$code_dir/$output" "$chat_dir" "$test_dir/T$formatted_team_number" "$dataset" 2>&1 | tee -a "$error_logs_dir/$output"
 done

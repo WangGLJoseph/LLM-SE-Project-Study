@@ -1,0 +1,8 @@
+23s2-cp-spa-team-10: Chat id error, chat id is not found in URL: https://chat.openai.com/share/eee4ab57-c5f0-44ca-9fe9-885abf9a14cc
+23s2-cp-spa-team-10: Chat id error, chat id is not found in URL: https://chat.openai.com/share/5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
+23s2-cp-spa-team-10: Chat id error, chat id is not found in URL: https://chat.openai.com/share/feedba04-6fd0-4e9b-8b5a-c7826127fa4f
+23s2-cp-spa-team-10: Chat id error, chat id is not found in URL: https://chat.openai.com/share/79929c11-45e4-4e55-9996-cc966fd74a80
+23s2-cp-spa-team-10: Chat id error, chat id is not found in URL: https://chat.openai.com/share/5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
+23s2-cp-spa-team-10: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp
+23s2-cp-spa-team-10: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp
+23s2-cp-spa-team-10: Chat id error, chat id is not found in URL: https://chat.openai.com/share/70c84b62-2943-4870-898b-3659df332b23

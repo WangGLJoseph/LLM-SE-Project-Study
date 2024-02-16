@@ -45,7 +45,7 @@ public:
     void addToHashSet(std::string value);
     bool isInHashSet(std::string value);
     void removeFromHashSet(std::string value);
-    std::unordered_set<std::string> QueryTable::getHashSet();
+    std::unordered_set<std::string> getHashSet();
 
 private:
     std::unordered_set<std::string> hashSet;
@@ -92,7 +92,7 @@ class PKB;
 
 class VariableClauseToQuery : public ClauseEvaluator {
 private:
-    void storePKBData();
+    void storePKBData() override;
 
 public:
     void convertClauseToQuery() override;
@@ -149,6 +149,7 @@ Code:
 #include <memory>
 #include <unordered_set>
 #include <vector>
+#include <list>
 
 class PKB;
 
@@ -1457,8 +1458,8 @@ void EntityStorageBase::addEntity(const std::string& Entity) {
 */
 
 void EntityStorageBase::addEntities(Entity& entity) {
-    std::unordered_set<std::string>* entityAttributes = &entity.getEntityAttributes();
-    entities.insert(entityAttributes->begin(), entityAttributes->end());
+    std::unordered_set<std::string> entityAttributes = entity.getEntityAttributes();
+    entities.insert(entityAttributes.begin(), entityAttributes.end());
 }
 
 std::unordered_set<std::string> EntityStorageBase::getEntities() { return entities; }
@@ -1788,8 +1789,6 @@ Language: e
 Prompt: used copilot
 ChatId: 
 Code:
-#pragma once
-
 #include "Entity.h"
 #include <unordered_set>
 
@@ -2160,4 +2159,4 @@ SP lines: 829
 PKB Snippets: 23
 PKB lines: 309
 QPS Snippets: 9
-QPS lines: 126
+QPS lines: 127

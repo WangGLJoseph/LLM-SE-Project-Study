@@ -1,0 +1,4 @@
+23s2-cp-spa-team-17: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-17/Team17/Code17/src/spa/src/SP/DesignExtractor/EntityExtractor.cpp
+23s2-cp-spa-team-17: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-17/Team17/Code17/src/spa/src/PKB/Tables/AssignmentTable.h
+23s2-cp-spa-team-17: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-17/Team17/Code17/src/unit_testing/src/PKB/TestPKB.cpp
+23s2-cp-spa-team-17: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-17/Team17/Code17/src/unit_testing/src/PKB/TestGetAllPKB.cpp

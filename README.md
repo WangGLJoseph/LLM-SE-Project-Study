@@ -19,6 +19,16 @@ Run the ms3_extract.sh script to extract the tagged code from the repositories o
 ./ ms3_extract.sh
 ```
 
+Backup data folder.
+```bash
+zip -r data-<date>.zip data/ -x '/*.DS_Store' -x '/__MACOSX' -x '*/.iCloud'
+```
+
+Backup repo folder.
+```bash
+zip -r repo-<date>.zip repo/ -x '/*.DS_Store' -x '/__MACOSX' -x '*/.iCloud'
+```
+
 ## Citation
 
 Sanka Rasnayaka, Guanlin Wang, Ridwan Shariffdeen, and Ganesh Neelakanta Iyer. 2023. An Empirical Study on Usage and Perceptions of LLMs in a Software Engineering Project.	arXiv:2401.16186 [cs.SE]

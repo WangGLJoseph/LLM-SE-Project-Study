@@ -1,0 +1,9 @@
+23s2-cp-spa-team-19: Chat id error, chat id is not found in URL: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+23s2-cp-spa-team-19: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-19/Team19/Code19/src/spa/src/sp/AST/AST.cpp
+23s2-cp-spa-team-19: Chat id error, chat id is not found in URL: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+23s2-cp-spa-team-19: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-19/Team19/Code19/src/spa/src/sp/AST/ASTNode.h
+23s2-cp-spa-team-19: Chat id error, chat id is not found in URL: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+23s2-cp-spa-team-19: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-19/Team19/Code19/src/spa/src/sp/AST/ASTNode.cpp
+23s2-cp-spa-team-19: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-19/Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractor.h
+23s2-cp-spa-team-19: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-19/Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractor.cpp
+23s2-cp-spa-team-19: Chat id error, chat id is not found in URL: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651

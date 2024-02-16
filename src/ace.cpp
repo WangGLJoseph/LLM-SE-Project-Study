@@ -366,9 +366,21 @@ void processFile(const std::string &repoName,
                         }
                     }
                 } else {
-                    std::cout << (!repoName.empty() ? repoName + ": " : repoName)
-                              << "Chat id error, chat id is not found in URL: " << prompt
-                              << "\n";
+                    std::smatch chatUrlMatch;
+                    // Match the string starting with https://chat.openai.com/
+                    const std::regex chatUrlRegex(R"(https:\/\/platform\.openai\.com\/[^\s]*)",
+                                                  std::regex_constants::icase);
+                    if (std::regex_search(prompt, chatUrlMatch, chatUrlRegex) && chatUrlMatch.size() > 1) {
+                        std::cout << (!repoName.empty() ? repoName + ": " : repoName)
+                                  << "Prompt URL error, URL should start with 'https://platform.openai.com/' "
+                                  << "instead of : "
+                                  << prompt
+                                  << "\n";
+                    } else {
+                        std::cout << (!repoName.empty() ? repoName + ": " : repoName)
+                                  << "Chat id error, chat id is not found in URL: " << prompt
+                                  << "\n";
+                    }
                 }
             } else {
                 prompt = toLowercase(prompt);
@@ -382,6 +394,30 @@ void processFile(const std::string &repoName,
         // 'ai-gen end' is found
         if (aiGenFound && std::regex_search(line, match, endTagRegex) && !match.empty()) {
             aiGenFound = false;
+            // Generator is not extracted properly
+            if (generator.empty()) {
+                std::cout << (!repoName.empty() ? repoName + ": " : repoName)
+                          << "\"Tag error, generator is not found in file: " << filePath
+                          << "\n";
+            }
+            // Intervention is not extracted properly
+            if (intervention.empty()) {
+                std::cout << (!repoName.empty() ? repoName + ": " : repoName)
+                          << "Tag error, intervention is not found in file: " << filePath
+                          << "\n";
+            }
+            // Language is not extracted properly
+            if (language.empty()) {
+                std::cout << (!repoName.empty() ? repoName + ": " : repoName)
+                          << "Tag error, language is not found in file: " << filePath
+                          << "\n";
+            }
+            // Prompt is not extracted properly
+            if (prompt.empty()) {
+                std::cout << (!repoName.empty() ? repoName + ": " : repoName)
+                          << "Tag error, prompt is not found in file: " << filePath
+                          << "\n";
+            }
 
             result = trimResult(result);
             // Write the extracted result

@@ -1,0 +1,6 @@
+23s2-cp-spa-team-09: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-09/Team09/Code09/src/spa/src/PKB/Stores/StatementStore.cpp
+23s2-cp-spa-team-09: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-09/Team09/Code09/src/spa/src/PKB/Stores/StatementStore.h
+23s2-cp-spa-team-09: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-09/Team09/Code09/src/spa/src/PKB/Stores/EntityStore.h
+23s2-cp-spa-team-09: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-09/Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h
+23s2-cp-spa-team-09: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-09/Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h
+23s2-cp-spa-team-09: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-09/Team09/Code09/src/unit_testing/src/PKB/Stores/TestEntityStore.cpp
