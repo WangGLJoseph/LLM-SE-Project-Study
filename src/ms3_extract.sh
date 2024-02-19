@@ -18,8 +18,8 @@ data_dir="../sample/data"
 # The destination directory where AI code will be extracted (replace this with your code path)
 code_dir="$data_dir/code"
 
-# The destination directory where AI chat will be extracted (replace this with your chat path)
-chat_dir="$data_dir/chat"
+# The destination directory where AI GPT code will be extracted (replace this with your GPT code path)
+gpt_code_dir="$data_dir/gpt_code"
 
 # The destination directory where AI test cases will be extracted (replace this with your test path)
 test_dir="$data_dir/test"
@@ -35,9 +35,9 @@ if [ -d "$code_dir" ]; then
     rm -rf "$code_dir"/*
 fi
 
-# Clear the chat directory
-if [ -d "$chat_dir" ]; then
-    rm -rf "$chat_dir"/*
+# Clear the GPT code directory
+if [ -d "$gpt_code_dir" ]; then
+    rm -rf "$gpt_code_dir"/*
 fi
 
 # Clear the test directory
@@ -75,5 +75,5 @@ for team_number in $(seq 0 $team_numbers); do
 
   # Extract for each team, redirect output and error to error log
   echo "Extracting $source_dir/$repo_name into $destination_dir/$output"
-  ./ace "$source_dir/$repo_name" "$code_dir/$output" "$chat_dir" "$test_dir/T$formatted_team_number" "$dataset" 2>&1 | tee -a "$error_logs_dir/$output"
+  ./ace "$source_dir/$repo_name" "$code_dir/$output" "$gpt_code_dir" "$test_dir/T$formatted_team_number" "$dataset" 2>&1 | tee -a "$error_logs_dir/$output"
 done

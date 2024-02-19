@@ -24,7 +24,7 @@ void processDirectory(const std::string &repoName,
                       const std::string &directoryPath,
                       std::ofstream &outCodeFile,
                       std::ofstream &outDatasetFile,
-                      const std::string &outChatPath,
+                      const std::string &outGptCodePath,
                       const std::string &outTestPath,
                       int &totalGeneratedSnippets,
                       int &totalGeneratedLines);
@@ -34,7 +34,7 @@ void processFile(const std::string &repoName,
                  const std::string &filePath,
                  std::ofstream &outCodeFile,
                  std::ofstream &outDatasetFile,
-                 const std::string &outChatPath,
+                 const std::string &outGptCodePath,
                  int &totalGeneratedSnippets,
                  int &totalGeneratedLines);
 
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
     // Check if the correct number of command-line arguments (input path and output file) is provided
     if (argc != 6) {
         std::cout << "Wrong input parameters, input should consist of an input repository, "
-                     "an output code txt file, an output chat directory, an output test directory "
+                     "an output code txt file, an output GPT code directory, an output test directory "
                      "and an output dataset file"
                   << "\n";
         return 1; // Return an error code to indicate failure
@@ -77,8 +77,8 @@ int main(int argc, char **argv) {
     // Get the output txt file path from the second argument
     const std::string outputCodeTxtPath = argv[2];
 
-    // Get the output chat file path from the third argument
-    const std::string outputChatPath = argv[3];
+    // Get the output GPT code file path from the third argument
+    const std::string outputGptCodePath = argv[3];
 
     // Get the output test file path from the fourth argument
     const std::string outputTestPath = argv[4];
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
                          inputPath,
                          outCodeFile,
                          outDatasetFile,
-                         outputChatPath,
+                         outputGptCodePath,
                          outputTestPath,
                          totalGeneratedSnippets,
                          totalGeneratedLines);
@@ -192,7 +192,7 @@ void processDirectory(const std::string &repoName,
                       const std::string &directoryPath,
                       std::ofstream &outCodeFile,
                       std::ofstream &outDatasetFile,
-                      const std::string &outChatPath,
+                      const std::string &outGptCodePath,
                       const std::string &outTestPath,
                       int &totalGeneratedSnippets,
                       int &totalGeneratedLines) {
@@ -208,7 +208,7 @@ void processDirectory(const std::string &repoName,
                             filePath,
                             outCodeFile,
                             outDatasetFile,
-                            outChatPath,
+                            outGptCodePath,
                             totalGeneratedSnippets,
                             totalGeneratedLines);
             }
@@ -235,7 +235,7 @@ void processFile(const std::string &repoName,
                  const std::string &filePath,
                  std::ofstream &outCodeFile,
                  std::ofstream &outDatasetFile,
-                 const std::string &outChatPath,
+                 const std::string &outGptCodePath,
                  int &totalGeneratedSnippets,
                  int &totalGeneratedLines) {
 
@@ -351,7 +351,7 @@ void processFile(const std::string &repoName,
                 if (std::regex_search(prompt, chatIdMatch, chatIdRegex) && chatIdMatch.size() > 2) {
                     chatId = chatIdMatch[2].str();
                     // Create chat id directory
-                    outChatIdPath = outChatPath + "/" + chatId;
+                    outChatIdPath = outGptCodePath + "/" + chatId;
                     if (!fs::exists(outChatIdPath)) {
                         try {
                             if (!fs::create_directories(outChatIdPath)) {
