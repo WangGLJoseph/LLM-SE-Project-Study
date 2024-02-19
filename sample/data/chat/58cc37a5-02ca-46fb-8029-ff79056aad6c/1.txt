@@ -1,0 +1,81 @@
+TEST_CASE("noDeclarationRule_AllEntitiesDeclaredOnce_returnsNoString") {
+    // Create a QueryObject with all entities declared exactly once
+    QueryObject qo;
+    // Add entity declarations
+    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("q"));
+    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("s"));
+
+    qo.addDeclaration(e1);
+    qo.addDeclaration(e2);
+    // Add a constraint with entities as arguments
+    std::shared_ptr<ParentConstraint> pConstraint = std::make_shared<ParentConstraint>(e1, e2);
+    qo.addConstraint(pConstraint);
+    NoDeclarationRule rule;
+    REQUIRE(rule.validate(qo).empty());
+}
+
+TEST_CASE("noDeclarationRule_Missing2EntityDeclaration_returnsString") {
+    // Create a QueryObject with a missing entity declaration
+    QueryObject qo;
+    // Add entity declaration
+    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("j"));
+    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("h"));
+
+    // Add a constraint with an undeclared entity as an argument
+    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2)); // e1, e2 is not declared in qo
+    NoDeclarationRule rule;
+
+    REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
+}
+
+TEST_CASE("noDeclarationRule_Missing1EntityDeclaration_returnsString") {
+    // Create a QueryObject with a missing entity declaration
+    QueryObject qo;
+    // Add entity declaration
+
+    auto e1 = std::make_shared<StatementEntity>(StatementEntity("g"));
+    auto e2 = std::make_shared<PrintEntity>(PrintEntity("f"));
+
+    qo.addDeclaration(e1);
+    // Add a constraint with an undeclared entity as an argument
+    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2));
+    NoDeclarationRule rule;
+
+    REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
+}
+
+
+
+TEST_CASE("noDeclarationRule_MultipleUsageOfMissingEntity_returnsString") {
+    // Create a QueryObject with multiple usage of the same entity
+    QueryObject qo;
+    // Add entity declaration
+    auto e1 = std::make_shared<StatementEntity>(StatementEntity("e"));
+    auto e2 = std::make_shared<PrintEntity>(PrintEntity("e2"));
+    qo.addDeclaration(e1);
+    // Add a constraint with multiple occurrences of the same entity as arguments
+    //auto* p = new ParentConstraint(e2, e2); // e1 is assigned again
+    qo.addConstraint(std::make_shared<ParentConstraint>(e2, e2));
+    NoDeclarationRule rule;
+    REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
+}
+
+TEST_CASE("noDeclarationRule_EmptyQueryObjectPass_returnsNoString") {
+    // Create an empty QueryObject
+    QueryObject qo;
+    NoDeclarationRule rule;
+    REQUIRE(rule.validate(qo).empty());
+}
+
+TEST_CASE("noDeclarationRule_EntitiesUsedAsArgumentsNotDeclared_returnsString") {
+    // Create a QueryObject with entities used as arguments but not declared
+    QueryObject qo;
+    // Add a constraint with an entity as an argument without declaration
+    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("q"));
+    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("s"));
+
+    ParentConstraint p = ParentConstraint(e1, e2); // e1 and e2 is not declared in qo
+    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2));
+    NoDeclarationRule rule;
+    REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
+}

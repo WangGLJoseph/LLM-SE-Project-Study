@@ -1,0 +1,61 @@
+// copilot wrote code according to given comments
+
+template<typename A, typename B>
+bool TwoSideFwdVecMap<A, B>::insert(A key, B value) {
+    // forward map
+    // if key does not exist, create a new vector with the value
+    if (forwardMap.find(key) == forwardMap.end()) {
+        auto v = std::make_shared<B>(value);
+        forwardMap[key] = {v};
+    } else {
+        forwardMap[key].insert(std::make_shared<B>(value));
+    }
+
+    // backward map
+    // if value does not exist, insert key. Else, warn that value already exists
+    if (backwardMap.find(value) == backwardMap.end()) {
+        backwardMap[value] = key;
+    } else {
+        std::cout << "Warning: TwoSideFedVecMap-insert: Value already exists in backward map" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+template<typename A, typename B>
+std::vector<B> TwoSideFwdVecMap<A, B>::getValues(A key) {
+    // guard clause for key not found
+    if (forwardMap.find(key) == forwardMap.end()) {
+        std::cout << "Warning: TwoSideFwdVecMap-getValues: Key not found in forward map" << std::endl;
+        return std::vector<B>();
+    }
+    std::vector<B> result;
+    for (auto ptr : forwardMap[key]) {
+        result.push_back(*ptr);
+    }
+    return result;
+}
+
+template<typename A, typename B>
+std::optional<A> TwoSideFwdVecMap<A, B>::getKey(B value) {
+    // guard clause for value not found
+    if (backwardMap.find(value) == backwardMap.end()) {
+        return std::nullopt;
+    }
+    return backwardMap[value];
+}
+
+template<typename A, typename B>
+bool TwoSideFwdVecMap<A, B>::containsKey(A key) {
+    return forwardMap.find(key) != forwardMap.end();
+}
+
+template<typename A, typename B>
+bool TwoSideFwdVecMap<A, B>::containsValue(B value) {
+    return backwardMap.find(value) != backwardMap.end();
+}
+
+template<typename A, typename B>
+int TwoSideFwdVecMap<A,B>::size() const {
+    return backwardMap.size();
+}

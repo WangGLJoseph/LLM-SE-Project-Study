@@ -1,0 +1,19 @@
+template <typename K, typename V>
+const std::vector<std::pair<K, V>>&
+RelationshipMapManager<K, V>::getAllPairs() {
+  auto* pairs = new std::vector<std::pair<K, V>>();
+  // Check if the map is empty before attempting to iterate over it
+  if (leftToRightMap.empty()) {
+    return *pairs;  // Return the dynamically allocated empty vector
+  }
+
+  // Iterate over the key-value pairs in the map
+  for (const auto& kvp : leftToRightMap) {
+    const auto key = kvp.first;
+    const auto arr = kvp.second;
+    for (const auto& val : arr) {
+      pairs->push_back({key, val});
+    }
+  }
+  return *pairs;
+}

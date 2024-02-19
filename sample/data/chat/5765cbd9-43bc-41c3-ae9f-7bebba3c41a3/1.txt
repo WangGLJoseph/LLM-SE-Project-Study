@@ -1,0 +1,10 @@
+private:
+  PKB();
+  PKB(const PKB&) = delete;
+  PKB& operator=(const PKB&) = delete;
+  EntityManager entityManager;
+  PatternManager patternManager;
+  RelationshipManager relationshipManager;
+
+ public:
+  static PKB& getPKB();

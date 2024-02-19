@@ -99,7 +99,7 @@ Generator: copilot
 Intervention: 1
 Language: e
 Prompt: used copilot
-ChatId: 
+ChatId: 8ef1cf87-56eb-45bd-b91f-fbf309b86d98
 Code:
 // copilot wrote code according to given comments
 
@@ -219,7 +219,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98
-ChatId: 
+ChatId: 8ef1cf87-56eb-45bd-b91f-fbf309b86d98
 Code:
 #include <iostream>
 
@@ -300,7 +300,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98
-ChatId: 
+ChatId: 8ef1cf87-56eb-45bd-b91f-fbf309b86d98
 Code:
 #include <iostream>
 #include <set>
@@ -445,7 +445,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/e39e28d1-87dc-410f-918e-2fe030a34c82
-ChatId: 
+ChatId: e39e28d1-87dc-410f-918e-2fe030a34c82
 Code:
 #include "catch.hpp"
 #include "sp/Scanner.h"
@@ -837,7 +837,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/b79012a9-d6db-4272-a8f5-d4e4e167dd91
-ChatId: 
+ChatId: b79012a9-d6db-4272-a8f5-d4e4e167dd91
 Code:
 TEST_CASE("QueryValidator_ValidateQuery_NoErrors") {
     // Create a QueryObject with valid unique declarations and no constraint violations
@@ -938,7 +938,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/ab543156-156c-4880-9673-2ea97ffd9182
-ChatId: 
+ChatId: ab543156-156c-4880-9673-2ea97ffd9182
 Code:
 TEST_CASE("QueryObject_GetReturnType_ReturnsCorrectValue") {
     QueryObject queryObj;
@@ -1009,7 +1009,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/1d6a042b-6280-4306-abaf-1ec120a9fef4
-ChatId: 
+ChatId: 1d6a042b-6280-4306-abaf-1ec120a9fef4
 Code:
 TEST_CASE("entity_statementEntityIsTypeStatement_stringStatement") {
     StatementEntity en = StatementEntity("q");
@@ -1062,7 +1062,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/79d15f08-fd88-453e-943a-261fbef441a6
-ChatId: 
+ChatId: 79d15f08-fd88-453e-943a-261fbef441a6
 Code:
 TEST_CASE("Entity_GetIdentifier_Success") {
     // Arrange
@@ -1082,7 +1082,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/09e67ecb-4081-4912-bb8c-023c7e117580
-ChatId: 
+ChatId: 09e67ecb-4081-4912-bb8c-023c7e117580
 Code:
 TEST_CASE("inheritance_check_statementReference_ReadEntity") {
     ReadEntity readEntity("v");
@@ -1184,7 +1184,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/dccb94c8-d4d6-4310-b2f1-2306849865cf
-ChatId: 
+ChatId: dccb94c8-d4d6-4310-b2f1-2306849865cf
 Code:
 TEST_CASE("SingleDeclarationRule_ValidDeclarations_NoError") {
     // Create a QueryObject with valid unique declarations
@@ -1284,7 +1284,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/ec225b64-f0c0-4d04-a5c2-9645760d0401
-ChatId: 
+ChatId: ec225b64-f0c0-4d04-a5c2-9645760d0401
 Code:
 TEST_CASE("StatementEntity_inherits_from_ConstraintArgument") {
     StatementEntity statement("z");
@@ -1390,7 +1390,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/58cc37a5-02ca-46fb-8029-ff79056aad6c
-ChatId: 
+ChatId: 58cc37a5-02ca-46fb-8029-ff79056aad6c
 Code:
 TEST_CASE("noDeclarationRule_AllEntitiesDeclaredOnce_returnsNoString") {
     // Create a QueryObject with all entities declared exactly once
@@ -1480,7 +1480,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/f965b299-102c-4b5b-a9df-e2e1a17ded54
-ChatId: 
+ChatId: f965b299-102c-4b5b-a9df-e2e1a17ded54
 Code:
 TEST_CASE("dynamic_cast_inheritance_relationship_constraint") {
     std::shared_ptr<StatementEntity> s = std::make_shared<StatementEntity>("q");

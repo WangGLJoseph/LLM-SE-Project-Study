@@ -1,0 +1,8 @@
+#include "QueryEvaluationContext.h"
+#include <algorithm>
+#include <string>
+#include <sstream>
+
+void QueryEvaluationContext::addSynonymValues(const SynonymValues& synonymValues) {
+    synonymValuesList.push_back(synonymValues);
+}

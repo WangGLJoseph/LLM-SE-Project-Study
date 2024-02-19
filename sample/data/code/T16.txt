@@ -4,7 +4,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/4d1458e5-2925-4f5a-a6ba-a75fc192c817
-ChatId: 
+ChatId: 4d1458e5-2925-4f5a-a6ba-a75fc192c817
 Code:
 void addRow(Key key, std::shared_ptr<Value> value) {
         table[key] = value;
@@ -135,7 +135,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/51d22ff9-c94d-48e5-9158-4b2364c910fe
-ChatId: 
+ChatId: 51d22ff9-c94d-48e5-9158-4b2364c910fe
 Code:
 #include <iostream>
 #include <fstream>
@@ -176,7 +176,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/51d22ff9-c94d-48e5-9158-4b2364c910fe
-ChatId: 
+ChatId: 51d22ff9-c94d-48e5-9158-4b2364c910fe
 Code:
 #include <iostream>
 #include <fstream>

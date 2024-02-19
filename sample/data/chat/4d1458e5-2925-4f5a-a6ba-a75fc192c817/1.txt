@@ -1,0 +1,15 @@
+void addRow(Key key, std::shared_ptr<Value> value) {
+        table[key] = value;
+    }
+
+    std::shared_ptr<Value> getRow(Key key) {
+        auto it = table.find(key);
+        if (it != table.end()) {
+            return it->second;
+        }
+        return nullptr; // Or handle the case where the key is not found
+    }
+
+    std::unordered_map<Key, std::shared_ptr<Value>> getAllRows() {
+        return table;
+    }

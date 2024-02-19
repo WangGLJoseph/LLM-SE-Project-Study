@@ -1,0 +1,26 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+class FileReader {
+private:
+    std::string filepath;
+    std::ifstream filestream;
+
+public:
+    FileReader(const std::string& filepath) : filepath(filepath)
+    {
+        filestream.open(filepath);
+        if (!filestream.is_open()) {
+            std::cerr << "Error: Failed to open file '" << filepath << "'." << std::endl;
+        }
+    }
+
+    ~FileReader() {
+        if (filestream.is_open()) {
+            filestream.close();
+        }
+    }
+
+    std::string getLine();
+};

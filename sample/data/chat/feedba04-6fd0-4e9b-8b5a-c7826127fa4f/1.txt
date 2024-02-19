@@ -1,0 +1,7 @@
+struct pairHash {
+  std::size_t operator()(const std::pair<int, std::string>& p) const {
+    std::size_t hashInt = std::hash<int>{}(p.first);
+    std::size_t hashStr = std::hash<std::string>{}(p.second);
+    return hashInt ^ (hashStr + 0x9e3779b9 + (hashInt << 6) + (hashInt >> 2));
+  }
+};

@@ -4,7 +4,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-ChatId: 
+ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 Code:
 #include "QueryEvaluationContext.h"
 #include <algorithm>
@@ -21,7 +21,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-ChatId: 
+ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 Code:
 #pragma once
 
@@ -51,7 +51,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-ChatId: 
+ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 Code:
 #include "SynonymValues.h"
 #include "common/Entity.h"
@@ -72,7 +72,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/dc4fa5ec-550d-4bf8-b28d-2d6a9d8bf4a2
-ChatId: 
+ChatId: dc4fa5ec-550d-4bf8-b28d-2d6a9d8bf4a2
 Code:
 bool SynonymValues::operator==(const SynonymValues &rhs) const {
     // First, check if the synonyms are different
@@ -114,7 +114,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-ChatId: 
+ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 Code:
 #pragma once
 
@@ -145,7 +145,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758
-ChatId: 
+ChatId: b4e5ee0e-2ffc-4b9b-810c-871f71f82758
 Code:
 #include "ProjectionStrategy.h"
 #include <algorithm>
@@ -175,7 +175,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758
-ChatId: 
+ChatId: b4e5ee0e-2ffc-4b9b-810c-871f71f82758
 Code:
 #ifndef PROJECTIONSTRATEGY_H
 #define PROJECTIONSTRATEGY_H
@@ -361,7 +361,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-ChatId: 
+ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 Code:
 #include <catch.hpp>
 
@@ -538,7 +538,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517
-ChatId: 
+ChatId: 5a9de667-07bb-4d68-86ec-9b4e16053517
 Code:
 TEST_CASE("DeclarationStrategy processes synonyms and updates context with SynonymValues", "[DeclarationStrategy]") {
     auto queryManager = std::make_shared<FakeQueryManager>();
@@ -658,7 +658,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517
-ChatId: 
+ChatId: 5a9de667-07bb-4d68-86ec-9b4e16053517
 Code:
 class FakeQueryManager : public QueryManager {
 private:

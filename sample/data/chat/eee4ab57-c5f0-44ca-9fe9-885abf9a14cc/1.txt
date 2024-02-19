@@ -1,0 +1,14 @@
+// Used my own paid subscription for gpt4 because I was used to it.
+// Reverted to gpt3.5 because it somehow gave me better code.
+std::pair<std::string, std::string> Tokenizer::splitStringByRegex(
+    const std::string& input, const std::regex& pattern) {
+  std::smatch match;
+  if (std::regex_search(input, match, pattern)) {
+    auto matchPos = static_cast<size_t>(match.position());
+    std::string first = input.substr(0, matchPos);
+    std::string second =
+        input.substr(matchPos + static_cast<size_t>(match.length()));
+    return {first, second};
+  }
+  return {input, ""};
+}

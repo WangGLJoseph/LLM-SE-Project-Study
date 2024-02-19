@@ -4,7 +4,7 @@ Generator: gpt3.5
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/eee4ab57-c5f0-44ca-9fe9-885abf9a14cc
-ChatId: 
+ChatId: eee4ab57-c5f0-44ca-9fe9-885abf9a14cc
 Code:
 // Used my own paid subscription for gpt4 because I was used to it.
 // Reverted to gpt3.5 because it somehow gave me better code.
@@ -27,7 +27,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
-ChatId: 
+ChatId: 5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
 Code:
 private:
   PKB();
@@ -46,7 +46,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/feedba04-6fd0-4e9b-8b5a-c7826127fa4f
-ChatId: 
+ChatId: feedba04-6fd0-4e9b-8b5a-c7826127fa4f
 Code:
 struct pairHash {
   std::size_t operator()(const std::pair<int, std::string>& p) const {
@@ -62,7 +62,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/79929c11-45e4-4e55-9996-cc966fd74a80
-ChatId: 
+ChatId: 79929c11-45e4-4e55-9996-cc966fd74a80
 Code:
 template <typename T>
 void EntitySetStore<T>::insert(const T& element) {
@@ -83,7 +83,7 @@ Generator: gpt
 Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
-ChatId: 
+ChatId: 5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
 Code:
 PKB::PKB() {}
 
@@ -157,7 +157,7 @@ Generator: gpt
 Intervention: 0
 Language: e
 Prompt: https://chat.openai.com/share/70c84b62-2943-4870-898b-3659df332b23
-ChatId: 
+ChatId: 70c84b62-2943-4870-898b-3659df332b23
 Code:
 template <typename K, typename V>
 const std::vector<std::pair<K, V>>&

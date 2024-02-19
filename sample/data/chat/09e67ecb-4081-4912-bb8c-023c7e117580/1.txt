@@ -1,0 +1,47 @@
+TEST_CASE("inheritance_check_statementReference_ReadEntity") {
+    ReadEntity readEntity("v");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&readEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_PrintEntity") {
+    PrintEntity printEntity("p");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&printEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_AssignEntity") {
+    AssignEntity assignEntity("f");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&assignEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_CallEntity") {
+    CallEntity callEntity("c");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&callEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_IfEntity") {
+    IfEntity ifEntity("d");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&ifEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_WhileEntity") {
+    WhileEntity whileEntity("e");
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&whileEntity) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_IntegerArgument") {
+    IntegerArgument integerArgument;
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&integerArgument) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}
+
+TEST_CASE("inheritance_check_statementReference_WildCard") {
+    WildCard wildCard;
+    bool isInstanceOfStatementReference = dynamic_cast<StatementReference*>(&wildCard) != nullptr;
+    REQUIRE(isInstanceOfStatementReference);
+}

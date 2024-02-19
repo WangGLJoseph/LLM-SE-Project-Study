@@ -1,0 +1,6 @@
+PKB::PKB() {}
+
+PKB& PKB::getPKB() {
+  static PKB pkb;
+  return pkb;
+}

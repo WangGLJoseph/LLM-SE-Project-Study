@@ -1,0 +1,12 @@
+template <typename T>
+void EntitySetStore<T>::insert(const T& element) {
+  set.insert(element);
+}
+
+template <typename T>
+std::unordered_set<T>& EntitySetStore<T>::getAll() {
+  return set;
+}
+
+template class EntitySetStore<int>;
+template class EntitySetStore<std::string>;

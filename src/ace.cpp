@@ -347,9 +347,9 @@ void processFile(const std::string &repoName,
                 prompt = urlMatch[0].str();
                 std::smatch chatIdMatch;
                 // Extract the chat id inside the URL
-                const std::regex chatIdRegex(R"(/p/([^/?]+))");
-                if (std::regex_search(prompt, chatIdMatch, chatIdRegex) && chatIdMatch.size() > 1) {
-                    chatId = chatIdMatch[1].str();
+                const std::regex chatIdRegex(R"(/(p|share)/([^/?]+))");
+                if (std::regex_search(prompt, chatIdMatch, chatIdRegex) && chatIdMatch.size() > 2) {
+                    chatId = chatIdMatch[2].str();
                     // Create chat id directory
                     outChatIdPath = outChatPath + "/" + chatId;
                     if (!fs::exists(outChatIdPath)) {

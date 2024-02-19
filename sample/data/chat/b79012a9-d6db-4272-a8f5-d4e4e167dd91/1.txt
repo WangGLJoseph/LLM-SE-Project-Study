@@ -1,0 +1,92 @@
+TEST_CASE("QueryValidator_ValidateQuery_NoErrors") {
+    // Create a QueryObject with valid unique declarations and no constraint violations
+    QueryObject qo;
+    std::shared_ptr<AssignEntity> assignEntity = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<PrintEntity> printEntity = std::make_shared<PrintEntity>("y");
+
+    qo.addDeclaration(assignEntity);
+    qo.addDeclaration(printEntity);
+
+    std::shared_ptr<ParentConstraint> parentConstraint = std::make_shared<ParentConstraint>(assignEntity, printEntity);
+
+    qo.addConstraint(parentConstraint);
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure no failed rules are returned
+    REQUIRE(failedRules.empty());
+}
+
+TEST_CASE("QueryValidator_ValidateQuery_SingleDeclarationRuleViolation") {
+    // Create a QueryObject violating the SingleDeclarationRule
+    QueryObject qo;
+
+    std::shared_ptr<AssignEntity> assignEntity1 = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<AssignEntity> assignEntity2 = std::make_shared<AssignEntity>("x");
+
+    qo.addDeclaration(assignEntity1);
+    qo.addDeclaration(assignEntity2);
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure SingleDeclarationRule violation is detected
+    REQUIRE(failedRules.size() == 1);
+    REQUIRE(failedRules[0] == VALIDATION_RULE_SINGLE_DECLARATION);
+}
+
+TEST_CASE("QueryValidator_ValidateQuery_NoDeclarationRuleViolation") {
+    // Create a QueryObject violating the NoDeclarationRule
+    QueryObject qo;
+    std::shared_ptr<AssignEntity> assignEntity = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<AssignEntity> printEntity = std::make_shared<AssignEntity>("y");
+
+    std::shared_ptr<ParentConstraint> parentConstraint = std::make_shared<ParentConstraint>(assignEntity, printEntity); // Using undeclared entities
+    qo.addConstraint(parentConstraint);
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure NoDeclarationRule violation is detected
+    REQUIRE(failedRules.size() == 1);
+    REQUIRE(failedRules[0] == VALIDATION_RULE_NO_DECLARATION);
+}
+
+TEST_CASE("QueryValidator_ValidateQuery_MultipleRuleViolations") {
+    // Create a QueryObject violating both SingleDeclarationRule and NoDeclarationRule
+    QueryObject qo;
+
+    std::shared_ptr<AssignEntity> assignEntity1 = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<AssignEntity> assignEntity2 = std::make_shared<AssignEntity>("x");
+    std::shared_ptr<PrintEntity> printEntity = std::make_shared<PrintEntity>("y");
+    std::shared_ptr<ParentConstraint> parentConstraint = std::make_shared<ParentConstraint>(assignEntity1, printEntity); // Using undeclared entities
+
+    qo.addDeclaration(assignEntity1);
+    qo.addDeclaration(assignEntity2);
+    qo.addConstraint(parentConstraint);
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure both SingleDeclarationRule and NoDeclarationRule violations are detected
+    REQUIRE(failedRules.size() == 2);
+    REQUIRE(std::find(failedRules.begin(), failedRules.end(), VALIDATION_RULE_SINGLE_DECLARATION) != failedRules.end());
+    REQUIRE(std::find(failedRules.begin(), failedRules.end(), VALIDATION_RULE_NO_DECLARATION) != failedRules.end());
+}
+
+TEST_CASE("QueryValidator_ValidateQuery_EmptyQueryObject") {
+    // Create an empty QueryObject
+    QueryObject qo;
+
+    // Apply QueryValidator to validate the QueryObject
+    QueryValidator validator;
+    std::vector<std::string> failedRules = validator.validateQuery(qo);
+
+    // Ensure no failed rules are returned for an empty QueryObject
+    REQUIRE(failedRules.empty());
+}
