@@ -1,4 +1,224 @@
 RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/QPS/Evaluator/IntermediateResultsTable.cpp
+Generator: coplit
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void IntermediateResultsTable::combineTable(IntermediateResultsTable &otherTable) {
+    std::unordered_map<std::string, size_t> thisColumnNameToIndex = columnNameToIndex; // Assume this exists
+    std::vector<std::string> commonColumns;
+    std::unordered_map<std::string, size_t> otherColumnNameToIndex;
+
+    for (size_t i = 0; i < otherTable.columns.size(); ++i) {
+        if (thisColumnNameToIndex.find(otherTable.columns[i]) != thisColumnNameToIndex.end()) {
+            commonColumns.push_back(otherTable.columns[i]);
+            otherColumnNameToIndex[otherTable.columns[i]] = i;
+        }
+    }
+
+    std::vector<std::vector<std::string>> newRows;
+    newRows.reserve(rows.size() * otherTable.rows.size()); // Preallocate memory assuming full cross join
+    // Create a hash map for quick matching of rows based on common column values
+    std::unordered_map<std::string, std::vector<size_t>> valueToRowIndices;
+    if (!commonColumns.empty()) {
+        for (size_t i = 0; i < rows.size(); ++i) {
+            // New condition to skip processing for "empty" rows under the new scenario
+            if (!rows[i].empty()) { // Check if the row is not just an empty vector
+                std::string key;
+                for (const auto &col: commonColumns) {
+                    key += rows[i][thisColumnNameToIndex[col]] + "|"; // Concatenate values as key
+                }
+                valueToRowIndices[key].push_back(i);
+            }
+        }
+    }
+    if (commonColumns.empty()) {
+        // Handle no common columns separately as before
+//         Prepare the list of new columns by combining columns from both tables
+        std::vector<std::string> resultColumns;
+        resultColumns.reserve(columns.size() + otherTable.columns.size()); // Preallocate memory
+        resultColumns.insert(resultColumns.end(), columns.begin(), columns.end()); // Add current table's columns
+        resultColumns.insert(resultColumns.end(), otherTable.columns.begin(),
+                             otherTable.columns.end()); // Add otherTable's columns
+
+// Optimizing row combination
+        std::vector<std::vector<std::string>> newRows;
+        newRows.reserve(rows.size() * otherTable.rows.size()); // Preallocate memory for all possible combinations
+
+        for (const auto &row: rows) {
+            for (const auto &otherRow: otherTable.rows) {
+                std::vector<std::string> combinedRow(row.size() + otherRow.size()); // Allocate with required size
+                std::copy(row.begin(), row.end(), combinedRow.begin()); // Copy current table row
+                std::copy(otherRow.begin(), otherRow.end(), combinedRow.begin() + row.size()); // Copy other table row
+                newRows.push_back(std::move(
+                        combinedRow)); // Add the combined row to newRows using move semantics to avoid copying
+            }
+        }
+
+// Update the columns and rows of the current table
+        setColumns(resultColumns); // Update the columns
+        setRows(newRows); // Update the rows
+        return;
+    } else {
+        for (const auto &otherRow: otherTable.rows) {
+            // Check if the otherRow is considered "empty" under your new definition
+            if (otherRow.empty()) {
+                // Optionally handle empty rows, e.g., skip or handle them differently
+                newRows.push_back({});
+                continue; // Skip this iteration if otherRow is "empty"
+            }
+
+            std::string key;
+            for (const auto &col: commonColumns) {
+                key += otherRow[otherColumnNameToIndex[col]] + "|";
+            }
+            if (valueToRowIndices.find(key) != valueToRowIndices.end()) {
+                for (auto index: valueToRowIndices[key]) {
+                    std::vector<std::string> newRow = rows[index]; // Use existing row
+                    // Append non-overlapping columns from otherRow
+                    for (size_t i = 0; i < otherRow.size(); ++i) {
+                        if (otherColumnNameToIndex.find(otherTable.columns[i]) == otherColumnNameToIndex.end()) {
+                            newRow.push_back(otherRow[i]);
+                        }
+                    }
+                    newRows.push_back(std::move(newRow)); // Use move semantics
+                }
+            }
+        }
+    }  // Append new columns from otherTable if not common
+    auto newColumns = columns;
+
+    for (const auto &col: otherTable.columns) {
+        if (thisColumnNameToIndex.find(col) == thisColumnNameToIndex.end()) {
+            newColumns.push_back(col);
+        }
+    }
+    setColumns(newColumns);
+    setRows(newRows);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/SP/DesignExtractor/SPFacadeStub.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/d051145c-fee1-48c0-a850-c299d536b751
+ChatId: d051145c-fee1-48c0-a850-c299d536b751
+Code:
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "Common/Data/Abstractions/Follows/FollowsAbstraction.h"
+#include "Common/Data/Abstractions/Follows/FollowsTAbstraction.h"
+#include "Common/Data/Abstractions/Modifies/ModifiesAbstraction.h"
+#include "Common/Data/Abstractions/Parent/ParentAbstraction.h"
+#include "Common/Data/Abstractions/Parent/ParentTAbstraction.h"
+#include "Common/Data/Abstractions/Uses/UsesAbstraction.h"
+
+class SPFacadeStub {
+private:
+    SPFacadeStub() {}
+
+public:
+    static const SPFacadeStub &getInstance() {
+        static SPFacadeStub instance;
+        return instance;
+    }
+
+    static std::vector<std::vector<int>> &getFollowsTable() {
+        static std::vector<std::vector<int>> followsTable;
+        return followsTable;
+    }
+
+    static std::vector<std::vector<int>> &getFollowsTTable() {
+        static std::vector<std::vector<int>> followsTTable;
+        return followsTTable;
+    }
+
+    static std::vector<ModifiesAbstraction> &getModifiesTable() {
+        static std::vector<ModifiesAbstraction> modifiesTable;
+        return modifiesTable;
+    }
+
+    static std::vector<std::vector<int>> &getParentTable() {
+        static std::vector<std::vector<int>> parentTable;
+        return parentTable;
+    }
+
+    static std::vector<std::vector<int>> &getParentTTable() {
+        static std::vector<std::vector<int>> parentTTable;
+        return parentTTable;
+    }
+
+    static std::vector<UsesAbstraction> &getUsesTable() {
+        static std::vector<UsesAbstraction> usesTable;
+        return usesTable;
+    }
+
+    static void storeFollows(const FollowsAbstraction &abstraction) {
+        getFollowsTable().push_back(
+                {std::get<int>(abstraction.getLeftArgument()), std::get<int>(abstraction.getRightArgument())});
+    }
+
+    static void storeFollowsT(const FollowsTAbstraction &abstraction) {
+        getFollowsTTable().push_back(
+                {std::get<int>(abstraction.getLeftArgument()), std::get<int>(abstraction.getRightArgument())});
+    }
+
+    static void storeModifies(const ModifiesAbstraction &abstraction) {
+        getModifiesTable().push_back(abstraction);
+    }
+
+    static void storeParent(const ParentAbstraction &abstraction) {
+        getParentTable().push_back(
+                {std::get<int>(abstraction.getLeftArgument()), std::get<int>(abstraction.getRightArgument())});
+    }
+
+    static void storeParentT(const ParentTAbstraction &abstraction) {
+        getParentTTable().push_back(
+                {std::get<int>(abstraction.getLeftArgument()), std::get<int>(abstraction.getRightArgument())});
+    }
+
+    static void storeUses(const UsesAbstraction &abstraction) {
+        getUsesTable().push_back(abstraction);
+    }
+
+    static void clear() {
+        getFollowsTable().clear();
+        getFollowsTTable().clear();
+        getModifiesTable().clear();
+        getParentTable().clear();
+        getParentTTable().clear();
+        getUsesTable().clear();
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/spa/src/PKB/Tables/Base/IEntityTable.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/c/99e0f85a-237a-4fff-8029-9d416ad631ce
+ChatId: 
+Code:
+// This code is used to check whether an identifier's key matches the correct typing.
+    // An identifier can be either 'int' or 'std::string'.
+    std::visit([this, &entity](auto &&arg) {
+        using T = std::decay_t<decltype(arg)>;
+        // Ensure that the type of arg (int or std::string) matches Key
+        if constexpr (std::is_same_v<T, Key>) {
+            // Attempt to cast the entity to Value and store it in the table
+            auto castedEntity = std::dynamic_pointer_cast<Value>(entity);
+            if (castedEntity) {
+                this->table[arg] = castedEntity;
+            } else {
+                throw std::invalid_argument("Entity cast to Value failed");
+            }
+--------------------
+RepoName: 23s2-cp-spa-team-16
 File: Team16/Code16/src/spa/src/PKB/Tables/Base/IEntityTable.h
 Generator: gpt
 Intervention: 1
@@ -6,16 +226,14 @@ Language: e
 Prompt: https://chat.openai.com/share/4d1458e5-2925-4f5a-a6ba-a75fc192c817
 ChatId: 4d1458e5-2925-4f5a-a6ba-a75fc192c817
 Code:
-void addRow(Key key, std::shared_ptr<Value> value) {
-        table[key] = value;
-    }
+void addRow(std::shared_ptr<IDataEntry> dataEntry) override;
 
     std::shared_ptr<Value> getRow(Key key) {
         auto it = table.find(key);
         if (it != table.end()) {
             return it->second;
         }
-        return nullptr; // Or handle the case where the key is not found
+        return nullptr;
     }
 
     std::unordered_map<Key, std::shared_ptr<Value>> getAllRows() {
@@ -23,25 +241,38 @@ void addRow(Key key, std::shared_ptr<Value> value) {
     }
 --------------------
 RepoName: 23s2-cp-spa-team-16
-File: Team16/Code16/src/spa/src/PKB/Storage.cpp
+File: Team16/Code16/src/spa/src/PKB/PKBStorage.cpp
 Generator: gpt
 Intervention: 1
 Language: e
-Prompt: https://chat.openai.com/c/a1320bcd-2185-46c7-b524-c1abe2460879
+Prompt: https://chat.openai.com/c/44357f66-71ca-474e-b0fe-f8ac5fc83ef4
 ChatId: 
 Code:
-// Getter function to retrieve IPKBTable object from Storage, or create a new one if it does not exist.
-std::shared_ptr<IPKBTable> Storage::getOrCreateTable(const SPADataType key)
-{
-    auto it = tables.find(key);
-    if (it != tables.end()) {
-        return it->second;
-    }
-    else {
-        std::shared_ptr<IPKBTable> newTable = std::make_shared<IPKBTable>(key); // Return new table if key is not found
-        tables[key] = newTable;
-        return newTable;
-    }
+void PKBStorage::initialize() {
+    insertTable<VariableTable>();
+    insertTable<ProcedureTable>();
+    insertTable<ConstantTable>();
+    insertTable<StatementTable>();
+    insertTable<ReadStatementTable>();
+    insertTable<PrintStatementTable>();
+    insertTable<CallStatementTable>();
+    insertTable<WhileStatementTable>();
+    insertTable<IfStatementTable>();
+    insertTable<AssignStatementTable>();
+    insertTable<FollowsAbstractionTable>();
+    insertTable<FollowsTAbstractionTable>();
+    insertTable<ParentAbstractionTable>();
+    insertTable<ParentTAbstractionTable>();
+    insertTable<UsesAbstractionTable>();
+    insertTable<ModifiesAbstractionTable>();
+}
+
+template<typename TableType>
+void PKBStorage::insertTable() {
+    static_assert(std::is_base_of<IPKBTable, TableType>::value, "TableType must be derived from IPKBTable");
+    std::shared_ptr<TableType> table = std::make_shared<TableType>();
+    SPADataType dataType = table->getDataType();
+    tables[dataType] = table;
 }
 --------------------
 RepoName: 23s2-cp-spa-team-16
@@ -57,77 +288,10 @@ Code:
     PQLFacade() = delete;
 
     // Delete the copy constructor.
-    PQLFacade(const PQLFacade&) = delete;
+    PQLFacade(const PQLFacade &) = delete;
 
     // Delete the assignment operator.
-    PQLFacade& operator=(const PQLFacade&) = delete;
---------------------
-RepoName: 23s2-cp-spa-team-16
-File: Team16/Code16/src/spa/src/PKB/Facades/SPFacade.cpp
-Generator: gpt
-Intervention: 2
-Language: e
-Prompt: https://platform.openai.com/playground/p/yqWjZ1LL5NjZitx7ga3TXrwE?model=gpt-4&mode=chat
-ChatId: yqWjZ1LL5NjZitx7ga3TXrwE
-Code:
-void SPFacade::storeVariable(string& variableName)
-{
-    return PopulateHandler::storeVariable(variableName);
-}
-
-void SPFacade::storeCall(int lineNumber)
-{
-    return PopulateHandler::storeCall(lineNumber);
-}
-
-void SPFacade::storeRead(int lineNumber)
-{
-    return PopulateHandler::storeRead(lineNumber);
-}
-
-void SPFacade::storePrint(int lineNumber)
-{
-    return PopulateHandler::storePrint(lineNumber);
-}
-
-void SPFacade::storeProcedure(string& procedureName)
-{
-    return PopulateHandler::storeProcedure(procedureName);
-}
---------------------
-RepoName: 23s2-cp-spa-team-16
-File: Team16/Code16/src/spa/src/PKB/Handlers/QueryHandler.cpp
-Generator: copilot
-Intervention: 1
-Language: e
-Prompt: used copilot
-ChatId: 
-Code:
-// Helper function to convert a key to string. Default implementation for numeric types
-    template<typename Key>
-    std::string keyToString(const Key& key) {
-        return to_string(key); // Default implementation for numeric types
-    }
-
-    // Specialization for std::string
-    template<>
-    std::string keyToString<std::string>(const std::string& key) {
-        return key; // For std::string, return the key itself
-    }
-
-    // Helper function to iterate through a map and return a string of the keys, comma separated
-    template <typename Key, typename Value>
-    std::string iterateThroughMap(const std::unordered_map<Key, std::shared_ptr<Value>>& map) {
-        std::string resultString;
-        for (const auto& [key, val] : map) {
-            resultString += keyToString(key) + ", ";
-        }
-        // Remove the trailing ", "
-        if (!resultString.empty()) {
-            resultString.erase(resultString.length() - 2);
-        }
-        return resultString;
-    }
+    PQLFacade &operator=(const PQLFacade &) = delete;
 --------------------
 RepoName: 23s2-cp-spa-team-16
 File: Team16/Code16/src/spa/src/Common/FileReader.cpp
@@ -202,81 +366,170 @@ public:
         }
     }
 
-    std::string getLine();
+    std::string getLine() {
+        std::string line;
+        if (std::getline(filestream, line)) {
+            return line;
+        }
+        return ""; // Return empty string if there are no more lines
+    }
 };
 --------------------
 RepoName: 23s2-cp-spa-team-16
-File: Team16/Code16/src/spa/src/Common/Data/SPADataType.cpp
-Generator: copilot
+File: Team16/Code16/src/unit_testing/src/pkb_unit_testing/TestPKBStorage.cpp
+Generator: gpt
 Intervention: 1
 Language: e
-Prompt: used copilot
+Prompt: https://chat.openai.com/c/fda07a6f-9ba7-4782-9cae-f33916156c33
 ChatId: 
 Code:
-/**
- * A function to convert the SPADataType to a string - each enum value is mapped to a unique string identifier
- * @throws std::runtime_error if the SPADataType is invalid - not found in the map
- */
-std::string SPADataTypeConverter::convertDataTypeToString(SPADataType type)
-{
-    auto it = SPADataTypeToStringMap.find(type);
-    if (it == SPADataTypeToStringMap.end())
-    {
-        throw std::runtime_error("Invalid SPADataType for conversion to string");
-    }
-    return it->second;
-}
+PKBStorage &storage = PKBStorage::getStorage(); // Obtain the singleton instance of PKBStorage
 
-/**
- * A function to convert a string to a SPADataType - each string identifier is mapped to a unique enum value
- * @throws std::runtime_error if the string is invalid - not found in the map or does not match any SPADataType
- */
-SPADataType SPADataTypeConverter::convertStringToDataType(const std::string &typeStr)
-{
-    auto it = stringToSPADataTypeMap.find(typeStr);
-    if (it == stringToSPADataTypeMap.end())
-    {
-        throw std::runtime_error("Invalid string for conversion to SPADataType: " + typeStr);
+    SECTION("PKBStorage initialises all tables and retrieves them correctly") {
+        // Retrieve a table by its SPADataType
+        auto constantTable = storage.getTable(SPADataType::CONSTANT);
+        auto variableTable = storage.getTable(SPADataType::VARIABLE);
+        auto procedureTable = storage.getTable(SPADataType::PROCEDURE);
+        auto assignTable = storage.getTable(SPADataType::ASSIGN);
+        auto callTable = storage.getTable(SPADataType::CALL);
+        auto ifTable = storage.getTable(SPADataType::IF);
+        auto printTable = storage.getTable(SPADataType::PRINT);
+        auto readTable = storage.getTable(SPADataType::READ);
+        auto whileTable = storage.getTable(SPADataType::WHILE);
+        auto followsTable = storage.getTable(SPADataType::FOLLOWS);
+        auto parentTable = storage.getTable(SPADataType::PARENT);
+        auto followsTTable = storage.getTable(SPADataType::FOLLOWST);
+        auto parentTTable = storage.getTable(SPADataType::PARENTT);
+        auto usesTable = storage.getTable(SPADataType::USES);
+        auto modifiesTable = storage.getTable(SPADataType::MODIFIES);
+
+        // Check if the retrieved tables are not null
+        REQUIRE(constantTable != nullptr);
+        REQUIRE(variableTable != nullptr);
+        REQUIRE(procedureTable != nullptr);
+        REQUIRE(assignTable != nullptr);
+        REQUIRE(callTable != nullptr);
+        REQUIRE(ifTable != nullptr);
+        REQUIRE(printTable != nullptr);
+        REQUIRE(readTable != nullptr);
+        REQUIRE(whileTable != nullptr);
+        REQUIRE(followsTable != nullptr);
+        REQUIRE(parentTable != nullptr);
+        REQUIRE(followsTTable != nullptr);
+        REQUIRE(parentTTable != nullptr);
+        REQUIRE(usesTable != nullptr);
+        REQUIRE(modifiesTable != nullptr);
+        // Verify that the retrieved tables are of the correct type
+        REQUIRE(dynamic_cast<VariableTable *>(variableTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<ConstantTable *>(constantTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<AssignStatementTable *>(assignTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<PrintStatementTable *>(printTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<CallStatementTable *>(callTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<IfStatementTable *>(ifTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<ReadStatementTable *>(readTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<WhileStatementTable *>(whileTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<FollowsAbstractionTable *>(followsTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<ParentAbstractionTable *>(parentTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<FollowsTAbstractionTable *>(followsTTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<ParentTAbstractionTable *>(parentTTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<UsesAbstractionTable *>(usesTable.get()) != nullptr);
+        REQUIRE(dynamic_cast<ModifiesAbstractionTable *>(modifiesTable.get()) != nullptr);
     }
-    return it->second;
-}
+
+        // Test retrieving non-existent tables
+    SECTION("Retrieving non-existent tables from PKBStorage returns null") {
+        // Retrieve a table that doesn't exist
+        auto nonExistentTable = storage.getTable(SPADataType::STATEMENT_LIST);
+
+        // Check if the retrieved table is null
+        REQUIRE(nonExistentTable == nullptr);
+    }
 --------------------
 RepoName: 23s2-cp-spa-team-16
-File: Team16/Code16/src/spa/src/Common/Data/SPADataType.h
+File: Team16/Code16/src/unit_testing/src/pkb_unit_testing/Data/Entities/Expressions/TestConditionalExpressionNode.cpp
 Generator: copilot
-Intervention: 1
+Intervention: 2
 Language: e
 Prompt: used copilot
 ChatId: 
 Code:
-inline const std::unordered_map<SPADataType, std::string> SPADataTypeToStringMap = []
-    {
-        std::unordered_map<SPADataType, std::string> reversedMap;
-        for (const auto &pair : stringToSPADataTypeMap)
-        {
-            reversedMap[pair.second] = pair.first;
-        }
-        return reversedMap;
-    }();
+SECTION("ConditionalExpressionNode throws error with valid ConditionalOperator but invalid unary operator") {
+        std::shared_ptr<IExpressionNode> expression = std::make_shared<ConstantExpressionNode>(2);
+        REQUIRE_THROWS(ConditionalExpressionNode(Symbol::AND, expression));
+    }
 
-    /**
-     * A function to convert the SPADataType to a string - each enum value is mapped to a unique string identifier
-     * @throws std::runtime_error if the SPADataType is invalid - not found in the map
-     */
-    std::string convertDataTypeToString(SPADataType type);
+    SECTION("ConditionalExpressionNode with unary conditional operator is unary") {
+        std::shared_ptr<IExpressionNode> expression = std::make_shared<ConstantExpressionNode>(2);
+        ConditionalExpressionNode conditionalExpressionNode = ConditionalExpressionNode(Symbol::NOT, expression);
+        REQUIRE(conditionalExpressionNode.isUnaryExpression());
+    }
 
-    /**
-     * A function to convert a string to a SPADataType - each string identifier is mapped to a unique enum value
-     * @throws std::runtime_error if the string is invalid - not found in the map or does not match any SPADataType
-     */
-    SPADataType convertStringToDataType(const std::string &typeStr);
+    SECTION("ConditionalExpressionNode with unary conditional operator throws error when setting right operand") {
+        std::shared_ptr<IExpressionNode> expression = std::make_shared<ConstantExpressionNode>(2);
+        ConditionalExpressionNode conditionalExpressionNode = ConditionalExpressionNode(Symbol::NOT, expression);
+        std::shared_ptr<IExpressionNode> newRightExpression = std::make_shared<ConstantExpressionNode>(3);
+        REQUIRE_THROWS(conditionalExpressionNode.setRightExpression(newRightExpression));
+    }
+
+    SECTION("ConditionalExpressionNode returns correct unary operator") {
+        std::shared_ptr<IExpressionNode> expression = std::make_shared<ConstantExpressionNode>(2);
+        ConditionalExpressionNode conditionalExpressionNode = ConditionalExpressionNode(Symbol::NOT, expression);
+        REQUIRE(conditionalExpressionNode.getSymbol() == Symbol::NOT);
+    }
+
+    SECTION("ConditionalExpressionNode returns correct expression") {
+        std::shared_ptr<IExpressionNode> expression = std::make_shared<ConstantExpressionNode>(2);
+        ConditionalExpressionNode conditionalExpressionNode = ConditionalExpressionNode(Symbol::NOT, expression);
+        std::string expectedExpression = Symbol::NOT + "(" + expression->getExpression() + ")";
+        REQUIRE(conditionalExpressionNode.getExpression() == expectedExpression);
+    }
+
+    SECTION("ConditionalExpressionNode returns correct expression with nested expressions") {
+        std::shared_ptr<IExpressionNode> expression = std::make_shared<ConstantExpressionNode>(2);
+        ConditionalExpressionNode conditionalExpressionNode = ConditionalExpressionNode(Symbol::NOT, expression);
+        std::shared_ptr<IExpressionNode> nestedExpression = std::make_shared<ConstantExpressionNode>(3);
+        conditionalExpressionNode.setLeftExpression(nestedExpression);
+        std::string expectedExpression = Symbol::NOT + "(" + nestedExpression->getExpression() + ")";
+        REQUIRE(conditionalExpressionNode.getExpression() == expectedExpression);
+    }
+
+    SECTION("ConditionalExpressionNode handles nullptr properly in getExpression()") {
+        std::shared_ptr<IExpressionNode> expression = nullptr;
+        ConditionalExpressionNode conditionalExpressionNode = ConditionalExpressionNode(Symbol::NOT, expression);
+        REQUIRE_THROWS(conditionalExpressionNode.getExpression());
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-16
+File: Team16/Code16/src/unit_testing/src/pkb_unit_testing/Data/Entities/Expressions/TestConditionalExpressionNode.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+TEST_CASE("ConditionalExpressionNode implements parent class methods properly") {
+    std::shared_ptr<IExpressionNode> leftExpression = std::make_shared<ConstantExpressionNode>(1);
+    std::shared_ptr<IExpressionNode> rightExpression = std::make_shared<ConstantExpressionNode>(2);
+    ConditionalExpressionNode conditionalExpressionNode = ConditionalExpressionNode(Symbol::AND, leftExpression,
+                                                                                    rightExpression);
+
+    SECTION("ConditionalExpressionNode returns correct data type") {
+        REQUIRE(conditionalExpressionNode.getDataType() == SPADataType::CONDITIONAL);
+    }
+
+    SECTION("ConditionalExpressionNode returns correct expression") {
+        std::string expectedExpression = "(" + leftExpression->getExpression() + ")" + Symbol::AND +
+                                         "(" + rightExpression->getExpression() + ")";
+        REQUIRE(conditionalExpressionNode.getExpression() == expectedExpression);
+    }
+}
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-16
-Total Snippets: 9
-Total lines: 200
-SP Snippets: 0
-SP lines: 0
-PKB Snippets: 5
-PKB lines: 89
-QPS Snippets: 0
-QPS lines: 0
+Total Snippets: 11
+Total lines: 434
+SP Snippets: 1
+SP lines: 88
+PKB Snippets: 4
+PKB lines: 64
+QPS Snippets: 1
+QPS lines: 92

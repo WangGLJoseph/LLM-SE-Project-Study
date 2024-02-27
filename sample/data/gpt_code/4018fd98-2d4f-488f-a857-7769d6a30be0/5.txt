@@ -1,0 +1,25 @@
+#ifndef FOLLOWSTPREDICATE_H
+#define FOLLOWSTPREDICATE_H
+
+#include "Predicate.h"
+#include <memory>
+#include <variant>
+#include "PredicateUtils.h"
+
+// Forward declaration of Strategy to avoid circular dependency
+class Strategy;
+
+class FollowsTPredicate : public Predicate {
+private:
+    StatementRef lhs; // Left-hand statement reference
+    StatementRef rhs; // Right-hand statement reference
+    [[nodiscard]] bool isValidRow(const std::vector<std::shared_ptr<Entity>> &row) const;
+
+public:
+    FollowsTPredicate(StatementRef lhs, StatementRef rhs);
+    ~FollowsTPredicate() override = default;
+
+    [[nodiscard]] std::shared_ptr<BaseTable> getTable(QueryManager &qm) override;
+};
+
+#endif // FOLLOWSTPREDICATE_H

@@ -1,11 +1,2284 @@
 RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentStarRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/7QDF1sjj5631VF7FfHCD269d?mode=chat
+static TNode::Ptr setupStmtListSubtree() {
+    auto stmtListNode =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // assignNode
+    auto assignNode = std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 1);
+
+    auto plusNode1 = std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 1);
+    auto yNode = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "y", 1);
+    auto aNode = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    plusNode1->addChild(yNode);
+    plusNode1->addChild(aNode);
+
+    auto plusNode2 = std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 1);
+    plusNode2->addChild(plusNode1);
+    auto constantNode =
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "1", 1);
+    plusNode2->addChild(constantNode);
+
+    assignNode->addChild(plusNode2);
+
+    // printNode
+    TNode::Ptr printNode =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 2);
+    TNode::Ptr zNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "z", 2);
+    printNode->addChild(zNode);
+
+    stmtListNode->addChild(assignNode);
+    stmtListNode->addChild(printNode);
+
+    return stmtListNode;
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentStarRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 2);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 2);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 2));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 3);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 3));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 4);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 4));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 5);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 5);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 5));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 5));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 6);
+
+    // b + x in stmt 6
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 6);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 6));
+
+    // b + x + 5 in stmt 6
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 6);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 6));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestUsesRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/TU3jJM88FvhiUnK1DJT0svJR?mode=chat
+static TNode::Ptr setupIfSubtree() {
+    auto nodeIf = std::make_shared<TNode>(TNode::NodeType::IF, "", 1);
+
+    auto eqNode = std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 1);
+    auto varNodeX = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 1);
+    auto constNode0 =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 1);
+    eqNode->addChild(varNodeX);
+    eqNode->addChild(constNode0);
+    nodeIf->addChild(eqNode);
+
+    auto stmtListThen =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    auto readNodeY = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    auto varNodeY = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "y", 2);
+    readNodeY->addChild(varNodeY);
+    stmtListThen->addChild(readNodeY);
+    nodeIf->addChild(stmtListThen);
+
+    auto stmtListElse =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    auto readNodeZ = std::make_shared<TNode>(TNode::NodeType::READ, "", 3);
+    auto varNodeZ = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "z", 3);
+    readNodeZ->addChild(varNodeZ);
+    stmtListElse->addChild(readNodeZ);
+
+    auto printNodeA = std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    auto varNodeA = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 4);
+    printNodeA->addChild(varNodeA);
+    stmtListElse->addChild(printNodeA);
+
+    nodeIf->addChild(stmtListElse);
+
+    return nodeIf;
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestUsesRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add read statement to stmtList
+    TNode::Ptr readStmt = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    TNode::Ptr readStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2);
+    readStmt->addChild(readStmtVarNode);
+    stmtList->addChild(readStmt);
+
+    // create while node and add it to stmtList
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 3);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr relExpr =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 3);
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 3));
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 3));
+
+    // add relExpr to whileNode
+    whileNode->addChild(relExpr);
+
+    // create whileBody and add it to whileNode
+    TNode::Ptr whileBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // add print stmt in whileBody
+    TNode::Ptr printStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    TNode::Ptr printStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 4);
+    printStmtInWhileBody->addChild(printStmtVarNodeInWhileBody);
+    whileBody->addChild(printStmtInWhileBody);
+
+    // add read stmt in whileBody
+    TNode::Ptr readStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::READ, "", 5);
+    TNode::Ptr readStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 5);
+    readStmtInWhileBody->addChild(readStmtVarNodeInWhileBody);
+    whileBody->addChild(readStmtInWhileBody);
+
+    // add whileBody to whileNode
+    whileNode->addChild(whileBody);
+
+    // add whileNode to stmtList
+    stmtList->addChild(whileNode);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 6);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 6);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 6));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 7);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 7));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 8);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 8));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 9);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 9);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "c", 9));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 9));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 10);
+
+    // b + x in stmt 10
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 10));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 10));
+
+    // b + x + 5 in stmt 10
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 10));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestVariableExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add read statement to stmtList
+    TNode::Ptr readStmt = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    TNode::Ptr readStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2);
+    readStmt->addChild(readStmtVarNode);
+    stmtList->addChild(readStmt);
+
+    // create while node and add it to stmtList
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 3);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr relExpr =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 3);
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 3));
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 3));
+
+    // add relExpr to whileNode
+    whileNode->addChild(relExpr);
+
+    // create whileBody and add it to whileNode
+    TNode::Ptr whileBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // add print stmt in whileBody
+    TNode::Ptr printStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    TNode::Ptr printStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 4);
+    printStmtVarNodeInWhileBody->addChild(printStmtInWhileBody);
+    whileBody->addChild(printStmtInWhileBody);
+
+    // add read stmt in whileBody
+    TNode::Ptr readStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::READ, "", 5);
+    TNode::Ptr readStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 5);
+    readStmtInWhileBody->addChild(readStmtVarNodeInWhileBody);
+    whileBody->addChild(readStmtInWhileBody);
+
+    // add whileBody to whileNode
+    whileNode->addChild(whileBody);
+
+    // add whileNode to stmtList
+    stmtList->addChild(whileNode);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 6);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 6);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "c", 6));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 6));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 7);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 7));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr zAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "z", 8);
+    zAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 8));
+    ifBody->addChild(zAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 9);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 9);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "d", 9));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 9));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 10);
+
+    // b + x in stmt 10
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 10));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 10));
+
+    // b + x + 5 in stmt 10
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 10));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestFollowsStarRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add read statement to stmtList
+    TNode::Ptr readStmt = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    TNode::Ptr readStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2);
+    readStmt->addChild(readStmtVarNode);
+    stmtList->addChild(readStmt);
+
+    // create while node and add it to stmtList
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 3);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr relExpr =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 3);
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 3));
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 3));
+
+    // add relExpr to whileNode
+    whileNode->addChild(relExpr);
+
+    // create whileBody and add it to whileNode
+    TNode::Ptr whileBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // add print stmt in whileBody
+    TNode::Ptr printStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    TNode::Ptr printStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 4);
+    printStmtVarNodeInWhileBody->addChild(printStmtInWhileBody);
+    whileBody->addChild(printStmtInWhileBody);
+
+    // add read stmt in whileBody
+    TNode::Ptr readStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::READ, "", 5);
+    TNode::Ptr readStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 5);
+    readStmtInWhileBody->addChild(readStmtVarNodeInWhileBody);
+    whileBody->addChild(readStmtInWhileBody);
+
+    // add whileBody to whileNode
+    whileNode->addChild(whileBody);
+
+    // add whileNode to stmtList
+    stmtList->addChild(whileNode);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 6);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 6);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 6));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 7);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 7));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 8);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 8));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 9);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 9);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 9));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 9));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 10);
+
+    // b + x in stmt 10
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 10));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 10));
+
+    // b + x + 5 in stmt 10
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 10));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestStatementExtractor_PKB.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/TU3jJM88FvhiUnK1DJT0svJR?mode=chat
+static TNode::Ptr setupIfSubtree() {
+    auto nodeIf = std::make_shared<TNode>(TNode::NodeType::IF, "", 1);
+
+    auto eqNode = std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 1);
+    auto varNodeX = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 1);
+    auto constNode0 =
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 1);
+    eqNode->addChild(varNodeX);
+    eqNode->addChild(constNode0);
+    nodeIf->addChild(eqNode);
+
+    auto stmtListThen =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    auto readNodeY = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    auto varNodeY = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "y", 2);
+    readNodeY->addChild(varNodeY);
+    stmtListThen->addChild(readNodeY);
+    nodeIf->addChild(stmtListThen);
+
+    auto stmtListElse =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    auto readNodeZ = std::make_shared<TNode>(TNode::NodeType::READ, "", 3);
+    auto varNodeZ = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "z", 3);
+    readNodeZ->addChild(varNodeZ);
+    stmtListElse->addChild(readNodeZ);
+
+    nodeIf->addChild(stmtListElse);
+
+    return nodeIf;
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestStatementExtractor_PKB.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// prompt
+    // https://platform.openai.com/playground/p/qmQaUmGxhCQ5E7MUPjqqDnV7?mode=chat
+    //  Construct nodes for conditions and statements
+    TNode::Ptr iNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "i", 1);
+    TNode::Ptr zeroNode =
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 1);
+    TNode::Ptr conditionNode =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 1);
+
+    // Add children to the condition node
+    conditionNode->addChild(iNode);
+    conditionNode->addChild(zeroNode);
+
+    // Create print statement
+    TNode::Ptr printNode =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 2);
+    TNode::Ptr aNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 2);
+    printNode->addChild(aNode);
+
+    // Create statement list node and add print and read nodes to it
+    TNode::Ptr stmtListNode =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    stmtListNode->addChild(printNode);
+
+    // Create while loop node and add condition and statement list to it
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 1);
+    whileNode->addChild(conditionNode);
+    whileNode->addChild(stmtListNode);
+
+    return whileNode;
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestStatementExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add read statement to stmtList
+    TNode::Ptr readStmt = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    TNode::Ptr readStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2);
+    readStmt->addChild(readStmtVarNode);
+    stmtList->addChild(readStmt);
+
+    // create while node and add it to stmtList
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 3);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr relExpr =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 3);
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 3));
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 3));
+
+    // add relExpr to whileNode
+    whileNode->addChild(relExpr);
+
+    // create whileBody and add it to whileNode
+    TNode::Ptr whileBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // add print stmt in whileBody
+    TNode::Ptr printStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    TNode::Ptr printStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 4);
+    printStmtVarNodeInWhileBody->addChild(printStmtInWhileBody);
+    whileBody->addChild(printStmtInWhileBody);
+
+    // add read stmt in whileBody
+    TNode::Ptr readStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::READ, "", 5);
+    TNode::Ptr readStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 5);
+    readStmtInWhileBody->addChild(readStmtVarNodeInWhileBody);
+    whileBody->addChild(readStmtInWhileBody);
+
+    // add whileBody to whileNode
+    whileNode->addChild(whileBody);
+
+    // add whileNode to stmtList
+    stmtList->addChild(whileNode);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 6);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 6);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 6));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 7);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 7));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 8);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 8));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 9);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 9);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 9));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 9));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 10);
+
+    // b + x in stmt 10
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 10));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 10));
+
+    // b + x + 5 in stmt 10
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 10));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestProcedureExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add read statement to stmtList
+    TNode::Ptr readStmt = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    TNode::Ptr readStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2);
+    readStmt->addChild(readStmtVarNode);
+    stmtList->addChild(readStmt);
+
+    // create while node and add it to stmtList
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 3);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr relExpr =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 3);
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 3));
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 3));
+
+    // add relExpr to whileNode
+    whileNode->addChild(relExpr);
+
+    // create whileBody and add it to whileNode
+    TNode::Ptr whileBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // add print stmt in whileBody
+    TNode::Ptr printStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    TNode::Ptr printStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 4);
+    printStmtVarNodeInWhileBody->addChild(printStmtInWhileBody);
+    whileBody->addChild(printStmtInWhileBody);
+
+    // add read stmt in whileBody
+    TNode::Ptr readStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::READ, "", 5);
+    TNode::Ptr readStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 5);
+    readStmtInWhileBody->addChild(readStmtVarNodeInWhileBody);
+    whileBody->addChild(readStmtInWhileBody);
+
+    // add whileBody to whileNode
+    whileNode->addChild(whileBody);
+
+    // add whileNode to stmtList
+    stmtList->addChild(whileNode);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 6);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 6);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 6));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 7);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 7));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 8);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 8));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 9);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 9);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 9));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 9));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 10);
+
+    // b + x in stmt 10
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 10));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 10));
+
+    // b + x + 5 in stmt 10
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 10));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestFollowsRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add read statement to stmtList
+    TNode::Ptr readStmt = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    TNode::Ptr readStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2);
+    readStmt->addChild(readStmtVarNode);
+    stmtList->addChild(readStmt);
+
+    // create while node and add it to stmtList
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 3);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr relExpr =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 3);
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 3));
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 3));
+
+    // add relExpr to whileNode
+    whileNode->addChild(relExpr);
+
+    // create whileBody and add it to whileNode
+    TNode::Ptr whileBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // add print stmt in whileBody
+    TNode::Ptr printStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    TNode::Ptr printStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 4);
+    printStmtVarNodeInWhileBody->addChild(printStmtInWhileBody);
+    whileBody->addChild(printStmtInWhileBody);
+
+    // add read stmt in whileBody
+    TNode::Ptr readStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::READ, "", 5);
+    TNode::Ptr readStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 5);
+    readStmtInWhileBody->addChild(readStmtVarNodeInWhileBody);
+    whileBody->addChild(readStmtInWhileBody);
+
+    // add whileBody to whileNode
+    whileNode->addChild(whileBody);
+
+    // add whileNode to stmtList
+    stmtList->addChild(whileNode);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 6);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 6);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 6));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 7);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 7));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 8);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 8));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 9);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 9);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 9));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 9));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 10);
+
+    // b + x in stmt 10
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 10));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 10));
+
+    // b + x + 5 in stmt 10
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 10));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestFollowsRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// prompt
+    // https://platform.openai.com/playground/p/qmQaUmGxhCQ5E7MUPjqqDnV7?mode=chat
+    //  Construct nodes for conditions and statements
+    TNode::Ptr iNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "i", 1);
+    TNode::Ptr zeroNode =
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 1);
+    TNode::Ptr conditionNode =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 1);
+
+    // Add children to the condition node
+    conditionNode->addChild(iNode);
+    conditionNode->addChild(zeroNode);
+
+    // Create print statement
+    TNode::Ptr printNode =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 2);
+    TNode::Ptr aNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 2);
+    printNode->addChild(aNode);
+
+    // Create read statement
+    TNode::Ptr readNode = std::make_shared<TNode>(TNode::NodeType::READ, "", 3);
+    TNode::Ptr bNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 3);
+    readNode->addChild(bNode);
+
+    // Create statement list node and add print and read nodes to it
+    TNode::Ptr stmtListNode =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    stmtListNode->addChild(printNode);
+    stmtListNode->addChild(readNode);
+
+    // Create while loop node and add condition and statement list to it
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 1);
+    whileNode->addChild(conditionNode);
+    whileNode->addChild(stmtListNode);
+
+    // While Node
+    REQUIRE(whileNode->getType() == TNode::NodeType::WHILE);
+    REQUIRE(whileNode->getChildren().size() == 2);
+
+    // Condition of while Node
+    auto conditionNodeOfWhileNode = whileNode->getChildren()[0];
+    REQUIRE(conditionNodeOfWhileNode->getType() == TNode::NodeType::REL_EXPR);
+    REQUIRE(conditionNodeOfWhileNode->getValue() == ">");
+
+    // Body of while Node
+    auto bodyNode = whileNode->getChildren()[1];
+    REQUIRE(bodyNode->getType() == TNode::NodeType::STATEMENT_LIST);
+    REQUIRE(bodyNode->getChildren().size() == 2);
+
+    // First statement(print) in while node
+    auto whilePrintNode = bodyNode->getChildren()[0];
+    REQUIRE(whilePrintNode->getType() == TNode::NodeType::PRINT);
+    REQUIRE(whilePrintNode->getChildren().size() == 1);
+    auto variableWhilePrintNode = whilePrintNode->getChildren()[0];
+    REQUIRE(variableWhilePrintNode->getType() == TNode::NodeType::VARIABLE);
+    REQUIRE(variableWhilePrintNode->getValue() == "a");
+
+    // Second statement(read) in while node
+    auto readPrintNode = bodyNode->getChildren()[1];
+    REQUIRE(readPrintNode->getType() == TNode::NodeType::READ);
+    REQUIRE(readPrintNode->getChildren().size() == 1);
+    auto variableReadPrintNode = readPrintNode->getChildren()[0];
+    REQUIRE(variableReadPrintNode->getType() == TNode::NodeType::VARIABLE);
+    REQUIRE(variableReadPrintNode->getValue() == "b");
+
+    return whileNode;
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestConstantExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 2);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 2);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 2));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 3);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 3));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 4);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 4));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 5);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 5);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 5));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "1", 5));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 6);
+
+    // b + x in stmt 6
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 6);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 6));
+
+    // b + x + 5 in stmt 6
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 6);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "34", 6));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestModifiesRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/TU3jJM88FvhiUnK1DJT0svJR?mode=chat
+static TNode::Ptr setupIfSubtree() {
+    auto nodeIf = std::make_shared<TNode>(TNode::NodeType::IF, "", 1);
+
+    auto eqNode = std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 1);
+    auto varNodeX = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 1);
+    auto constNode0 =
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 1);
+    eqNode->addChild(varNodeX);
+    eqNode->addChild(constNode0);
+    nodeIf->addChild(eqNode);
+
+    auto stmtListThen =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    auto readNodeY = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    auto varNodeY = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "y", 2);
+    readNodeY->addChild(varNodeY);
+    stmtListThen->addChild(readNodeY);
+    nodeIf->addChild(stmtListThen);
+
+    auto stmtListElse =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    auto readNodeZ = std::make_shared<TNode>(TNode::NodeType::READ, "", 3);
+    auto varNodeZ = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "z", 3);
+    readNodeZ->addChild(varNodeZ);
+    stmtListElse->addChild(readNodeZ);
+
+    auto printNodeA = std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    auto varNodeA = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 4);
+    printNodeA->addChild(varNodeA);
+    stmtListElse->addChild(printNodeA);
+
+    nodeIf->addChild(stmtListElse);
+
+    return nodeIf;
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestModifiesRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add read statement to stmtList
+    TNode::Ptr readStmt = std::make_shared<TNode>(TNode::NodeType::READ, "", 2);
+    TNode::Ptr readStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2);
+    readStmt->addChild(readStmtVarNode);
+    stmtList->addChild(readStmt);
+
+    // create while node and add it to stmtList
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 3);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr relExpr =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, ">", 3);
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 3));
+    relExpr->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 3));
+
+    // add relExpr to whileNode
+    whileNode->addChild(relExpr);
+
+    // create whileBody and add it to whileNode
+    TNode::Ptr whileBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // add print stmt in whileBody
+    TNode::Ptr printStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 4);
+    TNode::Ptr printStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 4);
+    printStmtVarNodeInWhileBody->addChild(printStmtInWhileBody);
+    whileBody->addChild(printStmtInWhileBody);
+
+    // add read stmt in whileBody
+    TNode::Ptr readStmtInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::READ, "", 5);
+    TNode::Ptr readStmtVarNodeInWhileBody =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 5);
+    readStmtInWhileBody->addChild(readStmtVarNodeInWhileBody);
+    whileBody->addChild(readStmtInWhileBody);
+
+    // add whileBody to whileNode
+    whileNode->addChild(whileBody);
+
+    // add whileNode to stmtList
+    stmtList->addChild(whileNode);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 6);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 6);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 6));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 7);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 7));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 8);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 8));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 9);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 9);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 9));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 9));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 10);
+
+    // b + x in stmt 10
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 10));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 10));
+
+    // b + x + 5 in stmt 10
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 10);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 10));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/ENNzPjBXEhTUmeO2ISamSzjl?mode=chat
+static TNode::Ptr setupProcedureAstTree() {
+    // create program node
+    TNode::Ptr root = std::make_shared<TNode>(TNode::NodeType::PROGRAM);
+
+    // create procedure node and add it to root
+    TNode::Ptr procedure =
+        std::make_shared<TNode>(TNode::NodeType::PROCEDURE, "Test");
+    root->addChild(procedure);
+
+    // create statement list node and add it to procedure
+    TNode::Ptr stmtList =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    procedure->addChild(stmtList);
+
+    // add print statement to stmtList
+    TNode::Ptr printStmt =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 1);
+    TNode::Ptr printStmtVarNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    printStmt->addChild(printStmtVarNode);
+    stmtList->addChild(printStmt);
+
+    // add ifNode to stmtList
+    TNode::Ptr ifNode = std::make_shared<TNode>(TNode::NodeType::IF, "", 2);
+    stmtList->addChild(ifNode);
+
+    // create relExpr node for if condition and add it to ifNode
+    TNode::Ptr ifCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 2);
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 2));
+    ifCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 2));
+
+    // add relExpr to ifNode
+    ifNode->addChild(ifCondition);
+
+    // create if body (then part) and add it to ifNode
+    TNode::Ptr ifBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr xAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 3);
+    xAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 3));
+    ifBody->addChild(xAssign);
+
+    TNode::Ptr yAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "y", 4);
+    yAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "2", 4));
+    ifBody->addChild(yAssign);
+
+    ifNode->addChild(ifBody);
+
+    // create statement list node for else block and add it to ifNode
+    TNode::Ptr elseBlock =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    ifNode->addChild(elseBlock);
+
+    // create while node and add it to elseBlock
+    TNode::Ptr elseWhileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 5);
+    elseBlock->addChild(elseWhileNode);
+
+    // create relExpr node and add it to whileNode
+    TNode::Ptr elseCondition =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "==", 5);
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 5));
+    elseCondition->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 5));
+
+    // add relExpr to elseWhileNode
+    elseWhileNode->addChild(elseCondition);
+
+    // create assign statement and add it to whileLoopBody
+    TNode::Ptr whileLoopBody =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    TNode::Ptr aAssign =
+        std::make_shared<TNode>(TNode::NodeType::ASSIGN, "a", 6);
+
+    // b + x in stmt 6
+    TNode::Ptr firstPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 6);
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "b", 6));
+    firstPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 6));
+
+    // b + x + 5 in stmt 6
+    TNode::Ptr secondPlusInAssign =
+        std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 6);
+    secondPlusInAssign->addChild(firstPlusInAssign);
+    secondPlusInAssign->addChild(
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "5", 6));
+
+    aAssign->addChild(secondPlusInAssign);
+    whileLoopBody->addChild(aAssign);
+    elseWhileNode->addChild(whileLoopBody);
+
+    return root;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/qmQaUmGxhCQ5E7MUPjqqDnV7?mode=chat
+    //  Construct nodes for conditions and statements
+    TNode::Ptr aNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "a", 1);
+    TNode::Ptr zeroNode =
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "0", 1);
+    TNode::Ptr conditionNode =
+        std::make_shared<TNode>(TNode::NodeType::REL_EXPR, "<", 1);
+
+    // Add children to the condition node
+    conditionNode->addChild(aNode);
+    conditionNode->addChild(zeroNode);
+
+    // Create print statement
+    TNode::Ptr printNode =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 2);
+    TNode::Ptr xNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 2);
+    printNode->addChild(xNode);
+
+    // Create read statement
+    TNode::Ptr readNode = std::make_shared<TNode>(TNode::NodeType::READ, "", 3);
+    TNode::Ptr yNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "y", 3);
+    readNode->addChild(yNode);
+
+    // Create statement list node and add print and read nodes to it
+    TNode::Ptr stmtListNode =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+    stmtListNode->addChild(printNode);
+    stmtListNode->addChild(readNode);
+
+    // Create while loop node and add condition and statement list to it
+    TNode::Ptr whileNode =
+        std::make_shared<TNode>(TNode::NodeType::WHILE, "", 1);
+    whileNode->addChild(conditionNode);
+    whileNode->addChild(stmtListNode);
+
+    // While Node
+    REQUIRE(whileNode->getType() == TNode::NodeType::WHILE);
+    REQUIRE(whileNode->getChildren().size() == 2);
+
+    // Condition of while Node
+    auto conditionNodeOfWhileNode = whileNode->getChildren()[0];
+    REQUIRE(conditionNodeOfWhileNode->getType() == TNode::NodeType::REL_EXPR);
+    REQUIRE(conditionNodeOfWhileNode->getValue() == "<");
+
+    // Body of while Node
+    auto bodyNode = whileNode->getChildren()[1];
+    REQUIRE(bodyNode->getType() == TNode::NodeType::STATEMENT_LIST);
+    REQUIRE(bodyNode->getChildren().size() == 2);
+
+    // First statement(print) in while node
+    auto whilePrintNode = bodyNode->getChildren()[0];
+    REQUIRE(whilePrintNode->getType() == TNode::NodeType::PRINT);
+    REQUIRE(whilePrintNode->getChildren().size() == 1);
+    auto variableWhilePrintNode = whilePrintNode->getChildren()[0];
+    REQUIRE(variableWhilePrintNode->getType() == TNode::NodeType::VARIABLE);
+    REQUIRE(variableWhilePrintNode->getValue() == "x");
+
+    // Second statement(read) in while node
+    auto readPrintNode = bodyNode->getChildren()[1];
+    REQUIRE(readPrintNode->getType() == TNode::NodeType::READ);
+    REQUIRE(readPrintNode->getChildren().size() == 1);
+    auto variableReadPrintNode = readPrintNode->getChildren()[0];
+    REQUIRE(variableReadPrintNode->getType() == TNode::NodeType::VARIABLE);
+    REQUIRE(variableReadPrintNode->getValue() == "y");
+
+    return whileNode;
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentRelationshipExtractor_PKB.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/7QDF1sjj5631VF7FfHCD269d?mode=chat
+static TNode::Ptr setupStmtListSubtree() {
+    auto stmtListNode =
+        std::make_shared<TNode>(TNode::NodeType::STATEMENT_LIST);
+
+    // assignNode
+    auto assignNode = std::make_shared<TNode>(TNode::NodeType::ASSIGN, "x", 1);
+
+    auto plusNode1 = std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 1);
+    auto yNode = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "y", 1);
+    auto xNode = std::make_shared<TNode>(TNode::NodeType::VARIABLE, "x", 1);
+    plusNode1->addChild(yNode);
+    plusNode1->addChild(xNode);
+
+    auto plusNode2 = std::make_shared<TNode>(TNode::NodeType::OPERATOR, "+", 1);
+    plusNode2->addChild(plusNode1);
+    auto constantNode =
+        std::make_shared<TNode>(TNode::NodeType::CONSTANT, "1", 1);
+    plusNode2->addChild(constantNode);
+
+    assignNode->addChild(plusNode2);
+
+    // printNode
+    TNode::Ptr printNode =
+        std::make_shared<TNode>(TNode::NodeType::PRINT, "", 2);
+    TNode::Ptr zNode =
+        std::make_shared<TNode>(TNode::NodeType::VARIABLE, "z", 2);
+    printNode->addChild(zNode);
+
+    stmtListNode->addChild(assignNode);
+    stmtListNode->addChild(printNode);
+
+    return stmtListNode;
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: 
+ChatId: 
+Code:
+ResultTable newTable(newColumnNames);
+    for (auto thisRow : this->rows) {
+        for (auto otherRow : other.rows) {
+            bool canJoin = canJoinOnRow(
+                thisRow, otherRow, thisJoinOnIndices, otherJoinOnIndices);
+            if (canJoin) {
+                std::vector<std::string> newRow = buildJoinRow(
+                    thisRow, otherRow, thisJoinOnIndices, otherJoinOnIndices);
+                newTable.addRow(newRow);
+            }
+        }
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+bool ResultTable::canJoinOnRow(ResultTableRow thisRow,
+                               ResultTableRow otherRow,
+                               std::vector<int> thisJoinOnIndices,
+                               std::vector<int> otherJoinOnIndices) {
+    auto thisIt = thisJoinOnIndices.begin();
+    auto otherIt = otherJoinOnIndices.begin();
+    while (thisIt != thisJoinOnIndices.end() &&
+           otherIt != otherJoinOnIndices.end()) {
+        if (thisRow[*thisIt] != otherRow[*otherIt]) {
+            return false;
+        }
+        thisIt++;
+        otherIt++;
+    }
+    return true;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+std::vector<int> ResultTable::getIndicesOfColumns(
+    std::vector<std::string> columnNames) {
+    std::vector<int> indices;
+    for (auto columnName : columnNames) {
+        auto it = std::find(
+            this->columnNames.begin(), this->columnNames.end(), columnName);
+        indices.push_back(std::distance(this->columnNames.begin(), it));
+    }
+    return indices;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+std::vector<std::string> ResultTable::buildJoinColumnNames(
+    std::vector<std::string> thisColumnNames,
+    std::vector<std::string> otherColumnNames,
+    std::vector<int> thisJoinOnIndices,
+    std::vector<int> otherJoinOnIndices) {
+    std::vector<std::string> newColumnNames;
+    for (int i : thisJoinOnIndices) {
+        newColumnNames.push_back(thisColumnNames[i]);
+    }
+
+    for (int i = 0; i < thisColumnNames.size(); i++) {
+        if (!Utils::existsInVector(thisJoinOnIndices, i)) {
+            newColumnNames.push_back(thisColumnNames[i]);
+        }
+    }
+    for (int i = 0; i < otherColumnNames.size(); i++) {
+        if (!Utils::existsInVector(otherJoinOnIndices, i)) {
+            newColumnNames.push_back(otherColumnNames[i]);
+        }
+    }
+
+    return newColumnNames;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+std::vector<std::string> ResultTable::findCommonColumnNames(ResultTable other) {
+    std::vector<std::string> commonColumnNames;
+    for (auto columnName : this->columnNames) {
+        if (Utils::existsInVector(other.columnNames, columnName)) {
+            commonColumnNames.push_back(columnName);
+        }
+    }
+    return commonColumnNames;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+ResultTable ResultTable::project(std::vector<std::string> columnsToProject) {
+    if (columnsToProject.size() == 0)
+        return ResultTable();
+
+    // check if all columns to be project exists. if not, return empty table
+    bool projectionColumnsExists = true;
+    for (auto column : columnsToProject) {
+        if (!Utils::existsInVector(this->columnNames, column)) {
+            projectionColumnsExists = false;
+            break;
+        }
+    }
+    if (!projectionColumnsExists)
+        return ResultTable();
+
+    std::vector<std::string> newColumnNames(columnsToProject.begin(),
+                                            columnsToProject.end());
+    ResultTable newTable(newColumnNames);
+    std::vector<int> indices = getIndicesOfColumns(newColumnNames);
+    for (auto row : this->rows) {
+        std::vector<std::string> newRow;
+        for (int i : indices) {
+            newRow.push_back(row[i]);
+        }
+        newTable.addRow(newRow);
+    }
+    return newTable;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+std::string ResultTable::prettyFormat() {
+    if (this->empty())
+        return "EMPTY TABLE";
+
+    std::string prettyPrintStr = "";
+    std::vector<std::string> columnNames(this->columnNames.begin(),
+                                         this->columnNames.end());
+    prettyPrintStr += Utils::joinStringVector(columnNames, " | ");
+    prettyPrintStr += "\n";
+    for (auto i : columnNames) {
+        prettyPrintStr += "----";
+    }
+    prettyPrintStr += "\n";
+
+    for (auto row : this->rows) {
+        prettyPrintStr += Utils::joinStringVector(row, " | ");
+        prettyPrintStr += "\n";
+    }
+
+    return prettyPrintStr;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryParser/QuerySyntaxValidator.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/Q1FNH6nMygUFXH1kOMJ4K5yo?model=gpt-4-turbo-preview&mode=chat
+
+QuerySyntaxValidator::QuerySyntaxValidator(
+    const std::vector<std::string>& tokens)
+    : tokens(tokens), curIdx(0) {}
+
+void QuerySyntaxValidator::validate() {
+    // Example of structure for while loop
+    while (curIdx < tokens.size()) {
+        if (SynonymUtil::isDesignEntity(tokens[curIdx])) {
+            validateDeclaration();
+        } else if (tokens[curIdx] == "Select") {
+            validateSelectClause();
+        } else if (tokens[curIdx] == "such") {
+            curIdx++;  // Move past "such"
+            if (curIdx < tokens.size() && tokens[curIdx] == "that") {
+                curIdx++;  // Move past "that"
+                validateSuchThatClause();
+            } else {
+                throw SyntaxError("Expected 'that' after 'such'");
+            }
+        } else if (tokens[curIdx] == "pattern") {
+            curIdx++;  // Move past "pattern"
+            validatePatternClause();
+        } else {
+            throw SyntaxError("Unexpected token encountered");
+        }
+    }
+}
+
+void QuerySyntaxValidator::validateDeclaration() {
+    curIdx++;  // Move past the declaration keyword
+
+    if (curIdx >= tokens.size()) {
+        throw SyntaxError("Unexpected end of input after declaration keyword");
+    }
+
+    bool expectSynonym = true;  // Initially, we expect a synonym
+
+    while (curIdx < tokens.size() && tokens[curIdx] != ";") {
+        if (expectSynonym) {
+            if (tokens[curIdx] == ",") {
+                throw SyntaxError("Expected synonym but found comma");
+            }
+            expectSynonym =
+                false;  // After a synonym, we expect a comma or a semicolon
+        } else {
+            if (tokens[curIdx] != ",") {
+                throw SyntaxError("Expected comma between synonyms");
+            }
+            expectSynonym = true;  // After a comma, we expect another synonym
+        }
+        curIdx++;
+    }
+
+    // If we ended the loop expecting a synonym, the last token was a comma,
+    // which is incorrect.
+    if (expectSynonym) {
+        throw SyntaxError("Trailing comma in declaration");
+    }
+
+    // Ensure that the declaration ends with a semicolon
+    if (curIdx == tokens.size()) {
+        throw SyntaxError("Declaration does not end with a semicolon");
+    }
+
+    curIdx++;  // Move past the semicolon for the next part of the query
+}
+
+void QuerySyntaxValidator::validateSelectClause() {
+    // Assume we are already at 'Select', move to synonym
+    curIdx++;
+    if (curIdx >= tokens.size()) {
+        throw SyntaxError("Incomplete Select clause at the end of the query");
+    }
+    std::string selectSynonym = tokens[curIdx];
+    curIdx++;
+}
+void QuerySyntaxValidator::validateSuchThatClause() {
+    // Ensure enough tokens for 'such that' structure: such that relRef '('
+    // argument ',' argument ')'
+    if (!(curIdx + 5 < tokens.size() && tokens[curIdx + 1] == "(" &&
+          tokens[curIdx + 3] == "," && tokens[curIdx + 5] == ")")) {
+        throw SyntaxError("Invalid 'such that' clause structure");
+    }
+    // If checks pass, update the index to point after this clause
+    curIdx += 6;
+}
+
+void QuerySyntaxValidator::validatePatternClause() {
+    // Expecting: pattern synAssign ( entRef , expressionSpec )
+    // Ensure we have enough tokens for 'pattern' structure
+    if (curIdx + 5 >= tokens.size() || tokens[curIdx + 1] != "(" ||
+        tokens[curIdx + 3] != "," || tokens[curIdx + 5] != ")") {
+        throw SyntaxError("Malformed pattern clause structure");
+    }
+
+    // The synAssign, entRef, and expressionSpec are not empty strings
+    if (tokens[curIdx].empty() || tokens[curIdx + 2].empty() ||
+        tokens[curIdx + 4].empty()) {
+        throw SyntaxError("Pattern clause contains empty argument");
+    }
+    curIdx += 6;  // Update the current index to point after the pattern clause
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/QPS/QueryParser/QueryTokenizer.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/Q1FNH6nMygUFXH1kOMJ4K5yo?model=gpt-4-turbo-preview&mode=chat
+
+// Simply tokenizes, does not perform semantic and syntax checks
+// Whitespace agnostic
+std::vector<std::string> QueryTokenizer::tokenize(const std::string &input) {
+    std::vector<std::string> tokens;
+    std::string currentToken;
+    bool insideQuotes = false;
+    bool potentiallySpecialSequence = false;
+
+    auto stripWhitespace = [](const std::string &str) -> std::string {
+        std::string result;
+        std::copy_if(
+            str.begin(), str.end(), std::back_inserter(result), [](char c) {
+                return !std::isspace(c);
+            });
+        return result;
+    };
+
+    for (size_t i = 0; i < input.size(); ++i) {
+        char ch = input[i];
+
+        // Check for start or end of quotes
+        if (ch == '"') {
+            insideQuotes = !insideQuotes;
+            currentToken += ch;
+            continue;
+        }
+
+        // Special characters handling outside quotes
+        if (!insideQuotes &&
+            (ch == ',' || ch == ';' || ch == '(' || ch == ')')) {
+            if (!currentToken.empty()) {
+                tokens.push_back(stripWhitespace(currentToken));
+                currentToken.clear();
+            }
+            tokens.push_back(stripWhitespace(std::string(1, ch)));
+            potentiallySpecialSequence =
+                false;  // Reset on encountering special character
+            continue;
+        }
+
+        // Handle whitespace outside quotes and not in a special sequence
+        if (std::isspace(ch) && !insideQuotes && !potentiallySpecialSequence) {
+            if (!currentToken.empty()) {
+                tokens.push_back(stripWhitespace(currentToken));
+                currentToken.clear();
+            }
+            continue;
+        }
+
+        // Detecting start or end of a special sequence
+        if (ch == '_') {
+            if (!insideQuotes) {
+                if (currentToken.empty() || currentToken == "_") {
+                    potentiallySpecialSequence = true;
+                    currentToken += ch;
+                    continue;
+                } else {
+                    potentiallySpecialSequence = false;
+                }
+            }
+        }
+
+        // If we've potentially started a special sequence, look ahead to
+        // confirm
+        if (potentiallySpecialSequence && !insideQuotes) {
+            size_t nextNonSpace = input.find_first_not_of(" \t\n\r\f\v", i + 1);
+            if (nextNonSpace != std::string::npos &&
+                input[nextNonSpace] == '"') {
+                // Confirmed start of special sequence, skip ahead
+                i = nextNonSpace -
+                    1;  // The for loop will increment i to the correct position
+                continue;
+            } else {
+                // False alarm, add '_' as a token and reset
+                tokens.push_back("_");
+                currentToken.clear();
+                potentiallySpecialSequence = false;
+                // Adjust i to not skip characters
+                i -= currentToken.length();
+            }
+        }
+
+        // Add character to the current token
+        currentToken += ch;
+    }
+
+    // Add the last token if it exists
+    if (!currentToken.empty()) {
+        tokens.push_back(stripWhitespace(currentToken));
+    }
+
+    return tokens;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
 File: Team07/Code07/src/spa/src/SP/DesignExtractor/DesignExtractor.h
 Generator: gpt
 Intervention: 2
 Language: e
-Prompt: https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
-ChatId: ZsoRSuHE0htMcUNCW0FDRVqn
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
 #include "PKB/PKBWriter.h"
 #include "SP/Parser/TNode.h"
 
@@ -18,7 +2291,7 @@ protected:
 public:
     DesignExtractor(std::shared_ptr<PKBWriter> pkb);
     virtual ~DesignExtractor();
-    virtual void extractData(TNode *node) = 0; // pure virtual function
+    virtual void extractData(TNode::Ptr node) = 0;  // pure virtual function
 };
 --------------------
 RepoName: 23s2-cp-spa-team-07
@@ -26,75 +2299,586 @@ File: Team07/Code07/src/spa/src/SP/DesignExtractor/ConstExtractor.cpp
 Generator: gpt
 Intervention: 2
 Language: e
-Prompt: https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
-ChatId: ZsoRSuHE0htMcUNCW0FDRVqn
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
 #include "ConstExtractor.h"
-#include "SP/Parser/TNode.h"
+
 #include <string>
 
-ConstExtractor::ConstExtractor(std::shared_ptr<PKBWriter> pkbWriter) : DesignExtractor(pkbWriter) {}
+#include "SP/Parser/TNode.h"
+
+ConstExtractor::ConstExtractor(std::shared_ptr<PKBWriter> pkbWriter)
+    : DesignExtractor(pkbWriter) {}
 ConstExtractor::~ConstExtractor() {}
 
-// TODO: Uncomment when structure to store in PKB is created
-/* void ConstExtractor::extractData(TNode *node) {
-        if (node->getType() == TNode::NodeType::CONSTANT) {
-            std::string value = node->getValue();
-            int intValue = std::stoi(value);
-            int stmtNum = node->getLine();
-            //TODO: add to PKB
-        } else {
-            return;
-        }
-}*/
+void ConstExtractor::extractData(TNode::Ptr node) {
+    if (node->getType() == TNode::NodeType::CONSTANT) {
+        std::string value = node->getValue();
+        int stmtNum = node->getLine();
+        pkbWriter->addConstant(stmtNum, value);
+    } else {
+        return;
+    }
+}
 --------------------
 RepoName: 23s2-cp-spa-team-07
 File: Team07/Code07/src/spa/src/SP/DesignExtractor/DesignExtractor.cpp
 Generator: gpt
 Intervention: 2
 Language: e
-Prompt: https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
-ChatId: ZsoRSuHE0htMcUNCW0FDRVqn
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat
+
 #include "DesignExtractor.h"
+
 #include "SP/Parser/TNode.h"
 
-DesignExtractor::DesignExtractor(std::shared_ptr<PKBWriter> pkb) : pkbWriter(pkb) {}
+DesignExtractor::DesignExtractor(std::shared_ptr<PKBWriter> pkb)
+    : pkbWriter(pkb) {}
 DesignExtractor::~DesignExtractor() {}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/Commons/Utils.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: 
+ChatId: 
+Code:
+std::string joinStringVector(const std::vector<std::string> &stringVector,
+                             const std::string &delimiter) {
+    if (stringVector.empty())
+        return "";
+    if (stringVector.size() == 1)
+        return stringVector[0];
 
-void DesignExtractor::extractData(TNode *node) {
-    this->extractData(node);
+    std::string joinedString = std::accumulate(
+        stringVector.begin(),
+        stringVector.end(),
+        std::string(),
+        [&delimiter](const std::string &a, const std::string &b) {
+            return a + delimiter + b;
+        });
+
+    return joinedString;
 }
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/PKB/PKBReader.cpp
+Generator: gpt
+Intervention: 0
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/zcSfz531xVP7ZyZU3CpGxopl?model=gpt-4&mode=chat
+int PKBReader::getFollowsAfterStatementId(int beforeStatementId) {
+    return this->readerManager->getFollowsRelationship(beforeStatementId);
+}
+
+std::vector<int> PKBReader::getFollowsStarAfterStatementIds(
+    int beforeStatementId) {
+    return this->readerManager->getFollowsStarRelationship(beforeStatementId);
+}
+
+int PKBReader::getFollowsBeforeStatementId(int afterStatementId) {
+    return this->readerManager->getFollowsByRelationship(afterStatementId);
+}
+
+std::vector<int> PKBReader::getFollowsStarBeforeStatementIds(
+    int afterStatementId) {
+    return this->readerManager->getFollowsByStarRelationship(afterStatementId);
+}
+
+int PKBReader::getParentStatementId(int childStmtId) {
+    return this->readerManager->getParentRelationship(childStmtId);
+}
+
+std::vector<int> PKBReader::getParentStarStatementIds(int childStmtId) {
+    return this->readerManager->getParentStarRelationship(childStmtId);
+}
+
+std::vector<int> PKBReader::getChildStatementId(int parentStmtId) {
+    return this->readerManager->getChildRelationship(parentStmtId);
+}
+
+std::vector<int> PKBReader::getChildStarStatementIds(int parentStmtId) {
+    return this->readerManager->getChildStarRelationship(parentStmtId);
+}
+
+std::vector<int> PKBReader::getModifiesStatementIds(std::string variable) {
+    return this->readerManager->getModifiedByRelationship(variable);
+}
+
+std::vector<std::string> PKBReader::getModifiesVariables(int statementId) {
+    return this->readerManager->getModifiesRelationship(statementId);
+}
+
+std::vector<int> PKBReader::getUsesStatementIds(std::string variable) {
+    return this->readerManager->getUsesByRelationship(variable);
+}
+
+std::vector<std::string> PKBReader::getUsesVariables(int statementId) {
+    return this->readerManager->getUsesRelationship(statementId);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/PKB/Managers/PkbReaderManager.h
+Generator: gpt
+Intervention: 1
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/zcSfz531xVP7ZyZU3CpGxopl?model=gpt-4&mode=chat
+    int getFollowsRelationship(int id);
+    std::vector<int> getFollowsStarRelationship(int id);
+    int getFollowsByRelationship(int id);
+    std::vector<int> getFollowsByStarRelationship(int id);
+    int getParentRelationship(int id);
+    std::vector<int> getParentStarRelationship(int id);
+    std::vector<int> getChildRelationship(int id);
+    std::vector<int> getChildStarRelationship(int id);
+    std::vector<std::string> getModifiesRelationship(int id);
+    std::vector<int> getModifiedByRelationship(const std::string &variable);
+    std::vector<std::string> getUsesRelationship(int id);
+    std::vector<int> getUsesByRelationship(const std::string &variable);
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/PKB/Managers/PkbWriterManager.cpp
+Generator: gpt
+Intervention: 2
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/wFkPsihS6PLgugOOk9ck7XmT?model=gpt-4&mode=chat
+
+void PkbWriterManager::addFollowsRelationship(int beforeStmtId,
+                                              int afterStmtId) {
+    this->relationshipManager->addFollowsRelationship(beforeStmtId,
+                                                      afterStmtId);
+    this->relationshipManager->addFollowsByRelationship(afterStmtId,
+                                                        beforeStmtId);
+}
+
+void PkbWriterManager::addParentRelationship(int parentStmtId,
+                                             int childStmtId) {
+    this->relationshipManager->addParentRelationship(childStmtId, parentStmtId);
+    this->relationshipManager->addChildRelationship(parentStmtId, childStmtId);
+}
+
+void PkbWriterManager::addModifiesRelationship(int stmtNo,
+                                               const std::string &varName) {
+    this->relationshipManager->addModifiesRelationship(stmtNo, varName);
+    this->relationshipManager->addModifiedByRelationship(varName, stmtNo);
+}
+
+void PkbWriterManager::addUsesRelationship(int stmtNo,
+                                           const std::string &varName) {
+    this->relationshipManager->addUsesRelationship(stmtNo, varName);
+    this->relationshipManager->addUsesByRelationship(varName, stmtNo);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/PKB/Managers/RelationshipManager.h
+Generator: gpt
+Intervention: 1
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/lGVb5z2fml0bsGpNmKko3djl?model=gpt-4&mode=chat
+    void addFollowsRelationship(int beforeStmtId, int afterStmtId);
+    int getFollowsRelationship(int beforeStmtId);
+
+    void addFollowsStarRelationship(int beforeStmtId, int afterStmtId);
+    std::vector<int> getFollowsStarRelationship(int beforeStmtId);
+
+    void addFollowsByRelationship(int afterStmtid, int beforeStmtId);
+    int getFollowsByRelationship(int afterStmtid);
+
+    void addFollowsByStarRelationship(int afterStmtid, int beforeStmtId);
+    std::vector<int> getFollowsByStarRelationship(int afterStmtid);
+
+    void addParentRelationship(int childId, int parentId);
+    int getParentRelationship(int childId);
+
+    void addParentStarRelationship(int childId, const int parentId);
+    std::vector<int> getParentStarRelationship(int childId);
+
+    void addChildRelationship(int parentId, int childId);
+    std::vector<int> getChildRelationship(int parentId);
+
+    void addChildStarRelationship(int parentId, int childId);
+    std::vector<int> getChildStarRelationship(int parentId);
+
+    void addModifiesRelationship(int parentId, const std::string &variable);
+    std::vector<std::string> getModifiesRelationship(int parentId);
+
+    void addModifiedByRelationship(const std::string &variable, int id);
+    std::vector<int> getModifiedByRelationship(const std::string &variable);
+
+    void addUsesRelationship(int id, const std::string &variable);
+    std::vector<std::string> getUsesRelationship(int id);
+
+    void addUsesByRelationship(const std::string &variable, int id);
+    std::vector<int> getUsesByRelationship(const std::string &variable);
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/PKB/Managers/PkbReaderManager.cpp
+Generator: gpt
+Intervention: 1
+Language: eng
+Prompt: https://platform.openai.com/playground/p/zcSfz531xVP7ZyZU3CpGxopl?model=gpt-4&mode=chat
+ChatId: zcSfz531xVP7ZyZU3CpGxopl
+Code:
+int PkbReaderManager::getFollowsRelationship(int id) {
+    return this->relationshipManager->getFollowsRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getFollowsStarRelationship(int id) {
+    return this->relationshipManager->getFollowsStarRelationship(id);
+}
+
+int PkbReaderManager::getFollowsByRelationship(int id) {
+    return this->relationshipManager->getFollowsByRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getFollowsByStarRelationship(int id) {
+    return this->relationshipManager->getFollowsByStarRelationship(id);
+}
+
+int PkbReaderManager::getParentRelationship(int id) {
+    return this->relationshipManager->getParentRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getParentStarRelationship(int id) {
+    return this->relationshipManager->getParentStarRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getChildRelationship(int id) {
+    return this->relationshipManager->getChildRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getChildStarRelationship(int id) {
+    return this->relationshipManager->getChildStarRelationship(id);
+}
+
+std::vector<std::string> PkbReaderManager::getModifiesRelationship(int id) {
+    return this->relationshipManager->getModifiesRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getModifiedByRelationship(
+    const std::string &variable) {
+    return this->relationshipManager->getModifiedByRelationship(variable);
+}
+
+std::vector<std::string> PkbReaderManager::getUsesRelationship(int id) {
+    return this->relationshipManager->getUsesRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getUsesByRelationship(
+    const std::string &variable) {
+    return this->relationshipManager->getUsesByRelationship(variable);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/PKB/Managers/RelationshipManager.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/lGVb5z2fml0bsGpNmKko3djl?model=gpt-4&mode=chat
+void RelationshipManager::addFollowsStarRelationship(int beforeStmtid,
+                                                     int afterStmtid) {
+    this->followsStarManager[beforeStmtid].push_back(afterStmtid);
+}
+
+std::vector<int> RelationshipManager::getFollowsStarRelationship(
+    int beforeStmtId) {
+    auto next = followsStarManager.find(beforeStmtId);
+    return next != followsStarManager.end() ? next->second : std::vector<int>();
+}
+
+void RelationshipManager::addFollowsByRelationship(int afterStmtid,
+                                                   int beforeStmtId) {
+    this->followsByManager[afterStmtid] = beforeStmtId;
+}
+
+int RelationshipManager::getFollowsByRelationship(int afterStmtid) {
+    auto next = followsByManager.find(afterStmtid);
+    return next != followsByManager.end() ? next->second : -1;
+}
+
+void RelationshipManager::addFollowsByStarRelationship(int afterStmtid,
+                                                       int beforeStmtId) {
+    this->followsByStarManager[afterStmtid].push_back(beforeStmtId);
+}
+
+std::vector<int> RelationshipManager::getFollowsByStarRelationship(
+    int afterStmtid) {
+    auto next = followsByStarManager.find(afterStmtid);
+    return next != followsByStarManager.end() ? next->second
+                                              : std::vector<int>();
+}
+
+void RelationshipManager::addParentRelationship(int childId, int parentId) {
+    this->parentManager[childId] = parentId;
+}
+
+int RelationshipManager::getParentRelationship(int childId) {
+    auto next = parentManager.find(childId);
+    return next != parentManager.end() ? next->second : -1;
+}
+
+void RelationshipManager::addParentStarRelationship(int childId, int parentId) {
+    this->parentStarManager[childId].push_back(parentId);
+}
+
+std::vector<int> RelationshipManager::getParentStarRelationship(int childId) {
+    auto next = parentStarManager.find(childId);
+    return next != parentStarManager.end() ? next->second : std::vector<int>();
+}
+
+void RelationshipManager::addChildRelationship(int parentId, int childId) {
+    this->childManager[parentId].push_back(childId);
+}
+
+std::vector<int> RelationshipManager::getChildRelationship(int parentId) {
+    auto next = childManager.find(parentId);
+    return next != childManager.end() ? next->second : std::vector<int>();
+}
+
+void RelationshipManager::addChildStarRelationship(int parentId, int childId) {
+    this->childStarManager[parentId].push_back(childId);
+}
+
+std::vector<int> RelationshipManager::getChildStarRelationship(int parentId) {
+    auto next = childStarManager.find(parentId);
+    return next != childStarManager.end() ? next->second : std::vector<int>();
+}
+
+void RelationshipManager::addModifiesRelationship(int parentId,
+                                                  const std::string &variable) {
+    this->modifiesManager[parentId].push_back(variable);
+}
+
+std::vector<std::string> RelationshipManager::getModifiesRelationship(int id) {
+    auto next = modifiesManager.find(id);
+    return next != modifiesManager.end() ? next->second
+                                         : std::vector<std::string>();
+}
+
+void RelationshipManager::addModifiedByRelationship(const std::string &variable,
+                                                    int id) {
+    this->modifiedByManager[variable].push_back(id);
+}
+
+std::vector<int> RelationshipManager::getModifiedByRelationship(
+    const std::string &variable) {
+    auto next = modifiedByManager.find(variable);
+    return next != modifiedByManager.end() ? next->second : std::vector<int>();
+}
+
+void RelationshipManager::addUsesRelationship(int id,
+                                              const std::string &variable) {
+    this->usesManager[id].push_back(variable);
+}
+
+std::vector<std::string> RelationshipManager::getUsesRelationship(int id) {
+    auto next = usesManager.find(id);
+    return next != usesManager.end() ? next->second
+                                     : std::vector<std::string>();
+}
+
+void RelationshipManager::addUsesByRelationship(const std::string &variable,
+                                                int id) {
+    this->usesByManager[variable].push_back(id);
+}
+
+std::vector<int> RelationshipManager::getUsesByRelationship(
+    const std::string &variable) {
+    auto next = usesByManager.find(variable);
+    return next != usesByManager.end() ? next->second : std::vector<int>();
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/spa/src/PKB/PKBWriter.h
+Generator: gpt
+Intervention: 2
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/wFkPsihS6PLgugOOk9ck7XmT?model=gpt-4&mode=chat
+    void addFollowsRelationship(int beforeStmtId, int afterStmtId);
+
+    void addParentRelationship(int parentStmtId, int childStmtId);
+
+    void addModifiesRelationship(int stmtNo, const std::string &varName);
+
+    void addUsesRelationship(int stmtNo, const std::string &varName);
 --------------------
 RepoName: 23s2-cp-spa-team-07
 File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbWriterManager.cpp
 Generator: gpt
 Intervention: 1
 Language: e
-Prompt: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
-ChatId: bVeV9rb56ugv0wmNcuji4KuH
+Prompt: 
+ChatId: 
 Code:
-TEST_CASE("PkbWriterManager adds statements and variables correctly", "[PkbWriterManager]") {
+// https://platform.openai.com/playground/p/SGsohpeFaufnmNGwybytLu8V?model=gpt-4&mode=chat
 
-    auto stmtManager = std::make_shared<StatementManager>();
-    auto varManager = std::make_shared<VariableManager>();
+#include "../../../../spa/src/Commons/EnumType.hpp"
+#include "../../../../spa/src/PKB/Managers/PatternManager.h"
+#include "../../../../spa/src/PKB/Managers/PkbWriterManager.h"
+#include "../../../../spa/src/PKB/Managers/RelationshipManager.h"
+#include "../../../../spa/src/PKB/Managers/StatementManager.h"
+#include "../../../../spa/src/PKB/Managers/VariableManager.h"
+#include "SP/Parser/TNode.h"
+#include "catch.hpp"
 
-    PkbWriterManager writer(stmtManager, varManager);
+TEST_CASE("PkbWriterManager methods work correctly", "[PkbWriterManager]") {
+    // Initialize necessary managers
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
 
-    // Test adding a statement
-    TNode testNode = TNode(TNode::NodeType::STATEMENT_LIST, "testValue", 1);
-    auto node = std::make_shared<TNode>(testNode);
-    writer.addStatement(EnumType::StatementType::PRINT, 1, node);
+    // Initialize PkbWriterManager
+    PkbWriterManager manager(statementManager,
+                             variableManager,
+                             constantManager,
+                             procedureManager,
+                             relationshipManager,
+                             patternManager);
 
-    std::map<int, std::shared_ptr<TNode>> stmtMap = stmtManager->getStatement(EnumType::StatementType::PRINT);
-    REQUIRE(stmtMap[1] == node); // Checks if the memory locations are equal
+    // Test addStatement
+    manager.addStatement(EnumType::StatementType::ASSIGN, 1, nullptr);
+    REQUIRE(statementManager->getAllStatement().size() == 1);
 
-    // Test adding a variable
-    std::string varName = "TestVariable";
-    writer.addVariable(1, varName);
+    // Test addVariable
+    manager.addVariable(1, "x");
+    REQUIRE(variableManager->getAllVariables().size() == 1);
 
-    std::map<int, std::string> varMap = varManager->getAllVariables();
-    REQUIRE(varMap[1] == varName);
+    // Test addConstant
+    manager.addConstant(1, "1");
+    REQUIRE(constantManager->getAllConstants().size() == 1);
+
+    // Test addProcedure
+    manager.addProcedure("main");
+    REQUIRE(procedureManager->getAllProcedure().size() == 1);
+
+    // Test addFollowsRelationship
+    manager.addFollowsRelationship(1, 2);
+    REQUIRE(relationshipManager->getAllFollowRelationship().size() == 1);
+    REQUIRE(relationshipManager->getAllFollowedByRelationship().size() == 1);
+
+    // Test addParentRelationship
+    manager.addParentRelationship(1, 2);
+    REQUIRE(relationshipManager->getAllParentRelationship().size() == 1);
+    REQUIRE(relationshipManager->getAllChildRelationship().size() == 1);
+
+    // Test addModifiesRelationship
+    manager.addModifiesRelationship(1, "x");
+    REQUIRE(relationshipManager->getAllModifyRelationship().size() == 1);
+
+    // Test addUsesRelationship
+    manager.addUsesRelationship(1, "x");
+    REQUIRE(relationshipManager->getAllUseRelationship().size() == 1);
+
+    // Test addFollowsStarRelationship
+    manager.addFollowsStarRelationship(1, 3);
+    REQUIRE(relationshipManager->getAllFollowStarRelationship().size() == 1);
+
+    // Test addParentStarRelationship
+    manager.addParentStarRelationship(1, 3);
+    REQUIRE(relationshipManager->getAllParentStarRelationship().size() == 1);
+
+    // Test addFollowsByStarRelationship
+    manager.addFollowsByStarRelationship(1, 3);
+    REQUIRE(relationshipManager->getAllFollowedByStarRelationship().size() ==
+            1);
+
+    // Test addChildStarRelationship
+    manager.addChildStarRelationship(1, 3);
+    REQUIRE(relationshipManager->getAllChildStarRelationship().size() == 1);
+
+    // Test addAssignPattern
+    manager.addAssignPattern(1, {"x", {"1"}});
+    REQUIRE(patternManager->getAllAssignPatterns().size() == 1);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestConstantManager.cpp
+Generator: gpt
+Intervention: 1
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/Y8Z4bGkXwvttQk3R9aaPhS5j?model=gpt-4&mode=chat
+#include "../../../../spa/src/PKB/Managers/ConstantManager.h"
+#include "catch.hpp"
+
+TEST_CASE("ConstantManager is initialized correctly", "[ConstantManager]") {
+    ConstantManager manager;
+
+    std::map<int, std::vector<std::string>> mapConstants =
+        manager.getAllConstants();
+    REQUIRE(mapConstants.empty() ==
+            true);  // Check that the map is empty initially
+}
+
+TEST_CASE("Adding and getting constant functions correctly",
+          "[ConstantManager]") {
+    ConstantManager manager;
+    int testStmtNo = 1;
+    std::string constantName = "testConstant";
+
+    // Add constant to the manager
+    manager.addConstant(testStmtNo, constantName);
+
+    // Get all constants from manager
+    std::map<int, std::vector<std::string>> mapConstants =
+        manager.getAllConstants();
+
+    // Verify the map is not empty after adding constant
+    REQUIRE(mapConstants.empty() == false);
+    // Verify the added constant is retrieved correctly
+    REQUIRE(mapConstants[testStmtNo][0] == constantName);
+}
+
+TEST_CASE("Adding multiple constants functions correctly",
+          "[ConstantManager]") {
+    ConstantManager manager;
+    int testStmtNo = 1;
+    std::string constantName1 = "testConstant1";
+    std::string constantName2 = "testConstant2";
+
+    // Add constants to the manager
+    manager.addConstant(testStmtNo, constantName1);
+    manager.addConstant(testStmtNo, constantName2);
+
+    // Get all constants from manager
+    std::map<int, std::vector<std::string>> mapConstants =
+        manager.getAllConstants();
+
+    // Verify the map is not empty after adding constants
+    REQUIRE(mapConstants.empty() == false);
+    // Verify the added constants are retrieved correctly
+    REQUIRE(mapConstants[testStmtNo].size() == 2);
+    REQUIRE(mapConstants[testStmtNo][0] == constantName1);
+    REQUIRE(mapConstants[testStmtNo][1] == constantName2);
 }
 --------------------
 RepoName: 23s2-cp-spa-team-07
@@ -102,167 +2886,812 @@ File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestVariableManager.cpp
 Generator: gpt
 Intervention: 0
 Language: e
-Prompt: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
-ChatId: bVeV9rb56ugv0wmNcuji4KuH
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
+
 TEST_CASE("VariableManager is initialized correctly", "[VariableManager]") {
     VariableManager manager;
 
-    std::map<int, std::string> map = manager.getAllVariables();
-    REQUIRE(map.empty() == true); // Checking that variable map is empty initially
+    std::map<int, std::vector<std::string>> map = manager.getAllVariables();
+    REQUIRE(map.empty() ==
+            true);  // Checking that variable map is empty initially
 }
 
-TEST_CASE("VariableManager adds and gets variables correctly", "[VariableManager]") {
+TEST_CASE("VariableManager adds and gets variables correctly",
+          "[VariableManager]") {
     VariableManager manager;
 
     int stmtNo = 1;
     std::string varName = "TestVariable";
     manager.addVariable(stmtNo, varName);
 
-    std::map<int, std::string> map = manager.getAllVariables();
+    std::map<int, std::vector<std::string>> map = manager.getAllVariables();
 
-    REQUIRE(map.empty() == false);   // Checking that variable map is not empty after adding node
-    REQUIRE(map[stmtNo] == varName); // Checking that added variable is retrieved correctly
+    REQUIRE(
+        map.empty() ==
+        false);  // Checking that variable map is not empty after adding node
+    REQUIRE(map[stmtNo][0] ==
+            varName);  // Checking that added variable is retrieved correctly
 }
 --------------------
 RepoName: 23s2-cp-spa-team-07
 File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbReaderManager.cpp
 Generator: gpt
 Intervention: 1
-Language: e
-Prompt: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
-ChatId: bVeV9rb56ugv0wmNcuji4KuH
+Language: eng
+Prompt: 
+ChatId: 
 Code:
-// Note: The tests assume that adding a nullptr TNode to the StatementManager is fine. If this isn't the case, the tests won't work correctly because we're not giving TNodes much information upon creation. Alternatively, you could give TNode a constructor that takes an integer, which you could then use as part of your assertions.
-TEST_CASE("PkbReaderManager is initialized correctly", "[PkbReaderManager]") {
+// https://platform.openai.com/playground/p/NHcSSknRNTWgsn17DEAX8AA1?model=gpt-4&mode=chat
 
-    auto stmtManager = std::make_shared<StatementManager>();
-    auto varManager = std::make_shared<VariableManager>();
+#include "../../../../spa/src/Commons/EnumType.hpp"
+#include "../../../../spa/src/PKB/Managers/ConstantManager.h"
+#include "../../../../spa/src/PKB/Managers/PatternManager.h"
+#include "../../../../spa/src/PKB/Managers/PkbReaderManager.h"
+#include "../../../../spa/src/PKB/Managers/ProcedureManager.h"
+#include "../../../../spa/src/PKB/Managers/RelationshipManager.h"
+#include "../../../../spa/src/PKB/Managers/StatementManager.h"
+#include "../../../../spa/src/PKB/Managers/VariableManager.h"
+#include "../../../../spa/src/SP/Parser/TNode.h"
+#include "catch.hpp"
 
-    PkbReaderManager reader(stmtManager, varManager);
+TEST_CASE("PKB Reader Manager is initialized correctly", "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
 
-    for (auto statementType : {EnumType::StatementType::PRINT, EnumType::StatementType::READ,
-                               EnumType::StatementType::ASSIGN, EnumType::StatementType::WHILE,
-                               EnumType::StatementType::IF}) {
-        INFO("Checking initializer for: " << static_cast<int>(statementType));
-        std::map<int, std::shared_ptr<TNode>> map = reader.getStatement(statementType);
-        REQUIRE(map.empty() == true); // Checking that map is empty initially
-    }
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
 
-    std::map<int, std::string> varMap = reader.getVariables();
-    REQUIRE(varMap.empty() == true); // Checking that variable map is empty initially
+    REQUIRE(readerManager.isFollowsEmpty() == true);
+    REQUIRE(readerManager.isParentEmpty() == true);
+    REQUIRE(readerManager.isModifiesEmpty() == true);
+    REQUIRE(readerManager.isUsesEmpty() == true);
 }
 
-TEST_CASE("PkbReaderManager gets variables correctly", "[PkbReaderManager]") {
+TEST_CASE("PKB Reader Manager returns all elements correctly",
+          "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
 
-    auto stmtManager = std::make_shared<StatementManager>();
-    auto varManager = std::make_shared<VariableManager>();
-    varManager->addVariable(1, "TestVariable");
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
 
-    PkbReaderManager reader(stmtManager, varManager);
+    // Add elements
+    variableManager->addVariable(1, "x");
+    constantManager->addConstant(2, "5");
+    procedureManager->addProcedure("main");
 
-    std::map<int, std::string> varMap = reader.getVariables();
-    REQUIRE(varMap[1] == "TestVariable");
+    // Add statements, relationships, and patterns ...
+
+    // Get all elements
+    auto vars = readerManager.getVariables();
+    auto consts = readerManager.getConstants();
+    auto procs = readerManager.getProcedures();
+
+    // Verify that the reader manager returns all elements correctly
+    REQUIRE(vars.size() == 1);
+    REQUIRE(consts.size() == 1);
+    REQUIRE(procs.size() == 1);
 }
 
-TEST_CASE("PkbReaderManager gets statements correctly", "[PkbReaderManager]") {
+TEST_CASE("PKB Reader Manager adds and gets relationships correctly",
+          "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
 
-    auto stmtManager = std::make_shared<StatementManager>();
-    auto varManager = std::make_shared<VariableManager>();
-    TNode testNode = TNode(TNode::NodeType::STATEMENT_LIST, "testValue", 1);
-    auto node = std::make_shared<TNode>(testNode);
-    stmtManager->addStatement(EnumType::StatementType::PRINT, 1, node);
+    // Add relationship data to relationship manager
+    relationshipManager->addFollowsRelationship(1, 2);
+    relationshipManager->addParentRelationship(2, 1);
 
-    PkbReaderManager reader(stmtManager, varManager);
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
 
-    std::map<int, std::shared_ptr<TNode>> stmtMap = reader.getStatement(EnumType::StatementType::PRINT);
-    REQUIRE(stmtMap[1] == node); // Checks if the memory locations are equal
+    // Access relationship data through reader manager
+    REQUIRE(readerManager.getFollowsRelationship(1) == 2);
+    REQUIRE(readerManager.getParentRelationship(2) == 1);
+    REQUIRE(readerManager.isAFollowRelationship(1, 2));
+    REQUIRE(readerManager.isAParentRelationship(2, 1));
+}
+
+TEST_CASE("PKB Reader Manager gets all relationships correctly",
+          "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
+
+    // Add relationship data to relationship manager
+    relationshipManager->addFollowsRelationship(1, 2);
+    relationshipManager->addParentRelationship(2, 1);
+
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
+
+    // Access relationship data through reader manager
+    auto allFollows = readerManager.getAllFollowRelationship();
+    auto allParents = readerManager.getAllParentRelationship();
+
+    REQUIRE(allFollows.size() == 1);
+    REQUIRE(allParents.size() == 1);
+}
+
+TEST_CASE("PKB Reader Manager handles patterns correctly",
+          "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
+
+    // Add pattern data to pattern manager
+    patternManager->addAssignPattern(1, {"x", {"5"}});
+
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
+
+    // Access pattern data through reader manager
+    auto patterns = readerManager.getAllAssignPatterns();
+    REQUIRE(patterns.size() == 1);
+}
+
+TEST_CASE("PKB Reader Manager checks is empty functions correctly",
+          "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
+
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
+
+    REQUIRE(readerManager.isFollowsEmpty() == true);
+    REQUIRE(readerManager.isParentEmpty() == true);
+    REQUIRE(readerManager.isModifiesEmpty() == true);
+    REQUIRE(readerManager.isUsesEmpty() == true);
+
+    // Add relationships to the relationship manager
+    relationshipManager->addFollowsRelationship(1, 2);
+    relationshipManager->addParentRelationship(2, 1);
+
+    REQUIRE(readerManager.isFollowsEmpty() == false);
+    REQUIRE(readerManager.isParentEmpty() == false);
+    REQUIRE(readerManager.isModifiesEmpty() ==
+            true);  // still no modifies relationship
+    REQUIRE(readerManager.isUsesEmpty() == true);  // still no uses relationship
+}
+
+TEST_CASE(
+    "PKB Reader Manager gets Modify relationship and isAModifyRelationship "
+    "correctly",
+    "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
+
+    // Add relationship data to relationship manager
+    relationshipManager->addModifiesRelationship(1, "x");
+
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
+
+    // Retrieve modify relationships through Pkb Reader Manager
+    auto modifyRel = readerManager.getModifiesRelationship(1);
+
+    REQUIRE(modifyRel.size() == 1);
+    REQUIRE(strcmp(modifyRel[0].c_str(), "x") ==
+            0);  // Check if "x" is present in modification
+    REQUIRE(readerManager.isAModifyRelationship(1, "x") == true);
+}
+
+TEST_CASE(
+    "PKB Reader Manager gets Uses relationship and isAUseRelationship "
+    "correctly",
+    "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
+
+    // Add relationship data to the relationship manager
+    relationshipManager->addUsesRelationship(1, "x");
+
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
+
+    // Retrieve uses relationships from the reader manager
+    auto usesRel = readerManager.getUsesRelationship(1);
+
+    REQUIRE(usesRel.size() == 1);
+    REQUIRE(strcmp(usesRel[0].c_str(), "x") ==
+            0);  // Check if "x" is present in usage
+    REQUIRE(readerManager.isAUseRelationship(1, "x") == true);
+}
+
+TEST_CASE("PKB Reader Manager gets statement correctly", "[PkbReaderManager]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
+
+    PkbReaderManager readerManager(statementManager,
+                                   variableManager,
+                                   constantManager,
+                                   procedureManager,
+                                   relationshipManager,
+                                   patternManager);
+
+    // Add statement data to the statement manager
+    auto stmt = std::make_shared<TNode>(TNode::NodeType::READ, "x", 1);
+    statementManager->addStatement(EnumType::StatementType::READ, 1, stmt);
+
+    // Retrieve statement from the reader manager
+    auto statement = readerManager.getStatement(EnumType::StatementType::READ);
+    REQUIRE(statement.size() == 1);
+    REQUIRE(statement[1] ==
+            stmt);  // Check if the retrieved statement is correct
+
+    // Retrieve all statements from the reader manager
+    auto allStatements = readerManager.getAllStatement();
+    REQUIRE(allStatements.size() == 1);
+    REQUIRE(allStatements[1] ==
+            stmt);  // Check if the retrieved statement is correct
+}
+
+TEST_CASE("PkbReaderManager gets FollowsStar relationships correctly",
+          "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addFollowsStarRelationship(1, 2);
+    relationshipManager->addFollowsStarRelationship(1, 3);
+    relationshipManager->addFollowsStarRelationship(1, 4);
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::vector<int> result = readerManager.getFollowsStarRelationship(1);
+    REQUIRE(result[0] == 2);
+    REQUIRE(result[1] == 3);
+    REQUIRE(result[2] == 4);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbReaderManager.cpp
+Generator: gpt
+Intervention: 0
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/cathP2dXutCaBMo2Jz1ugGtP?model=gpt-4&mode=chat
+
+TEST_CASE("PkbReaderManager gets ParentStar relationships correctly",
+          "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addParentStarRelationship(1, 2);
+    relationshipManager->addParentStarRelationship(1, 3);
+    relationshipManager->addParentStarRelationship(1, 4);
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::vector<int> result = readerManager.getParentStarRelationship(1);
+    REQUIRE(result[0] == 2);
+    REQUIRE(result[1] == 3);
+    REQUIRE(result[2] == 4);
+}
+
+TEST_CASE("PkbReaderManager gets ModifiedBy & UsedBy Relationships correctly",
+          "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addModifiedByRelationship("x", 1);
+    relationshipManager->addUsesByRelationship("x", 2);
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::vector<int> modifiedByResult =
+        readerManager.getModifiedByRelationship("x");
+    std::vector<int> usedByResult = readerManager.getUsesByRelationship("x");
+    REQUIRE(modifiedByResult[0] == 1);
+    REQUIRE(usedByResult[0] == 2);
+}
+
+TEST_CASE(
+    "PkbReaderManager gets all ModifiedBy & UsedBy Relationships correctly",
+    "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addModifiedByRelationship("x", 1);
+    relationshipManager->addModifiedByRelationship("y", 2);
+    relationshipManager->addUsesByRelationship("x", 3);
+    relationshipManager->addUsesByRelationship("z", 4);
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::map<std::string, std::vector<int>> allModifiedByResult =
+        readerManager.getAllModifiedByRelationship();
+    std::map<std::string, std::vector<int>> allUsedByResult =
+        readerManager.getAllUsedByRelationship();
+
+    REQUIRE(allModifiedByResult["x"][0] == 1);
+    REQUIRE(allModifiedByResult["y"][0] == 2);
+
+    REQUIRE(allUsedByResult["x"][0] == 3);
+    REQUIRE(allUsedByResult["z"][0] == 4);
+}
+
+TEST_CASE(
+    "PkbReaderManager gets FollowsBy and FollowedByStar relationships "
+    "correctly",
+    "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addFollowsByRelationship(1, 2);
+    relationshipManager->addFollowsByStarRelationship(1, 3);
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    int followsByRes = readerManager.getFollowsByRelationship(1);
+    std::vector<int> followsByStarRes =
+        readerManager.getFollowsByStarRelationship(1);
+    REQUIRE(followsByRes == 2);
+    REQUIRE(followsByStarRes[0] == 3);
+}
+
+TEST_CASE("PkbReaderManager gets Child and ChildStar relationships correctly",
+          "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addChildRelationship(1, 2);
+    relationshipManager->addChildStarRelationship(1, 3);
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::vector<int> childRes = readerManager.getChildRelationship(1);
+    std::vector<int> childStarRes = readerManager.getChildStarRelationship(1);
+    REQUIRE(childRes[0] == 2);
+    REQUIRE(childStarRes[0] == 3);
+}
+
+TEST_CASE(
+    "PkbReaderManager gets ModifyBy, UseBy, and Assignment information "
+    "correctly",
+    "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addModifiesRelationship(1, "x");
+    relationshipManager->addUsesRelationship(2, "x");
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::vector<std::string> modified =
+        readerManager.getModifiesRelationship(1);
+    std::vector<std::string> used = readerManager.getUsesRelationship(2);
+    REQUIRE(modified[0] == "x");
+    REQUIRE(used[0] == "x");
+}
+
+TEST_CASE("PkbReaderManager gets Procedure information correctly",
+          "[PkbReaderManager]") {
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    procedureManager->addProcedure("testProc");
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, procedureManager, nullptr, nullptr);
+
+    std::vector<std::string> procedures = readerManager.getProcedures();
+    REQUIRE(procedures[0] == "testProc");
+}
+
+TEST_CASE("PkbReaderManager handles assignment pattern correctly",
+          "[PkbReaderManager]") {
+    auto patternManager = std::make_shared<PatternManager>();
+    patternManager->addAssignPattern(1, {"x", {"5"}});
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, nullptr, patternManager);
+
+    auto patterns = readerManager.getAllAssignPatterns();
+    REQUIRE(patterns[1].first == "x");
+    REQUIRE(patterns[1].second[0] == "5");
+}
+
+TEST_CASE("PkbReaderManager gets FollowsStar and ParentStar correctly",
+          "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addFollowsStarRelationship(1, 2);
+    relationshipManager->addParentStarRelationship(1, 3);
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::vector<int> followsStarResult =
+        readerManager.getFollowsStarRelationship(1);
+    std::vector<int> parentStarResult =
+        readerManager.getParentStarRelationship(1);
+    REQUIRE(followsStarResult[0] == 2);
+    REQUIRE(parentStarResult[0] == 3);
+}
+
+TEST_CASE(
+    "PkbReaderManager gets AllFollows, AllFollowedBy, AllParent and AllChild "
+    "relationships correctly",
+    "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addFollowsRelationship(1, 2);
+    relationshipManager->addParentRelationship(1, 3);
+    relationshipManager->addFollowsByRelationship(2, 1);
+    relationshipManager->addChildRelationship(3, 1);
+
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::map<int, int> allFollows = readerManager.getAllFollowRelationship();
+    std::map<int, int> allFollowedBy =
+        readerManager.getAllFollowedByRelationship();
+    std::map<int, int> allParent = readerManager.getAllParentRelationship();
+    std::map<int, std::vector<int>> allChild =
+        readerManager.getAllChildRelationship();
+
+    REQUIRE(allFollows[1] == 2);
+    REQUIRE(allFollowedBy[2] == 1);
+    REQUIRE(allParent[1] == 3);
+    REQUIRE(allChild[3].size() == 1);
+    REQUIRE(allChild[3][0] == 1);
+}
+
+TEST_CASE(
+    "PkbReaderManager gets AllModify, AllUse, AllModifiedBy and AllUsedBy "
+    "relationships correctly",
+    "[PkbReaderManager]") {
+    auto relationshipManager = std::make_shared<RelationshipManager>();
+    relationshipManager->addModifiesRelationship(1, "x");
+    relationshipManager->addUsesRelationship(1, "y");
+    relationshipManager->addModifiedByRelationship("x", 1);
+    relationshipManager->addUsesByRelationship("y", 1);
+
+    PkbReaderManager readerManager(
+        nullptr, nullptr, nullptr, nullptr, relationshipManager, nullptr);
+
+    std::map<int, std::vector<std::string>> allModify =
+        readerManager.getAllModifyRelationship();
+    std::map<std::string, std::vector<int>> allModifiedBy =
+        readerManager.getAllModifiedByRelationship();
+    std::map<int, std::vector<std::string>> allUse =
+        readerManager.getAllUseRelationship();
+    std::map<std::string, std::vector<int>> allUsedBy =
+        readerManager.getAllUsedByRelationship();
+
+    REQUIRE(allModify[1][0] == "x");
+    REQUIRE(allModifiedBy["x"][0] == 1);
+    REQUIRE(allUse[1][0] == "y");
+    REQUIRE(allUsedBy["y"][0] == 1);
 }
 --------------------
 RepoName: 23s2-cp-spa-team-07
 File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestStatementManager.cpp
 Generator: gpt
 Intervention: 1
-Language: e
+Language: eng
 Prompt: 
 ChatId: 
 Code:
-// link: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
-// Tests
-/*
-TEST_CASE("StatementManager is initialized correctly", "[StatementManager]") {
-    StatementManager manager;
-
-    std::map<int, std::shared_ptr<TNode>> mapPrint = manager.getStatement(EnumType::StatementType::PRINT);
-    REQUIRE(mapPrint.empty() == true); // Checking that PRINT map is empty initially
-
-    std::map<int, std::shared_ptr<TNode>> mapRead = manager.getStatement(EnumType::StatementType::READ);
-    REQUIRE(mapRead.empty() == true); // Checking that READ map is empty initially
-
-    std::map<int, std::shared_ptr<TNode>> mapAssign = manager.getStatement(EnumType::StatementType::ASSIGN);
-    REQUIRE(mapAssign.empty() == true); // Checking that ASSIGN map is empty initially
-
-    std::map<int, std::shared_ptr<TNode>> mapWhile = manager.getStatement(EnumType::StatementType::WHILE);
-    REQUIRE(mapWhile.empty() == true); // Checking that WHILE map is empty initially
-
-    std::map<int, std::shared_ptr<TNode>> mapIf = manager.getStatement(EnumType::StatementType::IF);
-    REQUIRE(mapIf.empty() == true); // Checking that IF map is empty initially
-}
-
-*/
+// https://platform.openai.com/playground/p/Y8Z4bGkXwvttQk3R9aaPhS5j?model=gpt-4&mode=chat
+#include "../../../../spa/src/Commons/EnumType.hpp"
+#include "../../../../spa/src/PKB/Managers/StatementManager.h"
+#include "SP/Parser/TNode.h"
+#include "catch.hpp"
 
 TEST_CASE("StatementManager is initialized correctly", "[StatementManager]") {
     StatementManager manager;
 
-    for (auto statementType : {EnumType::StatementType::PRINT, EnumType::StatementType::READ,
-                               EnumType::StatementType::ASSIGN, EnumType::StatementType::WHILE,
+    for (auto statementType : {EnumType::StatementType::PRINT,
+                               EnumType::StatementType::READ,
+                               EnumType::StatementType::ASSIGN,
+                               EnumType::StatementType::WHILE,
                                EnumType::StatementType::IF}) {
         INFO("Checking initializer for: " << static_cast<int>(statementType));
-        std::map<int, std::shared_ptr<TNode>> map = manager.getStatement(statementType);
-        REQUIRE(map.empty() == true); // Checking that map is empty initially
+        std::map<int, std::shared_ptr<TNode>> map =
+            manager.getStatement(statementType);
+        REQUIRE(map.empty() == true);  // Checking that map is empty initially
     }
 }
-/*
-TEST_CASE("Adding and getting statement nodes functions correctly", "[StatementManager]") {
-    StatementManager manager;
-    auto node = std::make_shared<TNode>(TNode{1, "TestNode"});
 
-    manager.addStatement(EnumType::StatementType::PRINT, 1, node);
-
-    std::map<int, std::shared_ptr<TNode>> mapPrint = manager.getStatement(EnumType::StatementType::PRINT);
-
-    REQUIRE(mapPrint.empty() == false); // Checking that PRINT map is not empty after adding node
-    REQUIRE(mapPrint[1] == node);       // Checking that added node is retreived correctly
-
-    // Repeat similar test for other statement types: READ, ASSIGN, WHILE, IF
-}
-
-*/
-
-TEST_CASE("Adding and getting statement nodes functions correctly", "[StatementManager]") {
+TEST_CASE("Adding and getting statement nodes functions correctly",
+          "[StatementManager]") {
     StatementManager manager;
     int testStmtNo = 1;
 
-    for (auto statementType : {EnumType::StatementType::PRINT, EnumType::StatementType::READ,
-                               EnumType::StatementType::ASSIGN, EnumType::StatementType::WHILE,
+    for (auto statementType : {EnumType::StatementType::PRINT,
+                               EnumType::StatementType::READ,
+                               EnumType::StatementType::ASSIGN,
+                               EnumType::StatementType::WHILE,
                                EnumType::StatementType::IF}) {
-        INFO("Adding/getting to/from statement manager for: " << static_cast<int>(statementType));
+        INFO("Adding/getting to/from statement manager for: "
+             << static_cast<int>(statementType));
 
         // Add statement to the manager
-        TNode node = TNode(TNode::NodeType::STATEMENT_LIST, "testValue", testStmtNo);
+        TNode node(TNode::NodeType::STATEMENT_LIST, "testValue", testStmtNo);
         auto nodePrt = std::make_shared<TNode>(node);
         manager.addStatement(statementType, testStmtNo, nodePrt);
 
         // Get statement from manager
-        std::map<int, std::shared_ptr<TNode>> map = manager.getStatement(statementType);
+        std::map<int, std::shared_ptr<TNode>> map =
+            manager.getStatement(statementType);
 
-        // Verify that map is not empty after adding node
+        // Verify map is not empty after adding node
         REQUIRE(map.empty() == false);
-        // Verify that added node is retrieved correctly
+        // Verify added node is retrieved correctly
         REQUIRE(map[testStmtNo] == nodePrt);
+
         // Reset testStmtNo
         testStmtNo++;
     }
+}
+
+TEST_CASE("Getting all statement nodes functions correctly",
+          "[StatementManager]") {
+    StatementManager manager;
+    int testStmtNo = 1;
+
+    // Add nodes of all statement types
+    for (auto statementType : {EnumType::StatementType::PRINT,
+                               EnumType::StatementType::READ,
+                               EnumType::StatementType::ASSIGN,
+                               EnumType::StatementType::WHILE,
+                               EnumType::StatementType::IF}) {
+        INFO("Adding to statement manager for: "
+             << static_cast<int>(statementType));
+
+        // Add statement to the manager
+        TNode node(TNode::NodeType::STATEMENT_LIST, "testValue", testStmtNo);
+        auto nodePtr = std::make_shared<TNode>(node);
+        manager.addStatement(statementType, testStmtNo, nodePtr);
+
+        // Increment statement number
+        testStmtNo++;
+    }
+
+    // Get all statements from manager
+    std::map<int, std::shared_ptr<TNode>> mapAll = manager.getAllStatement();
+
+    REQUIRE(mapAll.size() == 5);  // Verify that all 5 nodes are returned
+
+    // Check that the correct nodes are retrieved
+    for (int i = 1; i <= 5; i++) {
+        REQUIRE(mapAll[i]->getLine() == i);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestProcedureManager.cpp
+Generator: gpt
+Intervention: 1
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/Y8Z4bGkXwvttQk3R9aaPhS5j?model=gpt-4&mode=chat
+#include "../../../../spa/src/PKB/Managers/ProcedureManager.h"
+#include "catch.hpp"
+
+TEST_CASE("ProcedureManager is initialized correctly", "[ProcedureManager]") {
+    ProcedureManager manager;
+
+    std::vector<std::string> procList = manager.getAllProcedure();
+    REQUIRE(procList.empty() ==
+            true);  // Check that the vector is empty initially
+}
+
+TEST_CASE("Adding and getting procedures functions correctly",
+          "[ProcedureManager]") {
+    ProcedureManager manager;
+    std::string testProcedure = "testProcedure";
+
+    // Add procedure to the manager
+    manager.addProcedure(testProcedure);
+
+    // Get all procedures from manager
+    std::vector<std::string> procList = manager.getAllProcedure();
+
+    // Verify the vector is not empty after adding procedure
+    REQUIRE(procList.empty() == false);
+    // Verify the added procedure is retrieved correctly
+    REQUIRE(procList[0] == testProcedure);
+}
+
+TEST_CASE("Adding multiple procedures functions correctly",
+          "[ProcedureManager]") {
+    ProcedureManager manager;
+    std::string testProcedure1 = "testProcedure1";
+    std::string testProcedure2 = "testProcedure2";
+
+    // Add procedures to the manager
+    manager.addProcedure(testProcedure1);
+    manager.addProcedure(testProcedure2);
+
+    // Get all procedures from manager
+    std::vector<std::string> procList = manager.getAllProcedure();
+
+    // Verify the vector is not empty after adding procedures
+    REQUIRE(procList.empty() == false);
+    // Verify the vector size is correct after adding procedures
+    REQUIRE(procList.size() == 2);
+    // Verify the added procedures are retrieved correctly
+    REQUIRE(procList[0] == testProcedure1);
+    REQUIRE(procList[1] == testProcedure2);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestRelationshipManager.cpp
+Generator: gpt
+Intervention: 1
+Language: eng
+Prompt: https://platform.openai.com/playground/p/Y8Z4bGkXwvttQk3R9aaPhS5j?model=gpt-4&mode=chat
+ChatId: Y8Z4bGkXwvttQk3R9aaPhS5j
+Code:
+#include "../../../../spa/src/PKB/Managers/RelationshipManager.h"
+#include "catch.hpp"
+
+TEST_CASE("RelationshipManager is initialized correctly",
+          "[RelationshipManager]") {
+    RelationshipManager manager;
+
+    REQUIRE(manager.isFollowsEmpty() == true);
+    REQUIRE(manager.isParentEmpty() == true);
+    REQUIRE(manager.isModifiesEmpty() == true);
+    REQUIRE(manager.isUsesEmpty() == true);
+}
+
+TEST_CASE("Adding and getting relationships function correctly",
+          "[RelationshipManager]") {
+    RelationshipManager manager;
+    int beforeStmtId = 1, afterStmtId = 2;
+    std::string variable = "x";
+
+    // Add relationships to the manager
+    manager.addFollowsRelationship(beforeStmtId, afterStmtId);
+    manager.addParentRelationship(afterStmtId, beforeStmtId);
+    manager.addModifiesRelationship(beforeStmtId, variable);
+    manager.addUsesRelationship(afterStmtId, variable);
+
+    // Get relationships from the manager
+    int followedStmt = manager.getFollowsRelationship(beforeStmtId);
+    int parentStmt = manager.getParentRelationship(afterStmtId);
+    std::vector<std::string> modifiesRel =
+        manager.getModifiesRelationship(beforeStmtId);
+    std::vector<std::string> usesRel = manager.getUsesRelationship(afterStmtId);
+
+    // Verify that the relationships were added correctly
+    REQUIRE(followedStmt == afterStmtId);
+    REQUIRE(parentStmt == beforeStmtId);
+    REQUIRE(std::find(modifiesRel.begin(), modifiesRel.end(), variable) !=
+            modifiesRel.end());
+    REQUIRE(std::find(usesRel.begin(), usesRel.end(), variable) !=
+            usesRel.end());
+
+    // Verify the is-A-relationship functions
+    REQUIRE(manager.isAFollowRelationship(beforeStmtId, afterStmtId) == true);
+    REQUIRE(manager.isAParentRelationship(afterStmtId, beforeStmtId) == true);
+    REQUIRE(manager.isAModifyRelationship(beforeStmtId, variable) == true);
+    REQUIRE(manager.isAUseRelationship(afterStmtId, variable) == true);
+}
+
+TEST_CASE("Getting all relationships functions correctly",
+          "[RelationshipManager]") {
+    RelationshipManager manager;
+    int beforeStmtId = 1, afterStmtId = 2;
+    std::string variable = "x";
+
+    // Add relationships to the manager
+    manager.addFollowsRelationship(beforeStmtId, afterStmtId);
+    manager.addParentRelationship(afterStmtId, beforeStmtId);
+    manager.addModifiesRelationship(beforeStmtId, variable);
+    manager.addUsesRelationship(afterStmtId, variable);
+
+    // Get all relationships from the manager
+    auto allFollows = manager.getAllFollowRelationship();
+    auto allParents = manager.getAllParentRelationship();
+    auto allModifies = manager.getAllModifyRelationship();
+    auto allUses = manager.getAllUseRelationship();
+
+    // Verify that the relationships are present in the maps
+    REQUIRE(allFollows[beforeStmtId] == afterStmtId);
+    REQUIRE(allParents[afterStmtId] == beforeStmtId);
+    REQUIRE(std::find(allModifies[beforeStmtId].begin(),
+                      allModifies[beforeStmtId].end(),
+                      variable) != allModifies[beforeStmtId].end());
+    REQUIRE(std::find(allUses[afterStmtId].begin(),
+                      allUses[afterStmtId].end(),
+                      variable) != allUses[afterStmtId].end());
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPatternManager.cpp
+Generator: gpt
+Intervention: 1
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/Y8Z4bGkXwvttQk3R9aaPhS5j?model=gpt-4&mode=chat
+#include "../../../../spa/src/PKB/Managers/PatternManager.h"
+#include "catch.hpp"
+
+TEST_CASE("PatternManager is initialized correctly", "[PatternManager]") {
+    PatternManager manager;
+
+    std::map<int, std::pair<std::string, std::vector<std::string>>>
+        mapPatterns = manager.getAllAssignPatterns();
+    REQUIRE(mapPatterns.empty() ==
+            true);  // Check that the map is empty initially
+}
+
+TEST_CASE("Adding and getting assign patterns functions correctly",
+          "[PatternManager]") {
+    PatternManager manager;
+    int testStmtNo = 1;
+    std::pair<std::string, std::vector<std::string>> testPattern = {
+        "testPattern", {"a", "b", "c"}};
+
+    // Add pattern to the manager
+    manager.addAssignPattern(testStmtNo, testPattern);
+
+    // Get all patterns from manager
+    std::map<int, std::pair<std::string, std::vector<std::string>>>
+        mapPatterns = manager.getAllAssignPatterns();
+
+    // Verify the map is not empty after adding pattern
+    REQUIRE(mapPatterns.empty() == false);
+    // Verify the added pattern is retrieved correctly
+    REQUIRE(mapPatterns[testStmtNo] == testPattern);
 }
 --------------------
 RepoName: 23s2-cp-spa-team-07
@@ -270,30 +3699,35 @@ File: Team07/Code07/src/unit_testing/src/PKB/TestPKB.cpp
 Generator: gpt
 Intervention: 0
 Language: e
-Prompt: https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
-ChatId: bVeV9rb56ugv0wmNcuji4KuH
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat
 TEST_CASE("Pkb is initialized correctly", "[Pkb]") {
     Pkb pkb;
 
-    REQUIRE(pkb.createPkbWriter() != nullptr); // Checking that PkbWriter is not null
-    REQUIRE(pkb.createPkbReader() != nullptr); // Checking that PkbReader is not null
+    REQUIRE(pkb.createPkbWriter() !=
+            nullptr);  // Checking that PkbWriter is not null
+    REQUIRE(pkb.createPkbReader() !=
+            nullptr);  // Checking that PkbReader is not null
 }
 
 TEST_CASE("Pkb creates PkbWriter correctly", "[Pkb]") {
     Pkb pkb;
     auto writer = pkb.createPkbWriter();
 
-    REQUIRE(writer != nullptr); // Checks if the returned pointer is not null
-    // Here you can add more REQUIRE statements to verify the state of the writer, which totally depends on your needs
+    REQUIRE(writer != nullptr);  // Checks if the returned pointer is not null
+    // Here you can add more REQUIRE statements to verify the state of the
+    // writer, which totally depends on your needs
 }
 
 TEST_CASE("Pkb creates PkbReader correctly", "[Pkb]") {
     Pkb pkb;
     auto reader = pkb.createPkbReader();
 
-    REQUIRE(reader != nullptr); // Checks if the returned pointer is not null
-    // Here you can add more REQUIRE statements to verify the state of the reader, which totally depends on your needs
+    REQUIRE(reader != nullptr);  // Checks if the returned pointer is not null
+    // Here you can add more REQUIRE statements to verify the state of the
+    // reader, which totally depends on your needs
 }
 --------------------
 RepoName: 23s2-cp-spa-team-07
@@ -304,16 +3738,30 @@ Language: e
 Prompt: 
 ChatId: 
 Code:
-// link: https://platform.openai.com/playground/p/wcjKOEZyyOQFegkpA2u4xlaA?model=gpt-4&mode=chat
+// https://platform.openai.com/playground/p/wcjKOEZyyOQFegkpA2u4xlaA?model=gpt-4&mode=chat
 
 TEST_CASE("PKBWriter and PKBReader work together correctly", "[PKB]") {
     auto statementManager = std::make_shared<StatementManager>();
     auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procManager = std::make_shared<ProcedureManager>();
+    auto rsManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
 
-    auto writerManager = std::make_shared<PkbWriterManager>(statementManager, variableManager);
+    auto writerManager = std::make_shared<PkbWriterManager>(statementManager,
+                                                            variableManager,
+                                                            constantManager,
+                                                            procManager,
+                                                            rsManager,
+                                                            patternManager);
     PKBWriter writer(writerManager);
 
-    auto readerManager = std::make_shared<PkbReaderManager>(statementManager, variableManager);
+    auto readerManager = std::make_shared<PkbReaderManager>(statementManager,
+                                                            variableManager,
+                                                            constantManager,
+                                                            procManager,
+                                                            rsManager,
+                                                            patternManager);
     PKBReader reader(readerManager);
 
     int stmtNo = 1;
@@ -334,18 +3782,851 @@ TEST_CASE("PKBWriter and PKBReader work together correctly", "[PKB]") {
         std::vector<int> printStatements = reader.getAllPrintStatements();
 
         REQUIRE(printStatements.size() == 1);
-        REQUIRE(std::find(printStatements.begin(), printStatements.end(), stmtNo) != printStatements.end());
+        REQUIRE(std::find(printStatements.begin(),
+                          printStatements.end(),
+                          stmtNo) != printStatements.end());
     }
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/TestPKBWriter.cpp
+Generator: gpt
+Intervention: 0
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/eBoKf36pWMRc8shw8UN8OaFI?model=gpt-4&mode=chat
 
     // Repeat similar tests for read, assign, while, if statements
+    SECTION("PKBWriter adds read statement and PKBReader gets it") {
+        writer.addReadStatement(stmtNo, nodePtr);
+        std::vector<int> readStatements = reader.getAllReadStatements();
+
+        REQUIRE(readStatements.size() == 1);
+        REQUIRE(std::find(readStatements.begin(),
+                          readStatements.end(),
+                          stmtNo) != readStatements.end());
+    }
+
+    SECTION("PKBWriter adds assign statement and PKBReader gets it") {
+        writer.addAssignStatement(stmtNo, nodePtr);
+        std::vector<int> assignStatements = reader.getAllAssignStatements();
+
+        REQUIRE(assignStatements.size() == 1);
+        REQUIRE(std::find(assignStatements.begin(),
+                          assignStatements.end(),
+                          stmtNo) != assignStatements.end());
+    }
+
+    SECTION("PKBWriter adds while statement and PKBReader gets it") {
+        writer.addWhileStatement(stmtNo, nodePtr);
+        std::vector<int> whileStatements = reader.getAllWhileStatements();
+
+        REQUIRE(whileStatements.size() == 1);
+        REQUIRE(std::find(whileStatements.begin(),
+                          whileStatements.end(),
+                          stmtNo) != whileStatements.end());
+    }
+
+    SECTION("PKBWriter adds if statement and PKBReader gets it") {
+        writer.addIfStatement(stmtNo, nodePtr);
+        std::vector<int> ifStatements = reader.getAllIfStatements();
+
+        REQUIRE(ifStatements.size() == 1);
+        REQUIRE(std::find(ifStatements.begin(), ifStatements.end(), stmtNo) !=
+                ifStatements.end());
+    }
+
+    SECTION("PKBWriter adds Follows relationship and PKBReader gets it") {
+        int stmtNo2 = 2;
+        writer.addFollowsRelationship(stmtNo, stmtNo2);
+
+        int retrievedFollowsStmt = reader.getFollowsAfterStatementId(stmtNo);
+
+        REQUIRE(retrievedFollowsStmt == stmtNo2);
+    }
+
+    SECTION("PKBWriter adds Parent relationship and PKBReader gets it") {
+        int stmtNo2 = 2;
+        writer.addParentRelationship(stmtNo, stmtNo2);
+
+        int retrievedParentStmt = reader.getParentStatementId(stmtNo2);
+
+        REQUIRE(retrievedParentStmt == stmtNo);
+    }
+
+    SECTION("PKBWriter adds Modifies relationship and PKBReader gets it") {
+        writer.addModifiesRelationship(stmtNo, varName);
+        std::vector<int> retrievedModifiesStmts =
+            reader.getModifiesStatementIds(varName);
+
+        REQUIRE(retrievedModifiesStmts.size() == 1);
+        REQUIRE(retrievedModifiesStmts[0] == stmtNo);
+    }
+
+    SECTION("PKBWriter adds Uses relationship and PKBReader gets it") {
+        writer.addUsesRelationship(stmtNo, varName);
+        std::vector<int> retrievedUsesStmts =
+            reader.getUsesStatementIds(varName);
+
+        REQUIRE(retrievedUsesStmts.size() == 1);
+        REQUIRE(retrievedUsesStmts[0] == stmtNo);
+    }
+
+    SECTION("PKBWriter adds Assign pattern and PKBReader gets it") {
+        std::pair<std::string, std::vector<std::string>> pattern = {varName,
+                                                                    {"1"}};
+        writer.addAssignPattern(stmtNo, pattern);
+        std::map<int, std::pair<std::string, std::vector<std::string>>>
+            retrievedPatterns = reader.getAllAssignPatterns();
+
+        REQUIRE(retrievedPatterns.size() == 1);
+        REQUIRE(retrievedPatterns[stmtNo] == pattern);
+    }
+
+    SECTION("PKBWriter adds Procedure and PKBReader gets it") {
+        std::string procName = "TestProcedure";
+        writer.addProcedure(procName);
+        std::vector<std::string> procs = reader.getAllProcedures();
+
+        REQUIRE(procs.size() == 1);
+        REQUIRE(std::find(procs.begin(), procs.end(), procName) != procs.end());
+    }
+
+    SECTION("PKBWriter adds Constant and PKBReader gets it") {
+        std::string constName = "123";
+        writer.addConstant(stmtNo, constName);
+        std::vector<std::string> consts = reader.getAllConstants();
+
+        REQUIRE(consts.size() == 1);
+        REQUIRE(std::find(consts.begin(), consts.end(), constName) !=
+                consts.end());
+    }
+
+    SECTION("PKBWriter adds Follows star relationship and PKBReader gets it") {
+        int stmtNo3 = 3;
+        writer.addFollowsStarRelationship(stmtNo, stmtNo3);
+
+        std::vector<int> retrievedFollowsStarStmts =
+            reader.getFollowsStarAfterStatementIds(stmtNo);
+
+        REQUIRE(retrievedFollowsStarStmts.size() == 1);
+        REQUIRE(retrievedFollowsStarStmts[0] == stmtNo3);
+    }
+
+    SECTION("PKBWriter adds Follows by relationship and PKBReader gets it") {
+        int stmtNo2 = 2;
+        writer.addFollowsByStarRelationship(stmtNo2, stmtNo);
+
+        std::vector<int> retrievedFollowsByStmts =
+            reader.getFollowsStarBeforeStatementIds(stmtNo);
+
+        REQUIRE(retrievedFollowsByStmts.size() == 1);
+        REQUIRE(retrievedFollowsByStmts[0] == stmtNo2);
+    }
+
+    SECTION("PKBWriter adds Parent star relationship and PKBReader gets it") {
+        int stmtNo3 = 3;
+        writer.addParentStarRelationship(stmtNo, stmtNo3);
+
+        std::vector<int> retrievedParentStarStmts =
+            reader.getParentStarStatementIds(stmtNo3);
+
+        REQUIRE(retrievedParentStarStmts.size() == 1);
+        REQUIRE(retrievedParentStarStmts[0] == stmtNo);
+    }
+
+    SECTION("PKBWriter adds FollowsByStar relationship and PKBReader gets it") {
+        int stmtNo2 = 2;
+        writer.addFollowsByStarRelationship(stmtNo2, stmtNo);
+
+        std::vector<int> retrievedFollowsByStarStmts =
+            reader.getFollowsStarBeforeStatementIds(stmtNo);
+
+        REQUIRE(retrievedFollowsByStarStmts.size() == 1);
+        REQUIRE(retrievedFollowsByStarStmts[0] == stmtNo2);
+    }
+
+    SECTION("PKBWriter adds ChildStar relationship and PKBReader gets it") {
+        int stmtNo2 = 2;
+        writer.addChildStarRelationship(stmtNo, stmtNo2);
+
+        std::vector<int> retrievedChildStarStmts =
+            reader.getChildStarStatementIds(stmtNo);
+
+        REQUIRE(retrievedChildStarStmts.size() == 1);
+        REQUIRE(retrievedChildStarStmts[0] == stmtNo2);
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/TestPKBReader.cpp
+Generator: gpt
+Intervention: 0
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/np0KJv4byi6ya3yb0lIrIUUD?model=gpt-4&mode=chat
+
+TEST_CASE("PKBReader is initialized correctly", "[PKBReader]") {
+    auto readerManager = std::make_shared<PkbReaderManager>(
+        std::make_shared<StatementManager>(),
+        std::make_shared<VariableManager>(),
+        std::make_shared<ConstantManager>(),
+        std::make_shared<ProcedureManager>(),
+        std::make_shared<RelationshipManager>(),
+        std::make_shared<PatternManager>());
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.getAllVariables().empty() == true);
+    REQUIRE(reader.getAllConstants().empty() == true);
+    REQUIRE(reader.getAllProcedures().empty() == true);
+    REQUIRE(reader.getAllPrintStatements().empty() == true);
+    REQUIRE(reader.getAllReadStatements().empty() == true);
+    REQUIRE(reader.getAllAssignStatements().empty() == true);
+    REQUIRE(reader.getAllWhileStatements().empty() == true);
+    REQUIRE(reader.getAllIfStatements().empty() == true);
+    REQUIRE(reader.getAllStatements().empty() == true);
+    REQUIRE(reader.isFollowsEmpty() == true);
+    REQUIRE(reader.isParentEmpty() == true);
+    REQUIRE(reader.isModifiesEmpty() == true);
+    REQUIRE(reader.isUsesEmpty() == true);
+    REQUIRE(reader.getAllFollowRelationship().empty() == true);
+    REQUIRE(reader.getAllFollowedByRelationship().empty() == true);
+    REQUIRE(reader.getAllParentRelationship().empty() == true);
+    REQUIRE(reader.getAllChildRelationship().empty() == true);
+    REQUIRE(reader.getAllModifyRelationship().empty() == true);
+    REQUIRE(reader.getAllModifiedByRelationship().empty() == true);
+    REQUIRE(reader.getAllUseRelationship().empty() == true);
+    REQUIRE(reader.getAllUsedByRelationship().empty() == true);
+    REQUIRE(reader.getAllAssignPatterns().empty() == true);
+}
+
+// test for function getFollowsAfterStatementId
+TEST_CASE("PKBReader gets follows after statement id correctly",
+          "[PKBReader]") {
+    auto statementManager = std::make_shared<StatementManager>();
+    auto variableManager = std::make_shared<VariableManager>();
+    auto constantManager = std::make_shared<ConstantManager>();
+    auto procManager = std::make_shared<ProcedureManager>();
+    auto rsManager = std::make_shared<RelationshipManager>();
+    auto patternManager = std::make_shared<PatternManager>();
+
+    rsManager->addFollowsRelationship(1, 2);
+
+    auto readerManager = std::make_shared<PkbReaderManager>(statementManager,
+                                                            variableManager,
+                                                            constantManager,
+                                                            procManager,
+                                                            rsManager,
+                                                            patternManager);
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.getFollowsAfterStatementId(1) == 2);
+}
+
+TEST_CASE("PKBReader gets followsStar after statement ids correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addFollowsStarRelationship(1, 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto followsStarStatements = reader.getFollowsStarAfterStatementIds(1);
+    REQUIRE(followsStarStatements.size() == 1);
+    REQUIRE(followsStarStatements[0] == 2);
+}
+
+// test for function getFollowsBeforeStatementId
+TEST_CASE("PKBReader gets follows before statement id correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addFollowsRelationship(1, 2);
+    rsManager->addFollowsByRelationship(2, 1);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.getFollowsBeforeStatementId(2) == 1);
+}
+
+// test for function getFollowsStarBeforeStatementIds
+TEST_CASE("PKBReader gets followsStar before statement ids correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addFollowsStarRelationship(1, 2);
+    rsManager->addFollowsByStarRelationship(2, 1);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto followsStarStatements = reader.getFollowsStarBeforeStatementIds(2);
+    REQUIRE(followsStarStatements.size() == 1);
+    REQUIRE(followsStarStatements[0] == 1);
+}
+
+// test for function getParentStatementId
+TEST_CASE("PKBReader gets parent statement id correctly", "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addParentRelationship(1, 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.getParentStatementId(1) == 2);
+}
+
+// test for function getParentStarStatementIds
+TEST_CASE("PKBReader gets parent* statement ids correctly", "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addParentStarRelationship(1, 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto parentStarStatements = reader.getParentStarStatementIds(1);
+    REQUIRE(parentStarStatements.size() == 1);
+    REQUIRE(parentStarStatements[0] == 2);
+}
+
+// test for function getAllAssignPatterns
+TEST_CASE("PKBReader gets all assign patterns correctly", "[PKBReader]") {
+    auto patternManager = std::make_shared<PatternManager>();
+    patternManager->addAssignPattern(1, {"x", {"y", "z"}});
+
+    auto readerManager = std::make_shared<PkbReaderManager>(
+        std::make_shared<StatementManager>(),
+        std::make_shared<VariableManager>(),
+        std::make_shared<ConstantManager>(),
+        std::make_shared<ProcedureManager>(),
+        std::make_shared<RelationshipManager>(),
+        patternManager);
+
+    PKBReader reader(readerManager);
+
+    auto assignPatterns = reader.getAllAssignPatterns();
+    REQUIRE(assignPatterns.size() == 1);
+    REQUIRE(assignPatterns[1].first == "x");
+    REQUIRE(assignPatterns[1].second.size() == 2);
+    REQUIRE(assignPatterns[1].second[0] == "y");
+    REQUIRE(assignPatterns[1].second[1] == "z");
+}
+
+// test for function getChildStatementId and getChildStarStatementIds
+TEST_CASE("PKBReader gets child statement ids correctly", "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addChildRelationship(1, 2);
+    rsManager->addChildStarRelationship(1, 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto childStatements = reader.getChildStatementId(1);
+    REQUIRE(childStatements.size() == 1);
+    REQUIRE(childStatements[0] == 2);
+
+    auto childStarStatements = reader.getChildStarStatementIds(1);
+    REQUIRE(childStarStatements.size() == 1);
+    REQUIRE(childStarStatements[0] == 2);
+}
+
+// test for function getModifiesStatementIds and getModifiesVariables
+TEST_CASE("PKBReader gets modifies statement ids and variables correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addModifiesRelationship(1, "x");
+    rsManager->addModifiedByRelationship("x", 1);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto modifiesStmts = reader.getModifiesStatementIds("x");
+    REQUIRE(modifiesStmts.size() == 1);
+    REQUIRE(modifiesStmts[0] == 1);
+
+    auto modifiesVars = reader.getModifiesVariables(1);
+    REQUIRE(modifiesVars.size() == 1);
+    REQUIRE(modifiesVars[0] == "x");
+}
+
+// test for function getUsesStatementIds and getUsesVariables
+TEST_CASE("PKBReader gets uses statement ids and variables correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addUsesRelationship(1, "x");
+    rsManager->addUsesByRelationship("x", 1);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto usesStmts = reader.getUsesStatementIds("x");
+    REQUIRE(usesStmts.size() == 1);
+    REQUIRE(usesStmts[0] == 1);
+
+    auto usesVars = reader.getUsesVariables(1);
+    REQUIRE(usesVars.size() == 1);
+    REQUIRE(usesVars[0] == "x");
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/TestPKBReader.cpp
+Generator: gpt
+Intervention: 0
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/vIoMw79WSxpiw6HS1suUv7st?model=gpt-4&mode=chat
+
+TEST_CASE("PKBReader gets all variables correctly", "[PKBReader]") {
+    auto varManager = std::make_shared<VariableManager>();
+    varManager->addVariable(1, "x");
+    varManager->addVariable(2, "y");
+    varManager->addVariable(3, "z");
+
+    auto readerManager = std::make_shared<PkbReaderManager>(
+        std::make_shared<StatementManager>(),
+        varManager,
+        std::make_shared<ConstantManager>(),
+        std::make_shared<ProcedureManager>(),
+        std::make_shared<RelationshipManager>(),
+        std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto variables = reader.getAllVariables();
+    REQUIRE(variables.size() == 3);
+    REQUIRE(std::find(variables.begin(), variables.end(), "x") !=
+            variables.end());
+    REQUIRE(std::find(variables.begin(), variables.end(), "y") !=
+            variables.end());
+    REQUIRE(std::find(variables.begin(), variables.end(), "z") !=
+            variables.end());
+}
+
+TEST_CASE("PKBReader isAFollowRelationship() returns correct relationship",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addFollowsRelationship(1, 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.isAFollowRelationship(1, 2) == true);
+    REQUIRE(reader.isAFollowRelationship(2, 3) == false);
+}
+
+TEST_CASE("PKBReader gets all constants correctly", "[PKBReader]") {
+    auto constantManager = std::make_shared<ConstantManager>();
+    constantManager->addConstant(1, "1");
+    constantManager->addConstant(2, "2");
+
+    auto readerManager = std::make_shared<PkbReaderManager>(
+        std::make_shared<StatementManager>(),
+        std::make_shared<VariableManager>(),
+        constantManager,
+        std::make_shared<ProcedureManager>(),
+        std::make_shared<RelationshipManager>(),
+        std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto constants = reader.getAllConstants();
+    REQUIRE(constants.size() == 2);
+    REQUIRE(std::find(constants.begin(), constants.end(), "1") !=
+            constants.end());
+    REQUIRE(std::find(constants.begin(), constants.end(), "2") !=
+            constants.end());
+}
+
+TEST_CASE("PKBReader gets all procedures correctly", "[PKBReader]") {
+    auto procedureManager = std::make_shared<ProcedureManager>();
+    procedureManager->addProcedure("proc1");
+    procedureManager->addProcedure("proc2");
+
+    auto readerManager = std::make_shared<PkbReaderManager>(
+        std::make_shared<StatementManager>(),
+        std::make_shared<VariableManager>(),
+        std::make_shared<ConstantManager>(),
+        procedureManager,
+        std::make_shared<RelationshipManager>(),
+        std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto procs = reader.getAllProcedures();
+    REQUIRE(procs.size() == 2);
+    REQUIRE(std::find(procs.begin(), procs.end(), "proc1") != procs.end());
+    REQUIRE(std::find(procs.begin(), procs.end(), "proc2") != procs.end());
+}
+
+TEST_CASE("PKBReader isAParentRelationship() returns correct relationship",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addParentRelationship(1, 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.isAParentRelationship(1, 2) == true);
+    REQUIRE(reader.isAParentRelationship(2, 3) == false);
+}
+
+TEST_CASE("PKBReader isAModifyRelationship() returns correct relationship",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addModifiesRelationship(1, "x");
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.isAModifyRelationship(1, "x") == true);
+    REQUIRE(reader.isAModifyRelationship(1, "y") == false);
+}
+
+TEST_CASE("PKBReader isAUseRelationship() returns correct relationship",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addUsesRelationship(1, "x");
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.isAUseRelationship(1, "x") == true);
+    REQUIRE(reader.isAUseRelationship(1, "y") == false);
+}
+
+TEST_CASE("PKBReader handles isFollowsEmpty() correctly", "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.isFollowsEmpty() == true);
+
+    rsManager->addFollowsRelationship(1, 2);
+    REQUIRE(reader.isFollowsEmpty() == false);
+}
+
+TEST_CASE("PKBReader handles isParentEmpty() correctly", "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    REQUIRE(reader.isParentEmpty() == true);
+
+    rsManager->addParentRelationship(1, 2);
+    REQUIRE(reader.isParentEmpty() == false);
+}
+
+/* Note: You can replicate the above test cases(isFollowsEmpty and isParentEmpty
+ * tests) for PKBReader::isModifiesEmpty() and PKBReader::isUsesEmpty() They
+ * have the same functionalities only on different attributes
+ */
+
+TEST_CASE("PKBReader gets all FollowRelationship correctly", "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addFollowsRelationship(1, 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto allFollowRelationships = reader.getAllFollowRelationship();
+    REQUIRE(allFollowRelationships.size() == 1);
+    REQUIRE(allFollowRelationships[1] == 2);
+}
+
+/* Note: Replicate this test case for the rest of 'getAll' functions like
+ * PKBReader::getAllFollowedByRelationship(),
+ * PKBReader::getAllParentRelationship(), PKBReader::getAllChildRelationship()
+ * etc. They have same functionalities only on different attributes
+ */
+
+// Here is one more example
+
+TEST_CASE("PKBReader gets all FollowedByRelationship correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addFollowsByRelationship(1, 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto allFollowedByRelationships = reader.getAllFollowedByRelationship();
+    REQUIRE(allFollowedByRelationships.size() == 1);
+    REQUIRE(allFollowedByRelationships[1] == 2);
+}
+
+TEST_CASE("PKBReader getAllModifyRelationship() works correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addModifiesRelationship(1, "x");
+    rsManager->addModifiesRelationship(1, "y");
+    rsManager->addModifiesRelationship(2, "z");
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto result = reader.getAllModifyRelationship();
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[1].size() == 2);
+    REQUIRE(std::find(result[1].begin(), result[1].end(), "x") !=
+            result[1].end());
+    REQUIRE(std::find(result[1].begin(), result[1].end(), "y") !=
+            result[1].end());
+    REQUIRE(result[2].size() == 1);
+    REQUIRE(std::find(result[2].begin(), result[2].end(), "z") !=
+            result[2].end());
+}
+
+// Follow the same pattern for the remaining methods
+
+TEST_CASE("PKBReader getAllModifiedByRelationship() works correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addModifiedByRelationship("x", 1);
+    rsManager->addModifiedByRelationship("y", 1);
+    rsManager->addModifiedByRelationship("z", 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto result = reader.getAllModifiedByRelationship();
+    REQUIRE(result.size() == 3);
+    REQUIRE(result["x"].size() == 1);
+    REQUIRE(result["x"][0] == 1);
+    REQUIRE(result["y"].size() == 1);
+    REQUIRE(result["y"][0] == 1);
+    REQUIRE(result["z"].size() == 1);
+    REQUIRE(result["z"][0] == 2);
+}
+
+TEST_CASE("PKBReader getAllUseRelationship() works correctly", "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addUsesRelationship(1, "x");
+    rsManager->addUsesRelationship(1, "y");
+    rsManager->addUsesRelationship(2, "z");
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto result = reader.getAllUseRelationship();
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[1].size() == 2);
+    REQUIRE(std::find(result[1].begin(), result[1].end(), "x") !=
+            result[1].end());
+    REQUIRE(std::find(result[1].begin(), result[1].end(), "y") !=
+            result[1].end());
+    REQUIRE(result[2].size() == 1);
+    REQUIRE(std::find(result[2].begin(), result[2].end(), "z") !=
+            result[2].end());
+}
+--------------------
+RepoName: 23s2-cp-spa-team-07
+File: Team07/Code07/src/unit_testing/src/PKB/TestPKBReader.cpp
+Generator: gpt
+Intervention: 0
+Language: eng
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/NgbiXc6xUun2NeXZtraR7Mqv?model=gpt-4&mode=chat
+TEST_CASE("PKBReader getAllUsedByRelationship() works correctly",
+          "[PKBReader]") {
+    auto rsManager = std::make_shared<RelationshipManager>();
+    rsManager->addUsesByRelationship("x", 1);
+    rsManager->addUsesByRelationship("y", 1);
+    rsManager->addUsesByRelationship("z", 2);
+
+    auto readerManager =
+        std::make_shared<PkbReaderManager>(std::make_shared<StatementManager>(),
+                                           std::make_shared<VariableManager>(),
+                                           std::make_shared<ConstantManager>(),
+                                           std::make_shared<ProcedureManager>(),
+                                           rsManager,
+                                           std::make_shared<PatternManager>());
+
+    PKBReader reader(readerManager);
+
+    auto result = reader.getAllUsedByRelationship();
+    REQUIRE(result.size() == 3);
+    REQUIRE(result["x"].size() == 1);
+    REQUIRE(result["x"][0] == 1);
+    REQUIRE(result["y"].size() == 1);
+    REQUIRE(result["y"][0] == 1);
+    REQUIRE(result["z"].size() == 1);
+    REQUIRE(result["z"][0] == 2);
+}
+
+TEST_CASE("PKBReader getAllAssignPatterns() works correctly", "[PKBReader]") {
+    auto patternManager = std::make_shared<PatternManager>();
+    patternManager->addAssignPattern(1, {"x", {"y", "z"}});
+    patternManager->addAssignPattern(2, {"a", {"b", "c"}});
+
+    auto readerManager = std::make_shared<PkbReaderManager>(
+        std::make_shared<StatementManager>(),
+        std::make_shared<VariableManager>(),
+        std::make_shared<ConstantManager>(),
+        std::make_shared<ProcedureManager>(),
+        std::make_shared<RelationshipManager>(),
+        patternManager);
+
+    PKBReader reader(readerManager);
+
+    auto result = reader.getAllAssignPatterns();
+    REQUIRE(result.size() == 2);
+    REQUIRE(result[1].first == "x");
+    REQUIRE(result[1].second.size() == 2);
+    REQUIRE(result[1].second[0] == "y");
+    REQUIRE(result[1].second[1] == "z");
+    REQUIRE(result[2].first == "a");
+    REQUIRE(result[2].second.size() == 2);
+    REQUIRE(result[2].second[0] == "b");
+    REQUIRE(result[2].second[1] == "c");
 }
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-07
-Total Snippets: 9
-Total lines: 268
+Total Snippets: 53
+Total lines: 4166
 SP Snippets: 3
-SP lines: 42
-PKB Snippets: 6
-PKB lines: 226
-QPS Snippets: 0
-QPS lines: 0
+SP lines: 45
+PKB Snippets: 22
+PKB lines: 2067
+QPS Snippets: 9
+QPS lines: 326

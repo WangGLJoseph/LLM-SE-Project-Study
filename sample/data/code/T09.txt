@@ -1,55 +1,163 @@
 RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/qps/evaluator/Table.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: find the rows that have the same values for the common headers
+ChatId: 
+Code:
+std::vector<Row> newRows{};
+    for (Row row : rows) {
+        for (Row otherRow : other.rows) {
+            if (areJoinableRows(row, otherRow, commonHeaders)) {
+                newRows.push_back(combineRows(row, otherRow, other.headers));
+            }
+        }
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/qps/evaluator/Table.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: create cross product of two tables
+ChatId: 
+Code:
+Table Table::cartesianProduct(const Table& other) {
+    std::vector<Synonym> newHeaders{mergeHeaders(headers, other.headers)};
+
+    std::vector<Row> newRows{};
+    for (Row row : rows) {
+        for (Row otherRow : other.rows) {
+            Row newRow{row};
+            for (Synonym header : other.headers) {
+                SynonymValue headerValue = header.getValue();
+                newRow[headerValue] = otherRow.at(headerValue);
+            }
+            newRows.push_back(newRow);
+        }
+    }
+
+    return Table{newHeaders, newRows};
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/qps/evaluator/Table.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: using copilot
+ChatId: 
+Code:
+std::vector<Synonym> Table::getCommonHeaders(const Table& other) const {
+    std::vector<Synonym> commonHeaders{};
+    for (Synonym header : headers) {
+        if (other.containsHeader(header)) {
+            commonHeaders.push_back(header);
+        }
+    }
+    return commonHeaders;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/qps/evaluator/Table.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: using copilot
+ChatId: 
+Code:
+bool Table::containsHeader(const Synonym& qe) const {
+    for (Synonym header : headers) {
+        if (header == qe) {
+            return true;
+        }
+    }
+    return false;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/spa/src/qps/parser/PQLParser.cpp
+Generator: chatgpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/xBykoVKvFKrMIxAn4pwwVhlY?model=gpt-4&mode=chat
+ChatId: xBykoVKvFKrMIxAn4pwwVhlY
+Code:
+std::vector<std::string> result = {};
+    std::smatch match;
+    std::string::const_iterator searchStart(unparsedClauses.cbegin());
+    while (std::regex_search(searchStart, unparsedClauses.cend(), match, pattern)) {
+        result.push_back(match.str(1));
+        searchStart = match.suffix().first;
+    }
+    return result;
+--------------------
+RepoName: 23s2-cp-spa-team-09
 File: Team09/Code09/src/spa/src/PKB/Stores/StatementStore.cpp
 Generator: gpt
 Intervention: 1
 Language: e
-Prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
-ChatId: JMwYQcYxmb857W2JkifHSp5w
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
 const std::unordered_set<Stmt>& StatementStore::getStatements() const {
     return statementSet;
 }
 
-void StatementStore::setStatements(const std::unordered_set<Stmt> &inputStmts) {
+void StatementStore::setStatements(const std::unordered_set<Stmt>& inputStmts) {
     statementSet.insert(inputStmts.begin(), inputStmts.end());
+
+    // Update statementTypeMap
+    for (const auto& stmt : inputStmts) {
+        statementNumMap[stmt.stmtNum] = stmt;
+        statementTypeMap[stmt.type].insert(stmt);
+    }
 }
 
-Stmt* StatementStore::getStatementByStmtNum(StmtNum stmtNum) const {
-    for (const auto& stmt : statementSet) {
-        if (stmt.stmtNum == stmtNum) {
-            return const_cast<Stmt*>(&stmt);
-        }
+std::optional<Stmt> StatementStore::getStatementByStmtNum(StmtNum stmtNum) const {
+    auto it = statementNumMap.find(stmtNum);
+    if (it != statementNumMap.end()) {
+        return it->second;
     }
-    return nullptr;
+    return std::nullopt;
 }
 
-std::vector<Stmt*> StatementStore::getStatementsByType(StatementType type) const {
-    std::vector<Stmt*> stmts;
-    for (const auto& stmt : statementSet) {
-        if (stmt.type == type) {
-            stmts.push_back(const_cast<Stmt*>(&stmt));
+std::unordered_set<Stmt> StatementStore::getStatementsByType(StatementType type) const {
+    auto it = statementTypeMap.find(type);
+    if (it != statementTypeMap.end()) {
+        std::unordered_set<Stmt> result;
+        for (const auto& optionalStmt : it->second) {
+            if (optionalStmt.has_value()) {
+                result.insert(optionalStmt.value());
+            }
         }
+        return result;
     }
-    return stmts;
+    return {};
 }
 --------------------
 RepoName: 23s2-cp-spa-team-09
 File: Team09/Code09/src/spa/src/PKB/Stores/StatementStore.h
 Generator: gpt
-Intervention: 0
+Intervention: 1
 Language: e
-Prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
-ChatId: JMwYQcYxmb857W2JkifHSp5w
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
 class StatementStore {
 public:
-    const std::unordered_set<Stmt>& getStatements() const;
     void setStatements(const std::unordered_set<Stmt>& inputStmts);
-    Stmt* getStatementByStmtNum(StmtNum stmtNum) const;
-    std::vector<Stmt*> getStatementsByType(StatementType type) const;
+    const std::unordered_set<Stmt>& getStatements() const;
+    std::optional<Stmt> getStatementByStmtNum(StmtNum stmtNum) const;
+    std::unordered_set<Stmt> getStatementsByType(StatementType type) const;
 
 private:
     std::unordered_set<Stmt> statementSet;
+    std::unordered_map<StmtNum, std::optional<Stmt>> statementNumMap;
+    std::unordered_map<StatementType, std::unordered_set<std::optional<Stmt>>> statementTypeMap;
 };
 --------------------
 RepoName: 23s2-cp-spa-team-09
@@ -57,13 +165,14 @@ File: Team09/Code09/src/spa/src/PKB/Stores/EntityStore.h
 Generator: gpt
 Intervention: 0
 Language: e
-Prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
-ChatId: JMwYQcYxmb857W2JkifHSp5w
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
 template <typename T>
 class EntityStore {
 public:
-    void addEntities(const std::unordered_set<T> &inputEntities);
+    void addEntities(const std::unordered_set<T>& inputEntities);
     bool hasEntity(const T& entity) const;
     const std::unordered_set<T>& getAllEntities() const;
 
@@ -91,9 +200,10 @@ File: Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h
 Generator: gpt
 Intervention: 0
 Language: e
-Prompt: https://platform.openai.com/playground/p/JgbVHgb6Vyxb5DJwrkiMKS0k?model=gpt-4&mode=chat
-ChatId: JgbVHgb6Vyxb5DJwrkiMKS0k
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/JgbVHgb6Vyxb5DJwrkiMKS0k?model=gpt-4&mode=chat
 enum class StatementType {
     READ,
     PRINT,
@@ -113,7 +223,7 @@ struct Stmt {
     StmtNum stmtNum;
 
     // must overload the == operator.
-    bool operator==(const Stmt &other) const {
+    bool operator==(const Stmt& other) const {
         return stmtNum == other.stmtNum && type == other.type;
     }
 };
@@ -123,18 +233,18 @@ File: Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h
 Generator: gpt
 Intervention: 0
 Language: e
-Prompt: https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
-ChatId: JMwYQcYxmb857W2JkifHSp5w
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat
 namespace std {
-    template <>
-    struct hash<Stmt> {
-        std::size_t operator()(const Stmt& stmt) const {
-            return ((hash<int>()(stmt.stmtNum)
-                     ^ (hash<int>()(static_cast<int>(stmt.type)) << 1)) >> 1);
-        }
-    };
-}
+template <>
+struct hash<Stmt> {
+    std::size_t operator()(const Stmt& stmt) const {
+        return ((hash<int>()(stmt.stmtNum) ^ (hash<int>()(static_cast<int>(stmt.type)) << 1)) >> 1);
+    }
+};
+}  // namespace std
 --------------------
 RepoName: 23s2-cp-spa-team-09
 File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
@@ -145,16 +255,17 @@ Prompt: test table class
 ChatId: 
 Code:
 TEST_CASE("Test Table extract results") {
-    std::vector<QueryEntity> headers = {
+    std::vector<Synonym> headers = {
         createVariable("v"),
         createConstant("c"),
         createProcedure("p"),
     };
-    std::vector<Row> rows = { {"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"} };
-    Table table(headers, rows);
+
+    std::vector<ColumnData> columns = {{"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"}};
+    Table table(headers, columns);
 
     SECTION("Test extractResults") {
-        std::vector<std::string> results = table.extractResults({ createVariable("v") });
+        std::vector<std::string> results = table.extractResults({createVariable("v")});
         REQUIRE(results == std::vector<std::string>{"x", "y", "z"});
     }
 
@@ -166,22 +277,350 @@ TEST_CASE("Test Table extract results") {
 RepoName: 23s2-cp-spa-team-09
 File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
 Generator: copilot
+Intervention: 0
+Language: e
+Prompt: test case for empty table
+ChatId: 
+Code:
+TEST_CASE("Test Table extract results with empty table") {
+    std::vector<Synonym> headers = {
+        createVariable("v"),
+        createConstant("c"),
+        createProcedure("p"),
+    };
+    std::vector<ColumnData> columns = {};
+    Table table(headers, columns);
+
+    std::vector<std::string> results = table.extractResults({createVariable("v")});
+    REQUIRE(results == std::vector<std::string>{});
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// test case for empty rows
+TEST_CASE("Test Table extract results with empty rows") {
+    std::vector<Synonym> headers = {
+        createVariable("v"),
+        createConstant("c"),
+        createProcedure("p"),
+    };
+    std::vector<Row> rows = {};
+    Table table(headers, rows);
+
+    std::vector<std::string> results = table.extractResults({createVariable("v")});
+    REQUIRE(results == std::vector<std::string>{});
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
+Generator: copilot
 Intervention: 2
 Language: e
 Prompt: try to extract a non-existent query entity. it should return an empty vector
 ChatId: 
 Code:
 TEST_CASE("Test Table extract results with non-existent query entity") {
-    std::vector<QueryEntity> headers = {
-       createVariable("v"),
-       createConstant("c"),
-       createProcedure("p"),
+    std::vector<Synonym> headers = {
+        createVariable("v"),
+        createConstant("c"),
+        createProcedure("p"),
     };
-    std::vector<Row> rows = { {"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"} };
+    std::vector<ColumnData> rows = {{"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"}};
     Table table(headers, rows);
 
-    std::vector<std::string> results = table.extractResults({ createVariable("nonExistent") });
+    std::vector<std::string> results = table.extractResults({createVariable("nonExistent")});
     REQUIRE(results == std::vector<std::string>{});
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: test case for table join
+ChatId: 
+Code:
+TEST_CASE("Test Table join") {
+    std::vector<Synonym> headers1 = {createVariable("v"), createConstant("c")};
+    std::vector<ColumnData> columns1 = {{"x", "y", "z"}, {"4", "5", "testString"}};
+    Table table1(headers1, columns1);
+
+    std::vector<Synonym> headers2 = {createVariable("v"), createProcedure("p")};
+    std::vector<ColumnData> columns2 = {{"x", "y", "z"}, {"Yishun", "Punggol", "Singapore"}};
+    Table table2(headers2, columns2);
+
+    Table joinedTable = table1.join(table2);
+
+    std::vector<Synonym> expectedHeaders = {createVariable("v"), createConstant("c"), createProcedure("p")};
+    std::vector<ColumnData> expectedColumns = {
+        {"x", "y", "z"}, {"4", "5", "testString"}, {"Yishun", "Punggol", "Singapore"}};
+    Table expectedTable(expectedHeaders, expectedColumns);
+
+    REQUIRE(joinedTable.extractResults({createVariable("v")}) == expectedTable.extractResults({createVariable("v")}));
+    REQUIRE(joinedTable.extractResults({createConstant("c")}) == expectedTable.extractResults({createConstant("c")}));
+    REQUIRE(joinedTable.extractResults({createProcedure("p")}) == expectedTable.extractResults({createProcedure("p")}));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: test case for table join where the tables have no common headers
+ChatId: 
+Code:
+TEST_CASE("Test Table join with no common headers") {
+    std::vector<Synonym> headers1 = {createVariable("v"), createConstant("c")};
+    std::vector<ColumnData> columns1 = {{"x", "y", "z"}, {"4", "5", "testString"}};
+    Table table1(headers1, columns1);
+
+    std::vector<Synonym> headers2 = {createProcedure("p"), createProcedure("p1")};
+    std::vector<ColumnData> columns2 = {{"Yishun", "Punggol", "Singapore"}, {"Sengkang", "Jurong", "Serangoon"}};
+    Table table2(headers2, columns2);
+
+    Table joinedTable = table1.join(table2);
+
+    std::vector<Synonym> expectedHeaders = {createVariable("v"), createConstant("c"), createProcedure("p"),
+                                            createProcedure("p1")};
+    std::vector<ColumnData> expectedColumns = {{"x", "y", "z"},
+                                               {"4", "5", "testString"},
+                                               {"Yishun", "Punggol", "Singapore"},
+                                               {"Sengkang", "Jurong", "Serangoon"}};
+    Table expectedTable(expectedHeaders, expectedColumns);
+
+    // check expected headers
+    REQUIRE(joinedTable.getHeaders() == expectedHeaders);
+
+    REQUIRE(joinedTable.extractResults({createVariable("v")}) == expectedTable.extractResults({createVariable("v")}));
+    REQUIRE(joinedTable.extractResults({createConstant("c")}) == expectedTable.extractResults({createConstant("c")}));
+    REQUIRE(joinedTable.extractResults({createProcedure("p")}) == expectedTable.extractResults({createProcedure("p")}));
+    REQUIRE(joinedTable.extractResults({createProcedure("p1")}) ==
+            expectedTable.extractResults({createProcedure("p1")}));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: test joining 1 empty table with a non-empty table
+ChatId: 
+Code:
+TEST_CASE("Test Table join with 1 empty table") {
+    std::vector<Synonym> headers1 = {createVariable("v"), createConstant("c")};
+    std::vector<ColumnData> columns1 = {};
+    Table emptyTable(headers1, columns1);
+
+    std::vector<Synonym> headers2 = {createVariable("v"), createProcedure("p")};
+    std::vector<ColumnData> columns2 = {{"x", "y", "z"}, {"Yishun", "Punggol", "Singapore"}};
+    Table nonEmptyTable(headers2, columns2);
+
+    Table joinedTable = emptyTable.join(nonEmptyTable);
+
+    std::vector<Synonym> expectedHeaders = {createVariable("v"), createConstant("c"), createProcedure("p")};
+    std::vector<ColumnData> expectedColumns = {};
+    Table expectedTable(expectedHeaders, expectedColumns);
+
+    REQUIRE(joinedTable.getHeaders() == expectedHeaders);
+    REQUIRE(joinedTable.extractResults({createVariable("v")}) == expectedTable.extractResults({createVariable("v")}));
+    REQUIRE(joinedTable.extractResults({createConstant("c")}) == expectedTable.extractResults({createConstant("c")}));
+    REQUIRE(joinedTable.extractResults({createProcedure("p")}) == expectedTable.extractResults({createProcedure("p")}));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: select s such that parent(s, 2) / should not show any results
+ChatId: 
+Code:
+SECTION("Select s such that Parent(s1, 2) / Should not show any results") {
+        std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2}};
+        pfw.setParentStore(parentStoreEntries);
+
+        std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
+        std::vector<SuchThatClause> suchThatClauses{
+            SuchThatClause{RelationshipType::PARENT, new Synonym{DesignEntityType::STMT, "s1"}, new Integer{"2"}}};
+        Query q{selectEntities, suchThatClauses, {}};
+
+        std::vector<std::string> result = q.evaluate(pkbReader);
+        std::sort(result.begin(), result.end());
+
+        std::vector<std::string> expected{};
+        std::sort(expected.begin(), expected.end());
+
+        REQUIRE(result == expected);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: select s such that parentstar(s, 3)
+ChatId: 
+Code:
+SECTION("Select s such that ParentStar(s, 3)") {
+        std::unordered_set<std::pair<int, int>> parentStoreEntries{std::pair<int, int>{1, 2},
+                                                                   std::pair<int, int>{2, 3}};
+        pfw.setParentStore(parentStoreEntries);
+
+        std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
+        std::vector<SuchThatClause> suchThatClauses{
+            SuchThatClause{RelationshipType::PARENT_STAR, new Synonym{DesignEntityType::STMT, "s"}, new Integer{"3"}}};
+        Query q{selectEntities, suchThatClauses, {}};
+
+        std::vector<std::string> result = q.evaluate(pkbReader);
+        std::sort(result.begin(), result.end());
+
+        std::vector<std::string> expected{"1", "2"};
+        std::sort(expected.begin(), expected.end());
+
+        REQUIRE(result == expected);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: select s such that uses(s, 'variable_x')
+ChatId: 
+Code:
+SECTION("Select s such that Uses(s, 'variable_x')") {
+        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "variable_x"}};
+        pfw.setUsesStore(usesStoreEntries);
+
+        std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
+        std::vector<SuchThatClause> suchThatClauses{SuchThatClause{
+            RelationshipType::USES, new Synonym{DesignEntityType::STMT, "s"}, new Literal{"variable_x"}}};
+        Query q{selectEntities, suchThatClauses, {}};
+
+        std::vector<std::string> result = q.evaluate(pkbReader);
+        std::sort(result.begin(), result.end());
+
+        std::vector<std::string> expected{"1"};
+        std::sort(expected.begin(), expected.end());
+
+        REQUIRE(result == expected);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: select s such that uses(1, v1)
+ChatId: 
+Code:
+SECTION("Select s such that Uses(1, v1)") {
+        std::unordered_set<std::pair<int, std::string>> usesStoreEntries{std::pair<int, std::string>{1, "variable_x"}};
+        pfw.setUsesStore(usesStoreEntries);
+
+        std::vector<Synonym> selectEntities{{DesignEntityType::VARIABLE, "v1"}};
+        std::vector<SuchThatClause> suchThatClauses{
+            SuchThatClause{RelationshipType::USES, new Integer{"1"}, new Synonym{DesignEntityType::VARIABLE, "v1"}}};
+        Query q{selectEntities, suchThatClauses, {}};
+
+        std::vector<std::string> result = q.evaluate(pkbReader);
+        std::sort(result.begin(), result.end());
+
+        std::vector<std::string> expected{"variable_x"};
+        std::sort(expected.begin(), expected.end());
+
+        REQUIRE(result == expected);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: select s such that modifies(s, 'variable_x')
+ChatId: 
+Code:
+SECTION("Select s such that Modifies(s, 'variable_x')") {
+        std::unordered_set<std::pair<int, std::string>> modifiesStoreEntries{
+            std::pair<int, std::string>{1, "variable_x"}};
+        pfw.setModifiesStore(modifiesStoreEntries);
+
+        std::vector<Synonym> selectEntities{{DesignEntityType::STMT, "s"}};
+        std::vector<SuchThatClause> suchThatClauses{SuchThatClause{
+            RelationshipType::MODIFIES, new Synonym{DesignEntityType::STMT, "s"}, new Literal{"variable_x"}}};
+        Query q{selectEntities, suchThatClauses, {}};
+
+        std::vector<std::string> result = q.evaluate(pkbReader);
+        std::sort(result.begin(), result.end());
+
+        std::vector<std::string> expected{"1"};
+        std::sort(expected.begin(), expected.end());
+
+        REQUIRE(result == expected);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/clauses/TestSuchThatClause_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: test suchthatclause gettype
+ChatId: 
+Code:
+TEST_CASE("SuchThatClause getType") {
+    SuchThatClause suchThatClause(RelationshipType::FOLLOWS, new Integer("1"), new Integer("2"));
+    REQUIRE(suchThatClause.getType() == ClauseType::SUCH_THAT);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/clauses/TestSuchThatClause_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: test suchthat clause equals
+ChatId: 
+Code:
+TEST_CASE("SuchThatClause equals") {
+    SuchThatClause suchThatClause1(RelationshipType::FOLLOWS, new Integer("1"), new Integer("2"));
+    SuchThatClause suchThatClause2(RelationshipType::FOLLOWS, new Integer("1"), new Integer("2"));
+    SuchThatClause suchThatClause3(RelationshipType::FOLLOWS, new Integer("1"), new Integer("3"));
+    SuchThatClause suchThatClause4(RelationshipType::FOLLOWS, new Integer("2"), new Integer("2"));
+    SuchThatClause suchThatClause5(RelationshipType::FOLLOWS_STAR, new Integer("1"), new Integer("2"));
+    SuchThatClause suchThatClause6(RelationshipType::PARENT, new Integer("1"), new Integer("2"));
+    SuchThatClause suchThatClause7(RelationshipType::PARENT_STAR, new Integer("1"), new Integer("2"));
+    SuchThatClause suchThatClause8(RelationshipType::USES, new Integer("1"), new Integer("2"));
+    SuchThatClause suchThatClause9(RelationshipType::MODIFIES, new Integer("1"), new Integer("2"));
+    REQUIRE(suchThatClause1.equals(suchThatClause2) == true);
+    REQUIRE(suchThatClause1.equals(suchThatClause3) == false);
+    REQUIRE(suchThatClause1.equals(suchThatClause4) == false);
+    REQUIRE(suchThatClause1.equals(suchThatClause5) == false);
+    REQUIRE(suchThatClause1.equals(suchThatClause6) == false);
+    REQUIRE(suchThatClause1.equals(suchThatClause7) == false);
+    REQUIRE(suchThatClause1.equals(suchThatClause8) == false);
+    REQUIRE(suchThatClause1.equals(suchThatClause9) == false);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/clauses/TestSuchThatClause_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: test suchthatclause determinerelationshiptype
+ChatId: 
+Code:
+TEST_CASE("SuchThatClause determineRelationshipType") {
+    REQUIRE(SuchThatClause::determineRelationshipType("Follows") == RelationshipType::FOLLOWS);
+    REQUIRE(SuchThatClause::determineRelationshipType("Follows*") == RelationshipType::FOLLOWS_STAR);
+    REQUIRE(SuchThatClause::determineRelationshipType("Parent") == RelationshipType::PARENT);
+    REQUIRE(SuchThatClause::determineRelationshipType("Parent*") == RelationshipType::PARENT_STAR);
+    REQUIRE(SuchThatClause::determineRelationshipType("Uses") == RelationshipType::USES);
+    REQUIRE(SuchThatClause::determineRelationshipType("Modifies") == RelationshipType::MODIFIES);
 }
 --------------------
 RepoName: 23s2-cp-spa-team-09
@@ -195,22 +634,112 @@ Code:
 // and checks that the type and name are correctly set
 
 TEST_CASE("Creates QueryEntity for type variable1") {
-    QueryEntity qe{ createVariable("v") };
-    REQUIRE(qe.getType() == EntityType::VARIABLE);
-    REQUIRE(qe.getName() == "v");
+    Synonym qe{createVariable("v")};
+    REQUIRE(qe.getType() == DesignEntityType::VARIABLE);
+    REQUIRE(qe.getValue() == "v");
 }
 
-
 TEST_CASE("Creates QueryEntity for type procedure") {
-    QueryEntity qe{ createProcedure("p") };
-    REQUIRE(qe.getType() == EntityType::PROCEDURE);
-    REQUIRE(qe.getName() == "p");
+    Synonym qe{createProcedure("p")};
+    REQUIRE(qe.getType() == DesignEntityType::PROCEDURE);
+    REQUIRE(qe.getValue() == "p");
 }
 
 TEST_CASE("Creates QueryEntity for type constant") {
-    QueryEntity qe{ createConstant("c") };
-    REQUIRE(qe.getType() == EntityType::CONSTANT);
-    REQUIRE(qe.getName() == "c");
+    Synonym qe{createConstant("c")};
+    REQUIRE(qe.getType() == DesignEntityType::CONSTANT);
+    REQUIRE(qe.getValue() == "c");
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestClauseArgument_AI.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: write tests for the clauseargument class that ensures that the relevant isxxx method returns the correct
+ChatId: 
+Code:
+// value
+TEST_CASE("ClauseArgument isXXX methods") {
+    SECTION("isExpressionSpec") {
+        std::shared_ptr<ClauseArgument> expressionSpec = std::make_shared<ExpressionSpec>("x");
+        REQUIRE(expressionSpec->isExpressionSpec());
+        REQUIRE_FALSE(expressionSpec->isInteger());
+        REQUIRE_FALSE(expressionSpec->isLiteral());
+        REQUIRE_FALSE(expressionSpec->isSynonym());
+        REQUIRE_FALSE(expressionSpec->isWildcard());
+    }
+
+    SECTION("isInteger") {
+        std::shared_ptr<ClauseArgument> integer = std::make_shared<Integer>("4");
+        REQUIRE(integer->isInteger());
+        REQUIRE_FALSE(integer->isExpressionSpec());
+        REQUIRE_FALSE(integer->isLiteral());
+        REQUIRE_FALSE(integer->isSynonym());
+        REQUIRE_FALSE(integer->isWildcard());
+    }
+
+    SECTION("isLiteral") {
+        std::shared_ptr<ClauseArgument> literal = std::make_shared<Literal>("v");
+        REQUIRE(literal->isLiteral());
+        REQUIRE_FALSE(literal->isExpressionSpec());
+        REQUIRE_FALSE(literal->isInteger());
+        REQUIRE_FALSE(literal->isSynonym());
+        REQUIRE_FALSE(literal->isWildcard());
+    }
+
+    SECTION("isSynonym") {
+        std::shared_ptr<ClauseArgument> synonym = std::make_shared<Synonym>(DesignEntityType::STMT, "s1");
+        REQUIRE(synonym->isSynonym());
+        REQUIRE_FALSE(synonym->isExpressionSpec());
+        REQUIRE_FALSE(synonym->isInteger());
+        REQUIRE_FALSE(synonym->isLiteral());
+        REQUIRE_FALSE(synonym->isWildcard());
+    }
+
+    SECTION("isWildcard") {
+        std::shared_ptr<ClauseArgument> wildcard = std::make_shared<Wildcard>();
+        REQUIRE(wildcard->isWildcard());
+        REQUIRE_FALSE(wildcard->isExpressionSpec());
+        REQUIRE_FALSE(wildcard->isInteger());
+        REQUIRE_FALSE(wildcard->isLiteral());
+        REQUIRE_FALSE(wildcard->isSynonym());
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-09
+File: Team09/Code09/src/unit_testing/src/qps/TestClauseArgument_AI.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: write tests for the clauseargument class that ensures that the values are retrievable
+ChatId: 
+Code:
+TEST_CASE("ClauseArgument getValue methods") {
+    SECTION("ExpressionSpec") {
+        std::shared_ptr<ClauseArgument> expressionSpec = std::make_shared<ExpressionSpec>("x");
+        REQUIRE(expressionSpec->getValue() == "x");
+    }
+
+    SECTION("Integer") {
+        std::shared_ptr<ClauseArgument> integer = std::make_shared<Integer>("4");
+        REQUIRE(integer->getValue() == "4");
+    }
+
+    SECTION("Literal") {
+        std::shared_ptr<ClauseArgument> literal = std::make_shared<Literal>("v");
+        REQUIRE(literal->getValue() == "v");
+    }
+
+    SECTION("Synonym") {
+        std::shared_ptr<ClauseArgument> synonym = std::make_shared<Synonym>(DesignEntityType::STMT, "s1");
+        REQUIRE(synonym->getValue() == "s1");
+    }
+
+    SECTION("Wildcard") {
+        std::shared_ptr<ClauseArgument> wildcard = std::make_shared<Wildcard>();
+        REQUIRE(wildcard->getValue() == "_");
+    }
 }
 --------------------
 RepoName: 23s2-cp-spa-team-09
@@ -218,9 +747,10 @@ File: Team09/Code09/src/unit_testing/src/PKB/Stores/TestEntityStore.cpp
 Generator: gpt
 Intervention: 1
 Language: e
-Prompt: https://platform.openai.com/playground/p/yzre7t43UnEzHeaMn64z5jkq?model=gpt-4&mode=chat
-ChatId: yzre7t43UnEzHeaMn64z5jkq
+Prompt: 
+ChatId: 
 Code:
+// https://platform.openai.com/playground/p/yzre7t43UnEzHeaMn64z5jkq?model=gpt-4&mode=chat
 using Procedure = std::string;
 using Variable = std::string;
 using Constant = std::string;
@@ -271,11 +801,11 @@ TEST_CASE("EntityStore - Base Test") {
 }
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-09
-Total Snippets: 9
-Total lines: 194
+Total Snippets: 29
+Total lines: 542
 SP Snippets: 0
 SP lines: 0
 PKB Snippets: 6
-PKB lines: 143
-QPS Snippets: 3
-QPS lines: 51
+PKB lines: 157
+QPS Snippets: 23
+QPS lines: 385

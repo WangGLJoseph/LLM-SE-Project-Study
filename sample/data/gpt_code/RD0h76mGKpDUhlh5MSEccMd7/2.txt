@@ -1,0 +1,85 @@
+#include "sp/DesignExtractor/ConcreteExtractor/FollowsExtractor.h"
+
+#include "catch.hpp"
+#include "pkb/storage/PKB.h"
+#include "sp/ASTNode/StatementListNode.h"
+#include "sp/ASTNode/WhileNode.h"
+#include "unit_testing/src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+#include "unit_testing/src/sp/utils/StubPKBWriter.h"
+
+#include <memory>
+
+TEST_CASE("FollowsExtractor correctly extracts relationships", "[FollowsExtractor]") {
+  std::shared_ptr<PKB> pkb;
+  auto stubPKBWriter = std::make_shared<StubPKBWriter>(pkb);
+  FollowsExtractor extractor((std::shared_ptr<PKBWriter> &)stubPKBWriter);
+
+  SECTION("Single statement list node") {
+    auto callNode = ASTBuilder::buildCallNode(1, "a");
+    auto stmtListNode = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{callNode});
+    extractor.VisitStatementListNode(stmtListNode);
+
+    // Make assertions for a single statement node. No Follows relation should
+    // exist
+    REQUIRE(stubPKBWriter->getAllFollowsRecord().empty());
+    REQUIRE(stubPKBWriter->getAllIndirectFollowsRecord().empty());
+  }
+
+  SECTION("Multiple statements list node") {
+    auto callNode = ASTBuilder::buildCallNode(1, "a");
+    auto readNode1 = ASTBuilder::buildReadNode(2, "a");
+    auto readNode2 = ASTBuilder::buildReadNode(3, "a");
+    auto stmtListNode = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{callNode, readNode1, readNode2});
+
+    extractor.VisitStatementListNode(stmtListNode);
+
+    // Make assertions for Follows relation. This should exist.
+    REQUIRE(stubPKBWriter->getAllFollowsRecord().size() == 2);
+    REQUIRE(stubPKBWriter->isFollows(1, 2, true));
+    REQUIRE(stubPKBWriter->isFollows(2, 3, true));
+
+    REQUIRE(stubPKBWriter->getAllIndirectFollowsRecord().size() == 1);
+    REQUIRE(stubPKBWriter->isFollows(1, 3, false));
+  }
+
+  SECTION("statement list with if block") {
+    // Source Code:
+    // 1           print x;
+    // 2           if (x==1) then {
+    // 3               read a;
+    // 4               print b;
+    // 5               call p; }
+    //             else {
+    // 6               call q; }
+
+    auto readNode = std::make_shared<ReadNode>(3, CommonTokens::A_TOKEN);
+    auto callNode_p = std::make_shared<CallNode>(5, CommonTokens::P_PROC_TOKEN);
+    auto callNode_q = std::make_shared<CallNode>(6, CommonTokens::Q_PROC_TOKEN);
+    auto printNode_b = std::make_shared<PrintNode>(4, CommonTokens::B_TOKEN);
+    auto thenStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{readNode, printNode_b, callNode_p});
+    auto elseStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{callNode_q});
+
+    auto expressionLeft = std::make_shared<ExpressionNode>(2, CommonTokens::X_TOKEN);
+    auto expressionRight = std::make_shared<ExpressionNode>(2, CommonTokens::ONE_TOKEN);
+
+    auto expressionNode = std::make_shared<ExpressionNode>(1, CommonTokens::EQUAL_EQUAL_TOKEN, expressionLeft, expressionRight);
+
+    auto ifNode = std::make_shared<IfNode>(2, expressionNode, thenStmtList, elseStmtList);
+    auto printNode_x = std::make_shared<PrintNode>(1, CommonTokens::X_TOKEN);
+    auto stmtListNode = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{printNode_x, ifNode});
+
+    extractor.VisitStatementListNode(stmtListNode);
+    extractor.VisitStatementListNode(thenStmtList);
+    extractor.VisitStatementListNode(elseStmtList);
+
+    // Make assertions for Follows relation. This should exist.
+    REQUIRE(stubPKBWriter->getAllFollowsRecord().size() == 3);
+    REQUIRE(stubPKBWriter->isFollows(1, 2, true));
+    REQUIRE(stubPKBWriter->isFollows(3, 4, true));
+    REQUIRE(stubPKBWriter->isFollows(4, 5, true));
+
+    REQUIRE(stubPKBWriter->getAllIndirectFollowsRecord().size() == 1);
+    REQUIRE(stubPKBWriter->isFollows(3, 5, false));
+  }
+}

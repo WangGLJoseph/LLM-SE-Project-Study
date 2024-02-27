@@ -1,0 +1,68 @@
+#include "HeaderTable.h"
+#include <algorithm>
+#include <unordered_set>
+#include <memory>
+#include "common/spa_exception/QPSEvaluationException.h"
+#include "BooleanTable.h"
+
+bool rowsAreCompatible(const TableRow &row1, const TableRow &row2,
+                       const HeaderTable &table1, const HeaderTable &table2,
+                       const std::vector<shared_ptr<Synonym>> &commonHeaders);
+
+
+std::vector<std::shared_ptr<Entity>> createJoinedRow(const TableRow &row1, const TableRow &row2,
+                                                     const HeaderTable &table1, const HeaderTable &table2,
+                                                     const std::vector<shared_ptr<Synonym>> &newHeaders);
+
+
+bool HeaderTable::isValidRow(const TableRow &row) const {
+    if (row.getValues().size() == headers.size()) {
+        // Checks if the types of the entities in the row match the types of the headers
+        for (size_t i = 0; i < headers.size(); ++i) {
+            if (!row.getValues()[i]->isOfType(headers[i]->getType())) {
+                return false;
+            }
+        }
+    }
+    return row.getValues().size() == headers.size();
+}
+
+void HeaderTable::setHeaders(const vector<shared_ptr<Synonym>> &headers) {
+    this->headers = headers;
+    setColumnCount(headers.size());
+    updateHeaderIndexMap();
+}
+
+const vector<shared_ptr<Synonym>>& HeaderTable::getHeaders() const {
+    return headers;
+}
+
+HeaderTable HeaderTable::selectColumns(const vector<shared_ptr<Synonym>> &synonyms) const {
+    HeaderTable newTable;
+    vector<shared_ptr<Synonym>> newHeaders;
+    vector<int> indices;
+
+    // Find the indices of the selected synonyms in the current headers
+    for (const auto &syn: synonyms) {
+        for (size_t i = 0; i < headers.size(); ++i) {
+            if (*headers[i] == *syn) {
+                newHeaders.push_back(syn);
+                indices.push_back(i);
+                break;
+            }
+        }
+    }
+
+    newTable.setHeaders(newHeaders);
+
+    // Project rows to new table based on selected columns
+    for (const auto &row: getRows()) {
+        vector<shared_ptr<Entity>> newRowValues;
+        for (int idx: indices) {
+            newRowValues.push_back(row.getValues()[idx]);
+        }
+        newTable.addRow(TableRow(newRowValues));
+    }
+
+    return newTable;
+}

@@ -1,6 +1,3 @@
-23s2-cp-spa-team-12: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/spa/src/pkb/entities/Statement.h
-23s2-cp-spa-team-12: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/spa/src/pkb/entities/Statement.h
-23s2-cp-spa-team-12: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/spa/src/source_processor/design_extractor/storage_manager/EntityWriter.cpp
-23s2-cp-spa-team-12: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/spa/src/source_processor/design_extractor/storage_manager/StorageManager.cpp
-23s2-cp-spa-team-12: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/spa/src/source_processor/design_extractor/visitor/EntityVisitor.cpp
-23s2-cp-spa-team-12: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/spa/src/utility/validator/SyntaxValidator.cpp
+23s2-cp-spa-team-12: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/integration_testing/src/sp-pkb/TestDesignExtractor.cpp
+23s2-cp-spa-team-12: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/spa/src/sp/node/statement/expression/ExprNode.h
+23s2-cp-spa-team-12: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-12/Team12/Code12/src/spa/src/common/utility/validator/SyntaxValidator.cpp

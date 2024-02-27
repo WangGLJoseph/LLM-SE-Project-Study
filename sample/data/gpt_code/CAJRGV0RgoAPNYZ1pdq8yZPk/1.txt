@@ -1,0 +1,9 @@
+namespace std {
+template <>
+struct hash<Statement> {
+  size_t operator()(const Statement& stmt) const {
+    // Custom hash function implementation based on statement's properties
+    return hash<int>()(stmt.getLineNumber());
+  }
+};
+}  // namespace std

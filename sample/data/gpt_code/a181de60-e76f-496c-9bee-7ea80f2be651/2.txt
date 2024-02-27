@@ -1,99 +1,107 @@
-enum class ASTNodeType {
-    PROGRAMS, PROCEDURE, STATEMENT_LIST,
-
-    // Statements
-    READ, PRINT, CALL, WHILE, IF_ELSE_THEN, ASSIGN,
-
-    // Expressions and operators
-    NOT, AND, OR, GREATER, GREATER_OR_EQUAL, LESSER, LESSER_OR_EQUAL,EQUAL, NOT_EQUAL,
-    ADD, SUBTRACT, MULTIPLY, DIVIDE, MODULO,
-
-    // Entities
-    VARIABLE, CONSTANT,
-
-    OTHER,
-
-    ERROR,
-};
-
-/**
- * @brief Represents a node in the Abstract Syntax Tree (AST).
- */
-class ASTNode {
-public:
-    /**
-     * @brief Default constructor for ASTNode.
-     */
-    ASTNode();
-
-    /**
-     * @brief Constructor for creating an ASTNode with specified type, line number, and value.
-     *
-     * @param type The type of the AST node.
-     * @param lineNumber The line number associated with the AST node.
-     * @param value The value associated with the AST node.
-     */
-    ASTNode(ASTNodeType type, int lineNumber, std::string value);
-    
-    /**
-     * @brief Adds a child node to the current AST node.
-     *
-     * @param child A shared pointer to the child AST node to be added.
-     */
-    void addChild(std::shared_ptr<ASTNode> child);
-    
-    /**
-     * @brief Sets the value of the current AST node.
-     *
-     * @param value The value to be set for the current AST node.
-     */
-    void setValue(std::string value);
-
-    /**
-    * @brief Computes the hash value of the current AST node.
-    *
-    * @return The hash value of the current AST node.
-    */
-    std::size_t hash() const;
-
-    /**
-     * @brief Checks if two AST nodes are equal.
-     *
-     * @param other The AST node to compare with.
-     * @return True if the two AST nodes are equal, otherwise false.
-     */
-    bool operator==(const ASTNode& other) const;
-
-    /**
-     * @brief Converts the AST node to a string representation.
-     *
-     * @return A string representation of the AST node.
-     */
-    std::string toString() const;
-
-    // To be set as private in future
-    ASTNodeType type;
-    std::vector<std::shared_ptr<ASTNode>> children;
-    int lineNumber;
-    std::string value;
-private:
-    std::shared_ptr<ASTNode> root;
-
-    /**
-     * @brief Generates a string representation of the AST node and its children recursively.
-     *
-     * @param tabs The number of tabs to indent the string representation.
-     * @return A string representation of the AST node and its children.
-     */
-    std::string recursiveString(int tabs) const;
-};
-
-
-namespace std {
-    template<> struct hash<ASTNode> {
-        std::size_t operator()(const ASTNode& node) const {
-            // Combine hash values of type, lineNumber, and value
-            return std::hash<long long>{}(node.hash());
-        }
+std::string ASTUtility::getASTNodeType(ASTNodeType t) {
+    switch (t) {
+        case ASTNodeType::PROGRAMS:
+            return "Program";
+        case ASTNodeType::PROCEDURE:
+            return "Procedure";
+        case ASTNodeType::STATEMENT_LIST:
+            return "StatementList";
+        case ASTNodeType::ASSIGN:
+            return "Assign";
+        case ASTNodeType::CALL:
+            return "Call";
+        case ASTNodeType::IF_ELSE_THEN:
+            return "IfElseThen";
+        case ASTNodeType::PRINT:
+            return "Print";
+        case ASTNodeType::READ:
+            return "Read";
+        case ASTNodeType::WHILE:
+            return "While";
+        case ASTNodeType::NOT:
+            return "!";
+        case ASTNodeType::AND:
+            return "&&";
+        case ASTNodeType::OR:
+            return "||";
+        case ASTNodeType::GREATER:
+            return ">";
+        case ASTNodeType::GREATER_OR_EQUAL:
+            return ">=";
+        case ASTNodeType::LESSER:
+            return "<";
+        case ASTNodeType::LESSER_OR_EQUAL:
+            return "<=";
+        case ASTNodeType::EQUAL:
+            return "==";
+        case ASTNodeType::NOT_EQUAL:
+            return "!=";
+        case ASTNodeType::ADD:
+            return "+";
+        case ASTNodeType::SUBTRACT:
+            return "-";
+        case ASTNodeType::MULTIPLY:
+            return "*";
+        case ASTNodeType::DIVIDE:
+            return "/";
+        case ASTNodeType::MODULO:
+            return "%";
+        case ASTNodeType::VARIABLE:
+            return "Variable";
+        case ASTNodeType::CONSTANT:
+            return "Constant";
+        case ASTNodeType::ERROR:
+            return "Error";
+        default:
+            throw "Error";
     };
+}
+
+bool ASTUtility::nodeIsStatement(ASTNodeType t) {
+    return t == ASTNodeType::ASSIGN || t == ASTNodeType::CALL 
+        || t == ASTNodeType::IF_ELSE_THEN || t == ASTNodeType::PRINT 
+        || t == ASTNodeType::READ || t == ASTNodeType::WHILE;
+}
+
+bool ASTUtility::nodeIsRelExpression(ASTNodeType t) {
+	return  t == ASTNodeType::GREATER || t == ASTNodeType::GREATER_OR_EQUAL 
+        || t == ASTNodeType::LESSER || t == ASTNodeType::LESSER_OR_EQUAL 
+        || t == ASTNodeType::EQUAL || t == ASTNodeType::NOT_EQUAL;
+}
+
+bool ASTUtility::nodeIsCondExpression(ASTNodeType t) {
+	return t == ASTNodeType::AND || t == ASTNodeType::OR 
+		|| t == ASTNodeType::NOT;
+}
+bool ASTUtility::nodeIsValidOperator(ASTNodeType t) {
+	return t == ASTNodeType::ADD || t == ASTNodeType::SUBTRACT 
+		|| t == ASTNodeType::MULTIPLY || t == ASTNodeType::DIVIDE 
+		|| t == ASTNodeType::MODULO;
+}
+
+bool ASTUtility::nodeIsValidRelFactor(ASTNodeType t) {
+	return t == ASTNodeType::VARIABLE || t == ASTNodeType::CONSTANT;
+}
+
+bool ASTUtility::nodeCanFormValidExpression(ASTNodeType t) {
+    return nodeIsRelExpression(t)
+        || nodeIsCondExpression(t)
+        || nodeIsValidOperator(t)
+        || nodeIsValidRelFactor(t);
+}
+
+bool ASTUtility::nodeIsProgram(ASTNodeType t) {
+	return t == ASTNodeType::PROGRAMS;
+}
+
+bool ASTUtility::nodeIsProcedure(ASTNodeType t) {
+	return t == ASTNodeType::PROCEDURE;
+}
+
+bool ASTUtility::nodeIsStatementList(ASTNodeType t) {
+	return t == ASTNodeType::STATEMENT_LIST;
+}
+
+bool ASTUtility::nodeIsIfElse(ASTNodeType t) {
+	return t == ASTNodeType::IF_ELSE_THEN;
 }

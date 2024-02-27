@@ -1,0 +1,22 @@
+std::vector<std::shared_ptr<SPToken>> ExpressionNode::getAllVariableTokens() {
+  std::vector<std::shared_ptr<SPToken>> tokens;
+
+  // Add the symbol token of this node
+  if (symbol->getType() == SPTokenType::IDENTIFIER) {
+    tokens.push_back(symbol);
+  }
+
+  // Recursively process the left child, if it exists
+  if (left != nullptr) {
+    std::vector<std::shared_ptr<SPToken>> leftTokens = left->getAllVariableTokens();
+    tokens.insert(tokens.end(), leftTokens.begin(), leftTokens.end());
+  }
+
+  // Recursively process the right child, if it exists
+  if (right != nullptr) {
+    std::vector<std::shared_ptr<SPToken>> rightTokens = right->getAllVariableTokens();
+    tokens.insert(tokens.end(), rightTokens.begin(), rightTokens.end());
+  }
+
+  return tokens;
+}

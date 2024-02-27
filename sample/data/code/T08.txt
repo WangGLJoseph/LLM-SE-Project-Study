@@ -1,157 +1,1727 @@
 RepoName: 23s2-cp-spa-team-08
-File: Team00/Code00/src/spa/src/sp/tnode/ProcedureNode.h
-Generator: copilot
-Intervention: 3
-Language: e
-Prompt: 
-ChatId: 
-Code:
-ProcedureNode() : TNode(TNodeType::PROCEDURE) {};
-    void setProcedureName(string procedureName) {
-        this->procedureName = procedureName;
-    }
-    void setStatementList(StatementListNode* statementListNode) {
-        statementList = statementListNode;
-    }
-    void setStartLine(int startLine) {
-        this->startLine = startLine;
-    }
-    void setEndLine(int endLine) {
-        this->endLine = endLine;
-    }
-    string getProcedureName() {
-        return procedureName;
-    }
-    StatementListNode* getStatementList() {
-        return statementList;
-    }
-    int getStartLine() {
-        return startLine;
-    }
-    int getEndLine() {
-        return endLine;
-    }
---------------------
-RepoName: 23s2-cp-spa-team-08
-File: Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+File: Team08/Code08/src/spa/src/QPS/evaluator/ResultTable.cpp
 Generator: copilot
 Intervention: 0
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
-while (source[stringIndex] == ' ' || source[stringIndex] == '\t' || source[stringIndex] == '\n') {
-            if (source[stringIndex] == '\n') {
-                line++;
-            }
-            stringIndex++;
+std::vector<std::string> mergeListsWithOrder(const std::vector<std::string>& a1, const std::vector<std::string>& a2) {
+    // Combine both vectors into a single vector
+    std::vector<std::string> combined_list = a1;
+    combined_list.insert(combined_list.end(), a2.begin(), a2.end());
+
+    // Use unordered_set to ensure uniqueness while preserving order
+    std::unordered_set<std::string> unique_set;
+    std::vector<std::string> unique_list;
+    for (const std::string& str : combined_list) {
+        if (unique_set.find(str) == unique_set.end()) {
+            unique_set.insert(str);
+            unique_list.push_back(str);
         }
+    }
+
+    return unique_list;
+}
 --------------------
 RepoName: 23s2-cp-spa-team-08
-File: Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+File: Team08/Code08/src/spa/src/QPS/parser/PatternType/ExpressionValidator.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+bool ExpressionValidator::isLetter(char ch) {
+    return (ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z');
+}
+
+// Helper function to check if a character is a valid digit
+bool ExpressionValidator::isDigit(char ch) {
+    return ch >= '0' && ch <= '9';
+}
+
+// Helper function to check if a character is a non-zero digit
+bool ExpressionValidator::isNonZeroDigit(char ch) {
+    return ch >= '1' && ch <= '9';
+}
+
+// Helper function to check if a character is a whitespace character
+bool ExpressionValidator::isWhitespace(char ch) {
+    return std::isspace(ch);
+}
+
+// Recursive descent parsing functions for each non-terminal
+bool ExpressionValidator::parseExpr() {
+    return parseTerm() && parseExprTail();
+}
+
+bool ExpressionValidator::parseExprTail() {
+    if (index < input.length() && (input[index] == '+' || input[index] == '-')) {
+        index++;
+        return parseTerm() && parseExprTail();
+    }
+    return true;  // Epsilon production (empty)
+}
+
+bool ExpressionValidator::parseTerm() {
+    return parseFactor() && parseTermTail();
+}
+
+bool ExpressionValidator::parseTermTail() {
+    if (index < input.length() && (input[index] == '*' || input[index] == '/' || input[index] == '%')) {
+        index++;
+        return parseFactor() && parseTermTail();
+    }
+    return true;  // Epsilon production (empty)
+}
+
+bool ExpressionValidator::parseFactor() {
+    if (index < input.length() && input[index] == '(') {
+        index++;
+        bool result = parseExpr();
+        if (index < input.length() && input[index] == ')') {
+            index++;
+            return result;
+        }
+        return false;
+    } else {
+        return parseVarName() || parseConstValue();
+    }
+}
+
+bool ExpressionValidator::parseVarName() {
+    return parseName();
+}
+
+bool ExpressionValidator::parseConstValue() {
+    return parseInteger();
+}
+
+bool ExpressionValidator::parseName() {
+    if (index < input.length() && isLetter(input[index])) {
+        index++;
+        while (index < input.length() && (isLetter(input[index]) || isDigit(input[index]))) {
+            index++;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool ExpressionValidator::parseInteger() {
+    if (index < input.length() && (input[index] == '0' || (isNonZeroDigit(input[index]) && parseDigits()))) {
+        return true;
+    }
+    return false;
+}
+
+bool ExpressionValidator::parseDigits() {
+    while (index < input.length() && isDigit(input[index])) {
+        index++;
+    }
+    return true;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/QPS/parser/PatternType/ExpressionValidator.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ExpressionValidator {
+public:
+    explicit ExpressionValidator(const std::string& expression) {
+        index = 0;
+        input = expression;
+    }
+    bool isValidateExpression() {
+        return this->parseExpr();
+    }
+private:
+    size_t index;
+    std::string input;
+    bool isLetter(char ch);
+
+    // Helper function to check if a character is a valid digit
+    bool isDigit(char ch);
+
+    // Helper function to check if a character is a non-zero digit
+    bool isNonZeroDigit(char ch);
+
+    // Helper function to check if a character is a whitespace character
+    bool isWhitespace(char ch);
+
+    // Recursive descent parsing functions for each non-terminal
+    bool parseExpr();
+
+    bool parseExprTail();
+
+    bool parseTerm();
+
+    bool parseTermTail();
+
+    bool parseFactor();
+
+    bool parseVarName();
+
+    bool parseConstValue();
+
+    bool parseName();
+
+    bool parseInteger();
+
+    bool parseDigits();
+};
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+if (source[stringIndex + 1] == '=') {
+                    stringIndex += 2;
+                    return {TokenType::EQUALEQUAL, "==", line};
+                } else {
+                    stringIndex++;
+                    return {TokenType::EQUAL, "=", line};
+                }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp
 Generator: copilot
 Intervention: 2
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
-if (isalpha(source[stringIndex])) {
-            string value;
-            while (isalnum(source[stringIndex]) && stringIndex < source.size()) {
-                value += source[stringIndex];
-                stringIndex++;
-            }
-            if (value == "procedure") {
-                return {Token::TokenType::PROCEDURE, value, line};
-            } else if (value == "read") {
-                return {Token::TokenType::READ, value, line};
-            } else if (value == "print") {
-                return {Token::TokenType::PRINT, value, line};
-            } else if (value == "call") {
-                return {Token::TokenType::CALL, value, line};
-            } else if (value == "while") {
-                return {Token::TokenType::WHILE, value, line};
-            } else if (value == "if") {
-                return {Token::TokenType::IF, value, line};
-            } else if (value == "then") {
-                return {Token::TokenType::THEN, value, line};
-            } else if (value == "else") {
-                return {Token::TokenType::ELSE, value, line};
-            } else {
-                return {Token::TokenType::IDENTIFIER, value, line};
-            }
-        }
+if (source[stringIndex + 1] == '=') {
+                    stringIndex += 2;
+                    return {TokenType::NOTEQUAL, "!=", line};
+                } else {
+                    stringIndex++;
+                    return {TokenType::NOT, "!", line};
+                }
 --------------------
 RepoName: 23s2-cp-spa-team-08
-File: Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+File: Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp
 Generator: copilot
-Intervention: 3
+Intervention: 0
 Language: e
-Prompt: 
+Prompt: used copilot
+ChatId: 
+Code:
+if (source[stringIndex + 1] == '&') {
+                    stringIndex += 2;
+                    return {TokenType::AND, "&&", line};
+                } else {
+                    throw std::invalid_argument("Invalid token & on line " + std::to_string(line));
+                }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+if (source[stringIndex + 1] == '|') {
+                    stringIndex += 2;
+                    return {TokenType::OR, "||", line};
+                } else {
+                    throw std::invalid_argument("Invalid token | on line " + std::to_string(line));
+                }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+if (source[stringIndex + 1] == '=') {
+                    stringIndex += 2;
+                    return {TokenType::GREATEREQUAL, ">=", line};
+                } else {
+                    stringIndex++;
+                    return {TokenType::GREATER, ">", line};
+                }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+if (source[stringIndex + 1] == '=') {
+                    stringIndex += 2;
+                    return {TokenType::LESSTHANEQUAL, "<=", line};
+                } else {
+                    stringIndex++;
+                    return {TokenType::LESSTHAN, "<", line};
+                }
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
 ChatId: 
 Code:
 if (isdigit(source[stringIndex])) {
-            string value;
-            while (isdigit(source[stringIndex]) && stringIndex < source.size()) {
-                value += source[stringIndex];
+            std::string number;
+            while (isdigit(source[stringIndex])) {
+                number += source[stringIndex];
                 stringIndex++;
             }
-            //if next character is letter, it is an invalid token
             if (isalpha(source[stringIndex])) {
-                while (isalnum(source[stringIndex]) && stringIndex < source.size()) {
-                    value += source[stringIndex];
+                while (isalpha(source[stringIndex]) || isdigit(source[stringIndex])) {
+                    number += source[stringIndex];
                     stringIndex++;
                 }
-                return {Token::TokenType::INVALID, value, line};
+                throw std::invalid_argument("Invalid number " + number + " on line " + std::to_string(line));
             }
-            return {Token::TokenType::NUMBER, value, line};
+            return {TokenType::NUMBER, number, line};
+        } else if (isalpha(c)) {
+            std::string identifier;
+            while (isalpha(source[stringIndex]) || isdigit(source[stringIndex])) {
+                identifier += source[stringIndex];
+                stringIndex++;
+            }
+
+            if (identifier == "procedure") {
+                return {TokenType::PROCEDURE, "procedure", line};
+            } else if (identifier == "read") {
+                return {TokenType::READ, "read", line};
+            } else if (identifier == "print") {
+                return {TokenType::PRINT, "print", line};
+            } else if (identifier == "call") {
+                return {TokenType::CALL, "call", line};
+            } else if (identifier == "while") {
+                return {TokenType::WHILE, "while", line};
+            } else if (identifier == "if") {
+                return {TokenType::IF, "if", line};
+            } else if (identifier == "then") {
+                return {TokenType::THEN, "then", line};
+            } else if (identifier == "else") {
+                return {TokenType::ELSE, "else", line};
+            } else {
+                return {TokenType::IDENTIFIER, identifier, line};
+            }
+        } else {
+            throw std::invalid_argument("Invalid token " + std::string(1, c) + " on line " + std::to_string(line));
         }
 --------------------
 RepoName: 23s2-cp-spa-team-08
-File: Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+File: Team08/Code08/src/spa/src/sp/parser/Parser.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/c26e2cf6-5e67-43eb-85aa-64ef5d97c328
+ChatId: c26e2cf6-5e67-43eb-85aa-64ef5d97c328
+Code:
+std::vector<TNode*> Parser::shuntingYard(std::vector<TNode*> tnodes) {
+            std::vector<TNode*> outputQueue;
+            std::stack<TNode*> operatorStack;
+            int unpairedBrackets = 0;
+            for (TNode* token : tnodes) {
+                if (token->getType() == TNodeType::OPEN_PARENTHESES) {
+                unpairedBrackets++;
+                } else if (token->getType() == TNodeType::CLOSE_PARENTHESES) {
+                unpairedBrackets--;
+            } }
+            if(unpairedBrackets != 0) {
+                throw std::invalid_argument("syntax error: invalid condition expression");
+            }
+            for (TNode* token : tnodes) {
+                if (token->getType() == TNodeType::CONSTANT || token->getType() == TNodeType::VARIABLE) {
+                    outputQueue.push_back(token);
+                } else if (token->getType() == TNodeType::NOT) {
+                    //skipping NOT for milestone 1
+                    //operatorStack.push(token);
+                    continue;
+                } else if (ParserHelper::isOperator(token)) {
+                    while (!operatorStack.empty() && precedence(operatorStack.top()) >= precedence(token)) {
+                        outputQueue.push_back(operatorStack.top());
+                        operatorStack.pop();
+                    }
+                    operatorStack.push(token);
+                } else if (token->getType() == TNodeType::OPEN_PARENTHESES) {
+                    operatorStack.push(token);
+                    unpairedBrackets++;
+                } else if (token->getType() == TNodeType::CLOSE_PARENTHESES) {
+                    unpairedBrackets--;
+                    while (!operatorStack.empty() && operatorStack.top()->getType() != TNodeType::OPEN_PARENTHESES) {
+                        outputQueue.push_back(operatorStack.top());
+                        operatorStack.pop();
+                    }
+                    operatorStack.pop();
+                }
+            }
+            while (!operatorStack.empty()) {
+                outputQueue.push_back(operatorStack.top());
+                operatorStack.pop();
+            }
+            if(unpairedBrackets != 0) {
+                throw std::invalid_argument("syntax error: invalid condition expression");
+            }
+            return outputQueue;
+    }
+
+    ExpressionNode* Parser::parseExpression(vector<Token> &tokens, int startIdx, int endIdx, int *stmtNum) {
+        std::vector<TNode*> tempVector;
+        parseTokens(tokens, startIdx, endIdx, stmtNum, tempVector);
+        ExpressionNode* expressionNode = new ExpressionNode();
+        expressionNode->setExpression(shuntingYard(tempVector));
+        return expressionNode;
+    }
+
+    ConditionNode *Parser::parseCondition(vector<Token> &tokens, int startIdx, int endIdx, int *stmtNum) {
+        std::vector<TNode*> tempVector;
+        parseTokens(tokens, startIdx, endIdx, stmtNum, tempVector);
+        ConditionNode* conditionNode = new ConditionNode();
+        conditionNode->setCondition(shuntingYard(tempVector));
+        return conditionNode;
+    }
+    void Parser::parseTokens(std::vector<Token>& tokens, int startIdx, int endIdx, int* stmtNum, std::vector<TNode*>& tempVector) {
+        for (int i = startIdx; i <= endIdx; i++) {
+            if (ParserHelper::isPotentialIdentifier(tokens[i].getType())) {
+                tempVector.push_back(new VariableNode(*stmtNum, tokens[i].getValue()));
+                continue;
+            }
+            switch (tokens[i].getType()) {
+                case TokenType::NUMBER:
+                    tempVector.push_back(new ConstNode(*stmtNum, std::stoi(tokens[i].getValue())));
+                    break;
+                case TokenType::IDENTIFIER:
+                    tempVector.push_back(new VariableNode(*stmtNum, tokens[i].getValue()));
+                    break;
+                case TokenType::READ:
+                    tempVector.push_back(new VariableNode(*stmtNum, "read"));
+                    break;
+                case TokenType::CALL:
+                    tempVector.push_back(new VariableNode(*stmtNum, "call"));
+                    break;
+                case TokenType::PRINT:
+                    tempVector.push_back(new VariableNode(*stmtNum, "print"));
+                    break;
+                case TokenType::WHILE:
+                    tempVector.push_back(new VariableNode(*stmtNum, "while"));
+                    break;
+                case TokenType::IF:
+                    tempVector.push_back(new VariableNode(*stmtNum, "if"));
+                    break;
+                case TokenType::THEN:
+                    tempVector.push_back(new VariableNode(*stmtNum, "then"));
+                    break;
+                case TokenType::PROCEDURE:
+                    tempVector.push_back(new VariableNode(*stmtNum, "procedure"));
+                    break;
+                case TokenType::ELSE:
+                    tempVector.push_back(new VariableNode(*stmtNum, "else"));
+                    break;
+                case TokenType::PLUS:
+                case TokenType::MINUS:
+                case TokenType::MULTIPLY:
+                case TokenType::DIVIDE:
+                case TokenType::MODULO:
+                case TokenType::OPEN_PARENTHESES:
+                case TokenType::CLOSE_PARENTHESES:
+                case TokenType::AND:
+                case TokenType::OR:
+                case TokenType::GREATEREQUAL:
+                case TokenType::GREATER:
+                case TokenType::LESSTHANEQUAL:
+                case TokenType::LESSTHAN:
+                case TokenType::EQUALEQUAL:
+                case TokenType::NOTEQUAL:
+                case TokenType::NOT:
+                    tempVector.push_back(new TNode(tokenTypeToNodeType(tokens[i].getType())));
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid token type");
+            }
+        }
+    }
+
+    TNodeType Parser::tokenTypeToNodeType(TokenType type) {
+        switch (type) {
+            case TokenType::PLUS:
+                return TNodeType::PLUS;
+            case TokenType::MINUS:
+                return TNodeType::MINUS;
+            case TokenType::MULTIPLY:
+                return TNodeType::MULTIPLY;
+            case TokenType::DIVIDE:
+                return TNodeType::DIVIDE;
+            case TokenType::MODULO:
+                return TNodeType::MODULO;
+            case TokenType::OPEN_PARENTHESES:
+                return TNodeType::OPEN_PARENTHESES;
+            case TokenType::CLOSE_PARENTHESES:
+                return TNodeType::CLOSE_PARENTHESES;
+            case TokenType::AND:
+                return TNodeType::AND;
+            case TokenType::OR:
+                return TNodeType::OR;
+            case TokenType::GREATEREQUAL:
+                return TNodeType::GREATEREQUAL;
+            case TokenType::GREATER:
+                return TNodeType::GREATER;
+            case TokenType::LESSTHANEQUAL:
+                return TNodeType::LESSTHANEQUAL;
+            case TokenType::LESSTHAN:
+                return TNodeType::LESSTHAN;
+            case TokenType::EQUALEQUAL:
+                return TNodeType::EQUALEQUAL;
+            case TokenType::NOTEQUAL:
+                return TNodeType::NOTEQUAL;
+            case TokenType::NOT:
+                return TNodeType::NOT;
+            default:
+                throw std::invalid_argument("Invalid token type");
+        }
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/PkbResult.cpp
 Generator: copilot
 Intervention: 1
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
-switch (c) {
-            case ';':
-                return {Token::TokenType::SEMICOLON, ";", line};
-            case '(':
-                return {Token::TokenType::OPEN_BRACKET, "(", line};
-            case ')':
-                return {Token::TokenType::CLOSE_BRACKET, ")", line};
-            case '{':
-                return {Token::TokenType::OPEN_BRACE, "{", line};
-            case '}':
-                return {Token::TokenType::CLOSE_BRACE, "}", line};
-            case '+':
-                return {Token::TokenType::PLUS, "+", line};
-            case '-':
-                return {Token::TokenType::MINUS, "-", line};
-            case '*':
-                return {Token::TokenType::MULTIPLY, "*", line};
-            case '/':
-                return {Token::TokenType::DIVIDE, "/", line};
-            case '%':
-                return {Token::TokenType::MODULO, "%", line};
-            case '=':
-                return {Token::TokenType::EQUAL, "=", line};
-            case '>':
-                return {Token::TokenType::GREATER, ">", line};
-            case '<':
-                return {Token::TokenType::LESSTHAN, "<", line};
-            default:
-                return {Token::TokenType::INVALID, string(1, source[stringIndex]), line};
+PkbResult::PkbResult() = default;
+
+PkbResult::PkbResult(bool boolPkbResult) : boolPkbResult(boolPkbResult) {
+}
+
+PkbResult::PkbResult(INT_TYPE intPkbResult) : intPkbResult(intPkbResult) {
+}
+
+PkbResult::PkbResult(STRING_TYPE stringPkbResult) : stringPkbResult(stringPkbResult) {
+}
+
+PkbResult::PkbResult(INT_LIST_TYPE intListPkbResult) : intListPkbResult(intListPkbResult) {
+}
+
+PkbResult::PkbResult(STRING_LIST_TYPE stringListPkbResult) : stringListPkbResult(stringListPkbResult) {
+}
+
+PkbResult::PkbResult(INT_PAIR_TYPE intPairPkbResult) : intPairPkbResult(intPairPkbResult) {
+}
+
+PkbResult::PkbResult(ENTITY_TYPE entityPkbResult) : entityPkbResult(entityPkbResult) {
+}
+
+PkbResult::PkbResult(ENTITY_LIST_TYPE entityListPkbResult) : entityListPkbResult(entityListPkbResult) {
+}
+
+PkbResult::PkbResult(RANGE_LIST_TYPE rangePkbResult) : rangePkbResult(rangePkbResult) {
+}
+
+PkbResult::PkbResult(ASSIGN_TYPE assignPkbResult) : assignPkbResult(assignPkbResult) {
+}
+
+PkbResult::PkbResult(INT_STRING_TUPLE intStringTuplePkbResult) : intStringTuplePkbResult(intStringTuplePkbResult) {
+}
+
+PkbResult::PkbResult(INT_INT_TUPLE intIntTuplePkbResult) : intIntTuplePkbResult(intIntTuplePkbResult) {
+}
+
+PkbResult::PkbResult(INT_STRING_TUPLE_LIST intStringTupleListPkbResult) : intStringTupleListPkbResult(intStringTupleListPkbResult) {
+}
+
+PkbResult::PkbResult(INT_INT_TUPLE_LIST intIntTupleListPkbResult) : intIntTupleListPkbResult(intIntTupleListPkbResult) {
+}
+
+bool PkbResult::operator==(const PkbResult& result) const {
+    return boolPkbResult == result.boolPkbResult
+           && intPkbResult == result.intPkbResult
+           && stringPkbResult == result.stringPkbResult
+           && intListPkbResult == result.intListPkbResult
+           && stringListPkbResult == result.stringListPkbResult
+           && intPairPkbResult == result.intPairPkbResult
+           && entityPkbResult == result.entityPkbResult
+           && entityListPkbResult == result.entityListPkbResult
+           && rangePkbResult == result.rangePkbResult
+           && assignPkbResult == result.assignPkbResult
+           && intStringTuplePkbResult == result.intStringTuplePkbResult
+           && intIntTuplePkbResult == result.intIntTuplePkbResult
+           && intStringTupleListPkbResult == result.intStringTupleListPkbResult
+           && intIntTupleListPkbResult == result.intIntTupleListPkbResult;
+}
+
+bool PkbResult::getboolPkbResult() {
+    return boolPkbResult;
+}
+
+INT_TYPE PkbResult::getintPkbResult() {
+    return intPkbResult;
+}
+
+STRING_TYPE PkbResult::getStringPkbResult() {
+    return stringPkbResult;
+}
+
+INT_LIST_TYPE PkbResult::getIntListPkbResult() {
+    return intListPkbResult;
+}
+
+STRING_LIST_TYPE PkbResult::getStringListPkbResult() {
+    return stringListPkbResult;
+}
+
+INT_PAIR_TYPE PkbResult::getIntPairPkbResult() {
+    return intPairPkbResult;
+}
+
+ENTITY_TYPE PkbResult::getEntityPkbResult() {
+    return entityPkbResult;
+}
+
+ENTITY_LIST_TYPE PkbResult::getEntityListPkbResult() {
+    return entityListPkbResult;
+}
+
+RANGE_LIST_TYPE PkbResult::getRangePkbResult() {
+    return rangePkbResult;
+}
+
+ASSIGN_TYPE PkbResult::getAssignPkbResult() {
+    return assignPkbResult;
+}
+
+INT_STRING_TUPLE PkbResult::getIntStringTuplePkbResult() {
+    return intStringTuplePkbResult;
+}
+
+INT_INT_TUPLE PkbResult::getIntIntTuplePkbResult() {
+    return intIntTuplePkbResult;
+}
+
+INT_STRING_TUPLE_LIST PkbResult::getIntStringTupleListPkbResult() {
+    return intStringTupleListPkbResult;
+}
+
+INT_INT_TUPLE_LIST PkbResult::getIntIntTupleListPkbResult() {
+    return intIntTupleListPkbResult;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/utils/RelationshipUtils.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+IntIntRelationshipStorage* relationship_utils::getStarRelationship(std::unordered_map<INT_TYPE, std::unordered_set<INT_TYPE, IntHash>> storage, RELATIONSHIP_TYPE relationshipType) {
+    IntIntRelationshipStorage* starStorage;
+
+    if (relationshipType == RELATIONSHIP_FOLLOWS_STAR) {
+        starStorage = new relationship_manager::FollowsStorage(relationshipType);
+        for (auto& it : storage) {
+            INT_TYPE key = it.first;
+            INT_TYPE value = *it.second.begin();
+            starStorage->add(key, value);
+            while (storage.find(value) != storage.end()) {
+                auto itr = storage.find(value);
+                value = *itr->second.begin();
+                starStorage->add(key, value);
+            }
         }
+    } else if (relationshipType == RELATIONSHIP_PARENTS_STAR) {
+        starStorage = new relationship_manager::ParentStorage(relationshipType);
+        std::unordered_map<INT_TYPE, INT_TYPE>* intermediateStorage = new std::unordered_map<INT_TYPE, INT_TYPE>;
+        for (auto& it : storage) {
+            INT_TYPE key = it.first;
+            INT_LIST_TYPE values = it.second;
+            for (INT_TYPE value : values) {
+                (*intermediateStorage)[value] = key;
+            }
+        }
+        for (auto& it : *intermediateStorage) {
+            INT_TYPE key = it.first;
+            INT_TYPE value = it.second;
+            starStorage->add(value, key);
+            while (intermediateStorage->find(value) != intermediateStorage->end()) {
+                auto itr = intermediateStorage->find(value);
+                value = itr->second;
+                starStorage->add(value, key);
+            }
+        }
+    }
+    return starStorage;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/EntityManager.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+//Add entry to statement storage
+void entity_manager::EntityManager::add(const ENTITY_TYPE& entityType, const STATEMENT_NO& statementNo, const ENTITY_TYPE& statementType) {
+    bool isValidEntity = entityType == ENTITY_STMT;
+    bool isValidStatement = isStatementValid(statementNo);
+    bool isValidStatementType = isEntityValid(statementType);
+    if (isValidEntity && isValidStatement && isValidStatementType) {
+        IntEntityEntityStorage* storage = getIntEntityEntityStorage(entityType);
+        storage->add(statementNo, statementType);
+    }
+}
+
+//Add entry to constant or while storage
+void entity_manager::EntityManager::add(const ENTITY_TYPE& entityType, const INT_TYPE& integerKey, const STATEMENT_NO& statementNo) {
+    bool isValidConstantEntity = entityType == ENTITY_CONSTANT;
+    bool isValidConstantStatement = isStatementValid(statementNo);
+    bool isValidConstant = isValidConstantEntity && isValidConstantStatement;
+
+    bool isValidWhileEntity = entityType == ENTITY_WHILE;
+    bool isValidWhileStatement = isStatementValid(integerKey);
+    bool isValidWhileRange = isRangeValid(integerKey, statementNo, entityType);
+    bool isValidWhile = isValidWhileEntity && isValidWhileStatement && isValidWhileRange;
+
+    if (isValidConstant || isValidWhile) {
+        IntIntEntityStorage* storage = getIntIntEntityStorage(entityType);
+        storage->add(integerKey, statementNo);
+    }
+}
+
+//Add entry to if storage
+void entity_manager::EntityManager::add(const ENTITY_TYPE& entityType, const STATEMENT_NO& statementNo, const RANGE_TYPE& range) {
+    bool isValidIfEntity = entityType == ENTITY_IF;
+    bool isValidStatement = isStatementValid(statementNo);
+    bool isValidStart = isStatementValid(range.first);
+    bool isValidIfElse = isIfElseValid(statementNo, range.first);
+    bool isValidRange = isRangeValid(range.first, range.second, entityType);
+
+    if (isValidIfEntity && isValidStatement && isValidStart && isValidIfElse && isValidRange) {
+        IntIntPairEntityStorage* storage = getIntIntPairEntityStorage(entityType);
+        storage->add(statementNo, range);
+    }
+}
+
+//Add entry to print, read, or call storage
+void entity_manager::EntityManager::add(const ENTITY_TYPE& entityType, const STATEMENT_NO& statementNo, const STRING_TYPE& string) {
+    bool isValidEntity = entityType == ENTITY_PRINT || entityType == ENTITY_READ || entityType == ENTITY_CALL;
+    bool isValidStatement = isStatementValid(statementNo);
+    bool isValidString = isStringValid(string);
+
+    if (isValidEntity && isValidStatement && isValidString) {
+        IntStringEntityStorage* storage = getIntStringEntityStorage(entityType);
+        storage->add(statementNo, string);
+    }
+}
+
+//Add entry to variable storage
+void entity_manager::EntityManager::add(const ENTITY_TYPE& entityType, const VAR_TYPE& variable, const STATEMENT_NO& statementNo) {
+    bool isValidVariableEntity = entityType == ENTITY_VARIABLE;
+    bool isValidVariable = isStringValid(variable);
+    bool isValidStatement = isStatementValid(statementNo);
+
+    if (isValidVariableEntity && isValidVariable && isValidStatement) {
+        StringIntEntityStorage* storage = getStringIntEntityStorage(entityType);
+        storage->add(variable, statementNo);
+    }
+}
+
+//Add entry to procedure storage
+void entity_manager::EntityManager::add(const ENTITY_TYPE& entityType, const PROC_TYPE& procedure, const RANGE_TYPE& range) {
+    bool isValidProcedureEntity = entityType == ENTITY_PROCEDURE;
+    bool isValidProcedure = isStringValid(procedure);
+    bool isValidStart = isStatementValid(range.first);
+    bool isValidRange = isRangeValid(range.first, range.second, entityType);
+
+    if (isValidProcedureEntity && isValidProcedure && isValidStart && isValidRange) {
+        StringIntPairEntityStorage* storage = getStringIntPairEntityStorage(entityType);
+        storage->add(procedure, range);
+    }
+}
+
+//Add entry to assignment storage
+void entity_manager::EntityManager::add(const ENTITY_TYPE& entityType, const STATEMENT_NO& statementNo, const ASSIGN_TYPE& assignment) {
+    bool isValidAssignEntity = entityType == ENTITY_ASSIGN;
+    bool isValidStatement = isStatementValid(statementNo);
+    bool isValidLHS = isStringValid(assignment.first);
+    bool isValidRHS = isStringValid(assignment.second);
+
+    if (isValidAssignEntity && isValidStatement && isValidLHS && isValidRHS) {
+        IntStringPairEntityStorage* storage = getIntStringPairEntityStorage(entityType);
+        storage->add(statementNo, assignment);
+    }
+}
+
+//Query procedure or variable
+PkbResult entity_manager::EntityManager::query(const ENTITY_TYPE& entityType, const STRING_TYPE& string) {
+    bool isValidProcedureEntity = entityType == ENTITY_PROCEDURE;
+    bool isValidVariableEntity = entityType == ENTITY_VARIABLE;
+    bool isValidString = isStringValid(string);
+    if (isValidProcedureEntity && isValidString) {
+        StringIntPairEntityStorage* storage = getStringIntPairEntityStorage(entityType);
+        RANGE_TYPE range = storage->getVal(string);
+        return PkbResult(range);
+    } else if (isValidVariableEntity && isValidString) {
+        StringIntEntityStorage* storage = getStringIntEntityStorage(entityType);
+        INT_LIST_TYPE statementNos = storage->getValues(string);
+        return PkbResult(statementNos);
+    }
+    return PkbResult();
+}
+
+PkbResult entity_manager::EntityManager::query(const ENTITY_TYPE& entityType, const INT_TYPE& statementNo) {
+    bool isValidStatement = isStatementValid(statementNo);
+
+    if (!isValidStatement) {
+        return PkbResult();
+    } else if (entityType == ENTITY_STMT) {
+        IntEntityEntityStorage* storage = getIntEntityEntityStorage(entityType);
+        ENTITY_LIST_TYPE entities = storage->getValues(statementNo);
+        return PkbResult(entities);
+    } else if (entityType == ENTITY_WHILE) {
+        IntIntEntityStorage* storage = getIntIntEntityStorage(entityType);
+        INT_TYPE value = storage->getVal(statementNo);
+        return value != DEFAULT_INTEGER ? PkbResult(value) : PkbResult();
+    } else if (entityType == ENTITY_IF) {
+        IntIntPairEntityStorage* storage = getIntIntPairEntityStorage(entityType);
+        RANGE_TYPE range = storage->getVal(statementNo);
+        return range != DEFAULT_INT_PAIR ? PkbResult(range) : PkbResult();
+    } else if (entityType == ENTITY_ASSIGN) {
+        IntStringPairEntityStorage* storage = getIntStringPairEntityStorage(entityType);
+        ASSIGN_TYPE assignment = storage->getVal(statementNo);
+        return PkbResult(assignment);
+    } else if (entityType == ENTITY_PROCEDURE) {
+        StringIntPairEntityStorage* storage = getStringIntPairEntityStorage(entityType);
+        PROC_TYPE procedureName = storage->getProcedureName(statementNo);
+        return PkbResult(procedureName);
+    }
+    return PkbResult();
+}
+
+PkbResult entity_manager::EntityManager::query(const ENTITY_TYPE& entityType, const STATEMENT_NO& parent, const STATEMENT_NO& begin, const STATEMENT_NO& end) {
+    if (entityType == ENTITY_IF) {
+        IntIntPairEntityStorage* storage = getIntIntPairEntityStorage(entityType);
+        bool hasMatchingBranch = storage->hasMatchingBranch(parent, begin, end);
+        return PkbResult(hasMatchingBranch);
+    }
+    return PkbResult(0);
+}
+
+
+//Query SELECT clause
+PkbResult entity_manager::EntityManager::query(const ENTITY_TYPE& entityType) {
+    if (entityType == ENTITY_VARIABLE) {
+        StringIntEntityStorage* storage = getStringIntEntityStorage(entityType);
+        STRING_LIST_TYPE variables = storage->getAllKeys();
+        return PkbResult(variables);
+    } else if (entityType == ENTITY_WHILE || entityType == ENTITY_CONSTANT) {
+        IntIntEntityStorage* storage = getIntIntEntityStorage(entityType);
+        INT_LIST_TYPE keys = storage->getAllKeys();
+        return PkbResult(keys);
+    } else if (entityType == ENTITY_CALL || entityType == ENTITY_PRINT || entityType == ENTITY_READ) {
+        IntStringEntityStorage* storage = getIntStringEntityStorage(entityType);
+        INT_LIST_TYPE statementNos = storage->getAllKeys();
+        return PkbResult(statementNos);
+    } else if (entityType == ENTITY_STMT) {
+        IntEntityEntityStorage* storage = getIntEntityEntityStorage(entityType);
+        INT_LIST_TYPE statementNos = storage->getAllKeys();
+        return PkbResult(statementNos);
+    } else if (entityType == ENTITY_IF) {
+        IntIntPairEntityStorage* storage = getIntIntPairEntityStorage(entityType);
+        INT_LIST_TYPE statementNos = storage->getAllKeys();
+        return PkbResult(statementNos);
+    } else if (entityType == ENTITY_PROCEDURE) {
+        StringIntPairEntityStorage* storage = getStringIntPairEntityStorage(entityType);
+        STRING_LIST_TYPE procedures = storage->getAllKeys();
+        return PkbResult(procedures);
+    } else if (entityType == ENTITY_ASSIGN) {
+        IntStringPairEntityStorage* storage = getIntStringPairEntityStorage(entityType);
+        INT_LIST_TYPE statementNos = storage->getAllKeys();
+        return PkbResult(statementNos);
+    }
+    return PkbResult();
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntIntPairEntityStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace entity_manager {
+    class IntIntPairEntityStorage : public EntityStorage<INT_TYPE, RANGE_TYPE, SimpleHash, IntHash> {
+    protected:
+        explicit IntIntPairEntityStorage(const ENTITY_TYPE&);
+        void preprocessKeys() override;
+
+    public:
+        void add(const INT_TYPE&, const RANGE_TYPE&) override;
+        [[nodiscard]] RANGE_TYPE getVal(const INT_TYPE&) const;
+        [[nodiscard]] INT_LIST_TYPE getAllKeys() const override;
+        bool hasMatchingBranch(const STATEMENT_NO&, const STATEMENT_NO&, const STATEMENT_NO&) const;
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntStringEntityStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void entity_manager::IntStringEntityStorage::add(
+    const INT_TYPE& intType, const STRING_TYPE& stringType) {
+    storage.insert({intType, {stringType}});
+}
+
+STRING_TYPE entity_manager::IntStringEntityStorage::getVal(const INT_TYPE& integer) const {
+    const auto& it = storage.find(integer);
+    if (it != storage.end()) {
+        return *it->second.begin();
+    }
+    return DEFAULT_STRING;
+}
+
+INT_LIST_TYPE entity_manager::IntStringEntityStorage::getAllKeys() const {
+    const_cast<IntStringEntityStorage*>(this)->preprocessKeys();
+    return keys;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntIntEntityStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace entity_manager {
+    class IntIntEntityStorage : public EntityStorage<INT_TYPE, INT_TYPE, IntHash, IntHash> {
+    protected:
+        explicit IntIntEntityStorage(const ENTITY_TYPE&);
+        void preprocessKeys() override;
+
+    public:
+        void add(const INT_TYPE&, const INT_TYPE&) override;
+        INT_TYPE getVal(const INT_TYPE&) const;
+        [[nodiscard]] INT_LIST_TYPE getValues(const INT_TYPE&) const;
+        [[nodiscard]] INT_LIST_TYPE getAllKeys() const override;
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntIntPairEntityStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void entity_manager::IntIntPairEntityStorage::add(
+    const INT_TYPE& key, const RANGE_TYPE& value) {
+    const auto& it = storage.find(key);
+    RANGE_LIST_TYPE rangeList;
+    if (it != storage.end()) {
+        rangeList = it->second;
+        storage.erase(key);
+    }
+    rangeList.insert(value);
+    storage.insert(std::make_pair(key, rangeList));
+}
+
+RANGE_TYPE entity_manager::IntIntPairEntityStorage::getVal(const INT_TYPE& integer) const {
+    const auto& it = storage.find(integer);
+    if (it != storage.end()) {
+        return *it->second.begin();
+    }
+    return DEFAULT_INT_PAIR;
+}
+
+INT_LIST_TYPE entity_manager::IntIntPairEntityStorage::getAllKeys() const {
+    const_cast<IntIntPairEntityStorage*>(this)->preprocessKeys();
+    return keys;
+}
+
+bool entity_manager::IntIntPairEntityStorage::hasMatchingBranch(const STATEMENT_NO& parent, const STATEMENT_NO& begin, const STATEMENT_NO& end) const {
+    const auto& it = storage.find(parent);
+
+    if (it != storage.end()) {
+        RANGE_TYPE range = getVal(parent);
+        RANGE_TYPE elseRange = std::pair(range.first, range.second);
+        bool isInsideConditional = begin > parent && begin <= range.second && end > parent && end <= range.second;
+        bool isInsideSameBranch = (begin < range.first && end < range.first) || (begin >= range.first && end >= range.first);
+        return isInsideConditional && isInsideSameBranch;
+    }
+    return false;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/StringIntPairEntityStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace entity_manager {
+    class StringIntPairEntityStorage : public EntityStorage<PROC_TYPE, RANGE_TYPE, SimpleHash, StringHash> {
+    protected:
+        explicit StringIntPairEntityStorage(const ENTITY_TYPE&);
+        void preprocessKeys() override;
+
+    public:
+        void add(const PROC_TYPE&, const RANGE_TYPE&) override;
+        [[nodiscard]] RANGE_TYPE getVal(const STRING_TYPE&) const;
+        [[nodiscard]] STRING_LIST_TYPE getAllKeys() const override;
+        STRING_TYPE getProcedureName(const INT_TYPE&) const;
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntEntityEntityStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void entity_manager::IntEntityEntityStorage::add(const INT_TYPE& key, const ENTITY_TYPE& value) {
+    const auto& it = storage.find(key);
+    ENTITY_LIST_TYPE entityList;
+    if (it != storage.end()) {
+        entityList = it->second;
+        storage.erase(key);
+    }
+    entityList.insert(value);
+    storage.insert(std::pair(key, entityList));
+}
+
+ENTITY_LIST_TYPE entity_manager::IntEntityEntityStorage::getValues(const INT_TYPE& integer) const {
+    const auto& it = storage.find(integer);
+    if (it != storage.end()) {
+        return it->second;
+    }
+    return DEFAULT_ENTITY_LIST;
+}
+
+INT_LIST_TYPE entity_manager::IntEntityEntityStorage::getAllKeys() const {
+    const_cast<IntEntityEntityStorage*>(this)->preprocessKeys();
+    return keys;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntStringPairEntityStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace entity_manager {
+    class IntStringPairEntityStorage : public EntityStorage<INT_TYPE, ASSIGN_TYPE, StringPairHash, IntHash> {
+    protected:
+        explicit IntStringPairEntityStorage(const ENTITY_TYPE&);
+        void preprocessKeys() override;
+
+    public:
+        void add(const INT_TYPE&, const ASSIGN_TYPE&) override;
+        [[nodiscard]] ASSIGN_TYPE getVal(const INT_TYPE&) const;
+        [[nodiscard]] INT_LIST_TYPE getAllKeys() const override;
+        INT_STRING_TUPLE_LIST getPatternResult(const VAR_TYPE&, const MATCH_TYPE&, const STRING_TYPE&) const;
+        INT_STRING_TUPLE_LIST getPatternResult(const MATCH_TYPE&, const STRING_TYPE&) const;
+        INT_STRING_TUPLE_LIST getPatternResult(const STRING_TYPE&, const MATCH_TYPE&) const;
+        INT_STRING_TUPLE_LIST getAllAssignResult() const;
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntIntEntityStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void entity_manager::IntIntEntityStorage::add(const INT_TYPE& key, const INT_TYPE& value) {
+    const auto& it = storage.find(key);
+    STATEMENT_LIST_TYPE statementNumbers;
+    if (it != storage.end()) {
+        statementNumbers = it->second;
+        storage.erase(key);
+    }
+    statementNumbers.insert(value);
+    storage.insert(std::pair(key, statementNumbers));
+}
+
+INT_TYPE entity_manager::IntIntEntityStorage::getVal(const INT_TYPE& integer) const {
+    const auto& it = storage.find(integer);
+    if (it != storage.end()) {
+        return *it->second.begin();
+    }
+    return DEFAULT_INTEGER;
+}
+
+INT_LIST_TYPE entity_manager::IntIntEntityStorage::getValues(const INT_TYPE& integer) const {
+    const auto& it = storage.find(integer);
+    if (it != storage.end()) {
+        return it->second;
+    }
+    return DEFAULT_INT_LIST;
+}
+
+INT_LIST_TYPE entity_manager::IntIntEntityStorage::getAllKeys() const {
+    const_cast<IntIntEntityStorage*>(this)->preprocessKeys();
+    return keys;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/StringIntEntityStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace entity_manager {
+    class StringIntEntityStorage : public EntityStorage<STRING_TYPE, INT_TYPE, IntHash, StringHash> {
+    protected:
+        explicit StringIntEntityStorage(const ENTITY_TYPE&);
+        void preprocessKeys() override;
+
+    public:
+        void add(const STRING_TYPE&, const INT_TYPE&) override;
+        [[nodiscard]] INT_LIST_TYPE getValues(const STRING_TYPE&) const;
+        [[nodiscard]] STRING_LIST_TYPE getAllKeys() const override;
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntEntityEntityStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace entity_manager {
+    class IntEntityEntityStorage : public EntityStorage<INT_TYPE, ENTITY_TYPE, std::hash<ENTITY_TYPE>, IntHash> {
+    protected:
+        explicit IntEntityEntityStorage(const ENTITY_TYPE&);
+        void preprocessKeys() override;
+
+    public:
+        void add(const INT_TYPE&, const ENTITY_TYPE&) override;
+        ENTITY_LIST_TYPE getValues(const INT_TYPE&) const;
+        [[nodiscard]] INT_LIST_TYPE getAllKeys() const override;
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/StringIntPairEntityStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void entity_manager::StringIntPairEntityStorage::add(
+        const PROC_TYPE& key, const RANGE_TYPE& value) {
+    const auto& it = storage.find(key);
+    RANGE_LIST_TYPE rangeList;
+    if (it != storage.end()) {
+        rangeList = it->second;
+        storage.erase(key);
+    }
+    rangeList.insert(value);
+    storage.insert(std::make_pair(key, rangeList));
+}
+
+RANGE_TYPE entity_manager::StringIntPairEntityStorage::getVal(const STRING_TYPE& string) const {
+    const auto& it = storage.find(string);
+    if (it != storage.end()) {
+        return *it->second.begin();
+    }
+    return DEFAULT_INT_PAIR;
+}
+
+STRING_LIST_TYPE entity_manager::StringIntPairEntityStorage::getAllKeys() const {
+    const_cast<StringIntPairEntityStorage*>(this)->preprocessKeys();
+    return keys;
+}
+
+STRING_TYPE entity_manager::StringIntPairEntityStorage::getProcedureName(const INT_TYPE& statementNo) const {
+    PROC_TYPE procedureName = DEFAULT_STRING;
+    for (const auto& it : storage) {
+        RANGE_TYPE range = *it.second.begin();
+        if (statementNo >= range.first && statementNo <= range.second) {
+            procedureName = it.first;
+            break;
+        }
+    }
+    return procedureName;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntStringPairEntityStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void entity_manager::IntStringPairEntityStorage::add(
+        const INT_TYPE& key, const ASSIGN_TYPE & value) {
+    const auto& it = storage.find(key);
+    ASSIGN_LIST_TYPE assignList;
+    if (it != storage.end()) {
+        assignList = it->second;
+        storage.erase(key);
+    }
+    assignList.insert(value);
+    storage.insert(std::make_pair(key, assignList));
+}
+
+ASSIGN_TYPE entity_manager::IntStringPairEntityStorage::getVal(const INT_TYPE& integer) const {
+    const auto& it = storage.find(integer);
+    if (it != storage.end()) {
+        return *it->second.begin();
+    }
+    return DEFAULT_ASSIGN_PAIR;
+}
+
+INT_LIST_TYPE entity_manager::IntStringPairEntityStorage::getAllKeys() const {
+    const_cast<IntStringPairEntityStorage*>(this)->preprocessKeys();
+    return keys;
+}
+
+INT_STRING_TUPLE_LIST entity_manager::IntStringPairEntityStorage::getPatternResult(const VAR_TYPE& variable, const MATCH_TYPE& matchType, const STRING_TYPE& string) const {
+    INT_STRING_TUPLE_LIST results = DEFAULT_INT_STRING_TUPLE_LIST;
+    for (const auto& it : storage) {
+        const ASSIGN_TYPE assignPair = *it.second.begin();
+        bool isLHSMatch = assignPair.first == variable;
+
+        if (!isLHSMatch) {
+            continue;
+        }
+
+        if (matchType == EXACT_MATCH && string == assignPair.second) {
+            results.insert(std::make_tuple(it.first, assignPair.first));
+        } else if (matchType == PARTIAL_MATCH && assignPair.second.find(string) != std::string::npos) {
+            results.insert(std::make_tuple(it.first, assignPair.first));
+        }
+    }
+    return results;
+}
+
+INT_STRING_TUPLE_LIST entity_manager::IntStringPairEntityStorage::getPatternResult(const MATCH_TYPE& matchType, const STRING_TYPE& string) const {
+    INT_STRING_TUPLE_LIST results = DEFAULT_INT_STRING_TUPLE_LIST;
+    for (const auto& it : storage) {
+        const ASSIGN_TYPE assignPair = *it.second.begin();
+
+        if (matchType == EXACT_MATCH && string == assignPair.second) {
+            results.insert(std::make_tuple(it.first, assignPair.first));
+        } else if (matchType == PARTIAL_MATCH && assignPair.second.find(string) != std::string::npos) {
+            results.insert(std::make_tuple(it.first, assignPair.first));
+        }
+    }
+    return results;
+}
+
+INT_STRING_TUPLE_LIST entity_manager::IntStringPairEntityStorage::getPatternResult(const STRING_TYPE& string, const MATCH_TYPE& matchType) const {
+    INT_STRING_TUPLE_LIST results = DEFAULT_INT_STRING_TUPLE_LIST;
+    for (const auto& it : storage) {
+        const ASSIGN_TYPE assignPair = *it.second.begin();
+        bool isLHSMatch = assignPair.first == string;
+
+        if (!isLHSMatch) {
+            continue;
+        }
+        results.insert(std::make_tuple(it.first, assignPair.first));
+    }
+    return results;
+}
+
+INT_STRING_TUPLE_LIST entity_manager::IntStringPairEntityStorage::getAllAssignResult() const {
+    INT_STRING_TUPLE_LIST results = DEFAULT_INT_STRING_TUPLE_LIST;
+    for (const auto& it : storage) {
+        const ASSIGN_TYPE assignPair = *it.second.begin();
+        results.insert(std::make_tuple(it.first, assignPair.first));
+    }
+    return results;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/EntityStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace entity_manager {
+    template <typename K, typename V, typename VHash = SimpleHash, typename KHash = SimpleHash>
+    class EntityStorage {
+    protected:
+        ENTITY_TYPE entityType;
+        std::unordered_map<K, std::unordered_set<V, VHash>> storage;
+        std::unordered_set<K, KHash> keys;
+        explicit EntityStorage(ENTITY_TYPE entityType) : entityType(entityType) {}
+        virtual void preprocessKeys() = 0;
+
+    public:
+        virtual void add(const K&, const V&) = 0;
+        //virtual std::unordered_set<V, VHash> getVal(const K&) const = 0;
+        virtual std::unordered_set<K,KHash> getAllKeys() const = 0;
+
+        std::unordered_map<K, std::unordered_set<V, VHash>> getStorage() {
+            return storage;
+        }
+
+        void setStorage(std::unordered_map<K, std::unordered_set<V>> storage) {
+            storage = storage;
+        }
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/StringIntEntityStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void entity_manager::StringIntEntityStorage::add(const STRING_TYPE& key, const INT_TYPE& value) {
+    const auto& it = storage.find(key);
+    STATEMENT_LIST_TYPE statementNumbers;
+    if (it != storage.end()) {
+        statementNumbers = it->second;
+        storage.erase(key);
+    }
+    statementNumbers.insert(value);
+    storage.insert(std::pair(key, statementNumbers));
+}
+
+INT_LIST_TYPE entity_manager::StringIntEntityStorage::getValues(const STRING_TYPE& string) const {
+    const auto& it = storage.find(string);
+    if (it != storage.end()) {
+        return it->second;
+    }
+    return DEFAULT_INT_LIST;
+}
+
+STRING_LIST_TYPE entity_manager::StringIntEntityStorage::getAllKeys() const {
+    const_cast<StringIntEntityStorage*>(this)->preprocessKeys();
+    return keys;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/pattern_manager/PatternManager.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+// Query a("String", "String")
+PkbResult pattern_manager::PatternManager::query(const PATTERN_TYPE& pattern, const VAR_TYPE& variable, const MATCH_TYPE& matchType, const STRING_TYPE& string) {
+    bool isValidPattern = pattern == PATTERN_A;
+    bool isValidStrings = isStringValid(variable) && isStringValid(string);
+    bool isValidMatchType = matchType == EXACT_MATCH || matchType == PARTIAL_MATCH;
+    INT_STRING_TUPLE_LIST results = DEFAULT_INT_STRING_TUPLE_LIST;
+
+    if (isValidPattern && isValidStrings && isValidMatchType) {
+        IntStringPairEntityStorage* storage = entity_utils::getAssignStorage(ENTITY_ASSIGN);
+        results = storage->getPatternResult(variable, matchType, string);
+    }
+    return results.empty() ? PkbResult() : PkbResult(results);
+}
+
+// Query a(Variable, "String") or a(_, "String")
+PkbResult pattern_manager::PatternManager::query(const PATTERN_TYPE& pattern, const MATCH_TYPE& matchType, const STRING_TYPE& string) {
+    bool isValidPattern = pattern == PATTERN_A;
+    bool isValidString = isStringValid(string);
+    bool isValidMatchType = matchType == EXACT_MATCH || matchType == PARTIAL_MATCH;
+    INT_STRING_TUPLE_LIST results = DEFAULT_INT_STRING_TUPLE_LIST;
+
+    if (isValidPattern && isValidString && isValidMatchType) {
+        IntStringPairEntityStorage* storage = entity_utils::getAssignStorage(ENTITY_ASSIGN);
+        results = storage->getPatternResult(matchType, string);
+    }
+    return results.empty() ? PkbResult() : PkbResult(results);
+}
+
+PkbResult pattern_manager::PatternManager::query(const PATTERN_TYPE& pattern, const STRING_TYPE& string, const MATCH_TYPE& matchType) {
+    bool isValidPattern = pattern == PATTERN_A;
+    bool isValidMatchType = matchType == EXACT_MATCH; //Only exact match for this scenario
+    bool isValidString = isStringValid(string);
+    INT_STRING_TUPLE_LIST results = DEFAULT_INT_STRING_TUPLE_LIST;
+
+    if (isValidPattern && isValidMatchType && isValidString) {
+        IntStringPairEntityStorage* storage = entity_utils::getAssignStorage(ENTITY_ASSIGN);
+        results = storage->getPatternResult(string, matchType);
+        return PkbResult(results);
+    }
+    return results.empty() ? PkbResult() : PkbResult(results);
+}
+
+PkbResult pattern_manager::PatternManager::query(const PATTERN_TYPE& pattern, const MATCH_TYPE& matchType) {
+    bool isValidPattern = pattern == PATTERN_A;
+    bool isValidMatchType = matchType == EXACT_MATCH; //Only exact match for this scenario
+    INT_STRING_TUPLE_LIST results = DEFAULT_INT_STRING_TUPLE_LIST;
+
+    if (isValidPattern && isValidMatchType) {
+        IntStringPairEntityStorage* storage = entity_utils::getAssignStorage(ENTITY_ASSIGN);
+        results = storage->getAllAssignResult();
+        return PkbResult(results);
+    }
+    return results.empty() ? PkbResult() : PkbResult(results);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/IntStringRelationshipStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+INT_STRING_TUPLE_LIST relationship_manager::IntStringRelationshipStorage::getQueryResult(const VAR_TYPE& variable) const {
+    INT_STRING_TUPLE_LIST result = {};
+
+    for (auto& it : storage) {
+        if (it.second.find(variable) != it.second.end()) {
+            result.insert(std::make_tuple(it.first, variable));
+        }
+    }
+    return result;
+}
+
+INT_STRING_TUPLE_LIST relationship_manager::IntStringRelationshipStorage::getQueryResult(const STATEMENT_NO& statementNo) const {
+    INT_STRING_TUPLE_LIST result = {};
+
+    for (auto& it : storage) {
+        if (it.first == statementNo) {
+            for (auto& itr : it.second) {
+                result.insert(std::make_tuple(it.first, itr));
+            }
+        }
+    }
+    return result;
+}
+
+INT_STRING_TUPLE_LIST relationship_manager::IntStringRelationshipStorage::getAllResult() const {
+    INT_STRING_TUPLE_LIST result = {};
+
+    for (auto& it : storage) {
+        for (auto& itr : it.second) {
+            result.insert(std::make_tuple(it.first, itr));
+        }
+    }
+    return result;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/StringStringRelationshipStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace relationship_manager {
+    class StringStringRelationshipStorage : public RelationshipStorage<STRING_TYPE , STRING_TYPE, StringHash> {
+    protected:
+        explicit StringStringRelationshipStorage(const RELATIONSHIP_TYPE&);
+
+    public:
+        void add(const STRING_TYPE&, const STRING_TYPE &) override = 0;
+        [[nodiscard]] bool getRelation(const STRING_TYPE&, const STRING_TYPE&) const override;
+        std::unordered_map<STRING_TYPE, std::unordered_set<STRING_TYPE , StringHash>> getProcedureStorage() {
+            return storage;
+        }
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/IntStringRelationshipStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace relationship_manager {
+    class IntStringRelationshipStorage : public RelationshipStorage<INT_TYPE, STRING_TYPE, StringHash> {
+    protected:
+        explicit IntStringRelationshipStorage(const RELATIONSHIP_TYPE&);
+
+    public:
+        void add(const INT_TYPE&, const STRING_TYPE &) override = 0;
+        [[nodiscard]] bool getRelation(const INT_TYPE&, const STRING_TYPE&) const override;
+        INT_STRING_TUPLE_LIST getQueryResult(const VAR_TYPE&) const;
+        INT_STRING_TUPLE_LIST getQueryResult(const STATEMENT_NO&) const;
+        INT_STRING_TUPLE_LIST getAllResult() const;
+
+        std::unordered_map<INT_TYPE, std::unordered_set<STRING_TYPE , StringHash>> getStatementStorage() {
+            return storage;
+        }
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/IntIntRelationshipStorage.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+INT_INT_TUPLE_LIST relationship_manager::IntIntRelationshipStorage::getQueryResult(const STATEMENT_NO& statementNo) const {
+    INT_INT_TUPLE_LIST result = {};
+
+    for (auto& it : storage) {
+        if (it.first == statementNo) {
+            for (auto& itr : it.second) {
+                result.insert(std::make_tuple(it.first, itr));
+            }
+        }
+    }
+    return result;
+}
+
+INT_INT_TUPLE_LIST relationship_manager::IntIntRelationshipStorage::getQueryValueResult(const STATEMENT_NO& statementValue) const {
+    INT_INT_TUPLE_LIST result = {};
+    for (auto& it : storage) {
+        auto values = it.second;
+        if (values.find(statementValue) != values.end()) {
+            result.insert(std::make_tuple(it.first, statementValue));
+        }
+    }
+    return result;
+}
+
+INT_INT_TUPLE_LIST relationship_manager::IntIntRelationshipStorage::getAllResult() const {
+    INT_INT_TUPLE_LIST result = {};
+
+    for (auto& it : storage) {
+        for (auto& itr : it.second) {
+            result.insert(std::make_tuple(it.first, itr));
+        }
+    }
+    return result;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/IntIntRelationshipStorage.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+namespace relationship_manager {
+    class IntIntRelationshipStorage : public RelationshipStorage<INT_TYPE, INT_TYPE, IntHash> {
+    protected:
+        explicit IntIntRelationshipStorage(const RELATIONSHIP_TYPE&);
+        PROC_TYPE procedure = DEFAULT_STRING;
+        STATEMENT_NO statementNo = DEFAULT_INTEGER;
+
+    public:
+        void add(const INT_TYPE&, const INT_TYPE &) override = 0;
+        [[nodiscard]] bool getRelation(const INT_TYPE&, const INT_TYPE&) const override;
+        void setProcedure(const PROC_TYPE&);
+        void setStatementNo(const STATEMENT_NO&);
+        INT_INT_TUPLE_LIST getQueryResult(const STATEMENT_NO&) const;
+        INT_INT_TUPLE_LIST getQueryValueResult(const STATEMENT_NO&) const;
+        INT_INT_TUPLE_LIST getAllResult() const;
+    };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-08
+File: Team08/Code08/src/spa/src/pkb/relationship_manager/RelationshipManager.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+//Populate Statement-Uses or Statement-Modifies
+void relationship_manager::RelationshipManager::add(const RELATIONSHIP_TYPE& relationshipType, const STATEMENT_NO& statementNo, const VAR_TYPE& variable) {
+    bool isValidStatement = isStatementValid(statementNo);
+    bool isValidVariable = isStringValid(variable);
+    bool isvalidRelationship = relationshipType == RELATIONSHIP_USES_STATEMENT || relationshipType == RELATIONSHIP_MODIFIES_STATEMENT;
+    if (isValidStatement && isValidVariable && isvalidRelationship) {
+        IntStringRelationshipStorage* storage = getIntStringRelationshipStorage(relationshipType);
+        storage->add(statementNo, variable);
+    }
+}
+
+//Populate Procedure-Uses or Procedure-Modifies
+void relationship_manager::RelationshipManager::add(const RELATIONSHIP_TYPE& relationshipType, const PROC_TYPE& procedure, const VAR_TYPE& variable) {
+    bool isValidProcedure = isStringValid(procedure);
+    bool isValidVariable = isStringValid(variable);
+    bool isvalidRelationship = relationshipType == RELATIONSHIP_USES_PROCEDURE || relationshipType == RELATIONSHIP_MODIFIES_PROCEDURE;
+    if (isValidProcedure && isValidVariable && isvalidRelationship) {
+        StringStringRelationshipStorage* storage = getStringStringRelationshipStorage(relationshipType);
+        storage->add(procedure, variable);
+    }
+}
+
+//Populate Follows or Parent Relationship
+void relationship_manager::RelationshipManager::add(const RELATIONSHIP_TYPE& relationshipType, const STATEMENT_NO& statement1, const STATEMENT_NO& statement2) {
+    bool isValidStatements = isStatementValid(statement1) && statement1 < statement2;
+    bool isValidRelationship = relationshipType == RELATIONSHIP_FOLLOWS || relationshipType == RELATIONSHIP_PARENTS;
+    if (isValidStatements && isValidRelationship) {
+        IntIntRelationshipStorage* storage = getIntIntRelationshipStorage(relationshipType);
+        storage->add(statement1, statement2);
+    }
+}
+
+//Populate Follows (Shortcut via Procedure and If-While)
+void relationship_manager::RelationshipManager::add(const RELATIONSHIP_TYPE& relationshipType, const PROC_TYPE& procedure, const STATEMENT_NO& statement1, const STATEMENT_NO& statement2) {
+    bool isValidStatements = isStatementValid(statement1) && statement1 < statement2;
+    bool isValidProcedure = isStringValid(procedure);
+    bool isValidRelationship = relationshipType == RELATIONSHIP_FOLLOWS;
+    if (isValidStatements && isValidProcedure && isValidRelationship) {
+        IntIntRelationshipStorage* storage = getIntIntRelationshipStorage(relationshipType);
+        storage->setProcedure(procedure);
+        storage->add(statement1, statement2);
+    }
+}
+
+void relationship_manager::RelationshipManager::add(const RELATIONSHIP_TYPE& relationshipType, const STATEMENT_NO& statement, const STATEMENT_NO& statement1, const STATEMENT_NO& statement2) {
+    bool isValidStatements = isStatementValid(statement1) && statement1 < statement2;
+    bool isValidStatement= isStatementValid(statement);
+    bool isValidRelationship = relationshipType == RELATIONSHIP_FOLLOWS;
+    if (isValidStatements && isValidStatement && isValidRelationship) {
+        IntIntRelationshipStorage* storage = getIntIntRelationshipStorage(relationshipType);
+        storage->setStatementNo(statement);
+        storage->add(statement1, statement2);
+    }
+}
+
+//Query Statement-Uses or Statement-Modifies (Integer-"IDENT")
+PkbResult relationship_manager::RelationshipManager::query(const RELATIONSHIP_TYPE& relationshipType, const STATEMENT_NO& statementNo, const VAR_TYPE& variable) {
+    bool isValidRelationship = relationshipType == RELATIONSHIP_MODIFIES_STATEMENT || relationshipType == RELATIONSHIP_USES_STATEMENT;
+    bool hasRelation = false;
+    if (isValidRelationship) {
+        IntStringRelationshipStorage* storage = getIntStringRelationshipStorage(relationshipType);
+        hasRelation = storage != nullptr && storage->getRelation(statementNo, variable);
+    }
+    INT_STRING_TUPLE_LIST result = { std::make_tuple(statementNo, variable) };
+    return hasRelation ? PkbResult(result) : PkbResult();
+}
+
+//Query Statement-Uses or Statement-Modifies (Synonym/Wildcard-"IDENT")
+PkbResult relationship_manager::RelationshipManager::query(const RELATIONSHIP_TYPE& relationshipType, const VAR_TYPE& variable) {
+    if (relationshipType != RELATIONSHIP_MODIFIES_STATEMENT && relationshipType != RELATIONSHIP_USES_STATEMENT) {
+        return PkbResult();
+    }
+
+    IntStringRelationshipStorage* storage = getIntStringRelationshipStorage(relationshipType);
+    if (storage == nullptr) {
+        return PkbResult();
+    }
+
+    INT_STRING_TUPLE_LIST result = storage->getQueryResult(variable);
+    return result.empty() ? PkbResult() : PkbResult(result);
+}
+
+//Query Follow-Parent (Integer-Integer)
+PkbResult relationship_manager::RelationshipManager::query(const RELATIONSHIP_TYPE& relationshipType, const STATEMENT_NO& statement1, const STATEMENT_NO& statement2) {
+    bool isValidStatements = isStatementValid(statement1) && statement1 < statement2;
+    bool isValidRelationship = relationshipType == RELATIONSHIP_FOLLOWS || relationshipType == RELATIONSHIP_PARENTS || relationshipType == RELATIONSHIP_FOLLOWS_STAR || relationshipType == RELATIONSHIP_PARENTS_STAR;
+
+    if (!isValidStatements || !isValidRelationship) {
+        return PkbResult();
+    }
+
+    IntIntRelationshipStorage* storage = getIntIntRelationshipStorage(relationshipType);
+    if (storage == nullptr) {
+        return PkbResult();  // Unable to get storage
+    }
+
+    bool hasRelation = storage->getRelation(statement1, statement2);
+    INT_INT_TUPLE_LIST result = { std::make_tuple(statement1, statement2) };
+    return hasRelation ? PkbResult(result) : PkbResult();
+}
+
+//Query Follow-Parent, Statement-Uses or Statement-Modifies (Integer-Synonym/Wildcard) or (Synonym/Wildcard-Integer --> Follow-Parent)
+PkbResult relationship_manager::RelationshipManager::query(const RELATIONSHIP_TYPE& relationshipType, const bool& isInitial, const STATEMENT_NO& statementNo) {
+    bool isValidStatement = isStatementValid(statementNo);
+    bool isIntIntRelationship = relationshipType == RELATIONSHIP_PARENTS || relationshipType == RELATIONSHIP_PARENTS_STAR || relationshipType == RELATIONSHIP_FOLLOWS || relationshipType == RELATIONSHIP_FOLLOWS_STAR;
+    bool isIntStringRelationship = relationshipType == RELATIONSHIP_USES_STATEMENT || relationshipType == RELATIONSHIP_MODIFIES_STATEMENT;
+
+    if (isValidStatement && isIntStringRelationship && isInitial) {
+        IntStringRelationshipStorage* storage = getIntStringRelationshipStorage(relationshipType);
+        if (storage == nullptr) {
+            return PkbResult();
+        }
+        INT_STRING_TUPLE_LIST results = storage->getQueryResult(statementNo);
+        return results.empty() ? PkbResult() : PkbResult(results);
+    }
+
+    IntIntRelationshipStorage* storage = getIntIntRelationshipStorage(relationshipType);
+    if (storage == nullptr || !isValidStatement) {
+        return PkbResult();
+    }
+    INT_INT_TUPLE_LIST results = DEFAULT_INT_INT_TUPLE_LIST;
+    if (isIntIntRelationship && isInitial) {
+        results = storage->getQueryResult(statementNo);
+    } else if (isIntIntRelationship && !isInitial) {
+        results = storage->getQueryValueResult(statementNo);
+        return results.empty() ? PkbResult() : PkbResult(results);
+    }
+    return results.empty() ? PkbResult() : PkbResult(results);
+}
+
+//Query Follow, Parent, Uses, Modifies (Synonym/Wildcard-Synonym/Wildcard)
+PkbResult relationship_manager::RelationshipManager::query(const RELATIONSHIP_TYPE& relationshipType) {
+    bool isIntIntRelationship = relationshipType == RELATIONSHIP_FOLLOWS || relationshipType == RELATIONSHIP_PARENTS || relationshipType == RELATIONSHIP_FOLLOWS_STAR || relationshipType == RELATIONSHIP_PARENTS_STAR;
+    bool isIntStringRelationship = relationshipType == RELATIONSHIP_USES_STATEMENT || relationshipType == RELATIONSHIP_MODIFIES_STATEMENT;
+
+    if (isIntIntRelationship) {
+        IntIntRelationshipStorage* storage = getIntIntRelationshipStorage(relationshipType);
+        if (storage == nullptr) {
+            return PkbResult();
+        }
+        INT_INT_TUPLE_LIST results = storage->getAllResult();
+        return results.empty() ? PkbResult() : PkbResult(results);
+    } else if (isIntStringRelationship) {
+        IntStringRelationshipStorage* storage = getIntStringRelationshipStorage(relationshipType);
+        if (storage == nullptr) {
+            return PkbResult();
+        }
+        INT_STRING_TUPLE_LIST results = storage->getAllResult();
+        return results.empty() ? PkbResult() : PkbResult(results);
+    }
+    return PkbResult();
+}
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-08
-Total Snippets: 5
-Total lines: 103
-SP Snippets: 5
-SP lines: 103
-PKB Snippets: 0
-PKB lines: 0
-QPS Snippets: 0
-QPS lines: 0
+Total Snippets: 35
+Total lines: 1406
+SP Snippets: 8
+SP lines: 246
+PKB Snippets: 24
+PKB lines: 1009
+QPS Snippets: 3
+QPS lines: 151

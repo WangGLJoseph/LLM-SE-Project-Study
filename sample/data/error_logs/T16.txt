@@ -1,2 +1,5 @@
-23s2-cp-spa-team-16: Chat id error, chat id is not found in the prompt URL: ../sample/repo/23s2-cp-spa-team-16/Team16/Code16/src/spa/src/PKB/Storage.cpp
+23s2-cp-spa-team-16: Chat id error, chat id is not found in the prompt URL: ../sample/repo/23s2-cp-spa-team-16/Team16/Code16/src/spa/src/PKB/Tables/Base/IEntityTable.cpp
+23s2-cp-spa-team-16: Chat id error, chat id is not found in the prompt URL: ../sample/repo/23s2-cp-spa-team-16/Team16/Code16/src/spa/src/PKB/PKBStorage.cpp
+23s2-cp-spa-team-16: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-16/Team16/Code16/src/spa/src/PKB/PKBStorage.cpp
 23s2-cp-spa-team-16: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-16/Team16/Code16/src/spa/src/PKB/Facades/PQLFacade.h
+23s2-cp-spa-team-16: Chat id error, chat id is not found in the prompt URL: ../sample/repo/23s2-cp-spa-team-16/Team16/Code16/src/unit_testing/src/pkb_unit_testing/TestPKBStorage.cpp

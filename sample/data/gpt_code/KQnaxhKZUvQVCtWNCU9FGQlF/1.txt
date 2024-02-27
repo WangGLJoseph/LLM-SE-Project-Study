@@ -1,0 +1,140 @@
+enum State {
+  ExpectOperand, ExpectOperator
+};
+
+enum TokenTypeSY {
+  Constant,
+  Variable,
+  BinaryOperator,
+  LeftParenthesis,
+  RightParenthesis
+};
+
+struct TokenSY {
+  TokenTypeSY type;
+  std::string value;
+};
+
+int getPrecedence(TokenSY op) {
+  switch (op.value[0]) {
+    case '+':
+    case '-':
+      return 1;
+    case '*':
+    case '/':
+    case '%':
+      return 2;
+    default:
+      return -1; // value for non-operators
+  }
+}
+
+std::vector<TokenSY> shuntingYardAlgorithm(const std::vector<TokenSY> &tokens) {
+  State state = ExpectOperand;
+  std::stack<TokenSY> operatorStack;
+  std::vector<TokenSY> outputQueue;
+
+  if (tokens.empty()) {
+    throw SyntaxErrorException("token vector cannot be empty");
+  }
+  if (tokens[tokens.size() - 1].type == BinaryOperator) {
+    throw SyntaxErrorException("trailing binary operator");
+  }
+
+  for (const auto &token: tokens) {
+    switch (token.type) {
+      case Constant:
+      case Variable:
+        if (state != ExpectOperand) {
+          throw SyntaxErrorException("expected operator but got operand");
+        }
+        outputQueue.push_back(token);
+        state = ExpectOperator;
+        break;
+      case BinaryOperator:
+        if (state != ExpectOperator) {
+          throw SyntaxErrorException("expected operand but got operator");
+        }
+        while (!operatorStack.empty() &&
+               operatorStack.top().type == BinaryOperator &&
+               getPrecedence(token) <= getPrecedence(operatorStack.top())) {
+          outputQueue.push_back(operatorStack.top());
+          operatorStack.pop();
+        }
+        operatorStack.push(token);
+        state = ExpectOperand;
+        break;
+      case LeftParenthesis:
+        if (state != ExpectOperand) {
+          throw SyntaxErrorException("expected operator but got operand");
+        }
+        operatorStack.push(token);
+        break;
+      case RightParenthesis:
+        while (true) {
+          if (operatorStack.empty()) {
+            throw SyntaxErrorException("tried to pop from an empty operator stack");
+          }
+          if (operatorStack.top().type == LeftParenthesis) {
+            break;
+          }
+          outputQueue.push_back(operatorStack.top());
+          operatorStack.pop();
+        }
+        operatorStack.pop(); // Pop LeftParenthesis
+        state = ExpectOperator;
+    }
+  }
+
+  while (!operatorStack.empty()) {
+    if (operatorStack.top().type == LeftParenthesis ||
+        operatorStack.top().type == RightParenthesis) {
+      throw SyntaxErrorException("mismatched parenthesis");
+    }
+    outputQueue.push_back(operatorStack.top());
+    operatorStack.pop();
+  }
+
+  // Here, outputQueue will have the postfix expression.
+  return outputQueue;
+}
+
+// parses a whitespace seperated token string
+std::vector<TokenSY> parseTokens(std::string &inputString) {
+  std::vector<TokenSY> tokens;
+  std::string token;
+  std::stringstream input(inputString);
+
+  while (input >> token) {
+    if (StringUtils::isInteger(token)) {
+      tokens.push_back({Constant, token});
+      continue;
+    }
+
+    if (StringUtils::isAlphanumericNoLeadingNumber(token)) {
+      tokens.push_back({Variable, token});
+      continue;
+    }
+
+    if (token.size() == 1) {
+      if (token[0] == '+' || token[0] == '-' || token[0] == '*' ||
+          token[0] == '/' || token[0] == '%') {
+        tokens.push_back({BinaryOperator, token});
+        continue;
+      } else if (token[0] == '(') {
+        tokens.push_back({LeftParenthesis, token});
+        continue;
+      } else if (token[0] == ')') {
+        // handle edge case: empty parentheses
+        if (tokens.at(tokens.size() - 1).type == LeftParenthesis) {
+          throw SyntaxErrorException("parentheses cannot be empty");
+        }
+        tokens.push_back({RightParenthesis, token});
+        continue;
+      }
+    }
+
+    throw SyntaxErrorException("invalid token: " + token);
+  }
+  return tokens;
+}

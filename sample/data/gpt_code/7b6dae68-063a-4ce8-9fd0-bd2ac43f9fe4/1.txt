@@ -1,0 +1,41 @@
+SynonymGraph::SynonymGraph(const std::vector<std::shared_ptr<Predicate>>& predicates) : predicates(predicates) {
+    for (const auto& predicate : predicates) {
+        auto synonyms = predicate->getSynonyms();
+        // add self loop for each synonym
+        for (const auto& synonym : synonyms) {
+            addEdge(synonym, synonym);
+        }
+        for (size_t i = 0; i < synonyms.size(); ++i) {
+            for (size_t j = i + 1; j < synonyms.size(); ++j) {
+                addEdge(synonyms[i], synonyms[j]);
+                addEdge(synonyms[j], synonyms[i]);
+            }
+        }
+    }
+}
+
+void SynonymGraph::addEdge(const std::shared_ptr<Synonym>& u, const std::shared_ptr<Synonym>& v) {
+    adjList[u].push_back(v);
+}
+
+std::vector<SynonymPtrSet> SynonymGraph::groupSynonyms() {
+    std::vector<SynonymPtrSet> groups;
+    for (const auto& pair : adjList) {
+        if (visited.find(pair.first) == visited.end()) {
+            SynonymPtrSet component;
+            DFS(pair.first, component);
+            groups.push_back(component);
+        }
+    }
+    return groups;
+}
+
+void SynonymGraph::DFS(std::shared_ptr<Synonym> v, SynonymPtrSet & component) {
+    visited.insert(v);
+    component.insert(v);
+    for (auto& adjSynonym : adjList[v]) {
+        if (visited.find(adjSynonym) == visited.end()) {
+            DFS(adjSynonym, component);
+        }
+    }
+}

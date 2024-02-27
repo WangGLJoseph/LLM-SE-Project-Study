@@ -1,0 +1,42 @@
+StubPKBWriter::StubPKBWriter(std::shared_ptr<PKB> pkb) : PKBWriter(pkb) {}
+
+void StubPKBWriter::write(FollowsEntry entry) {
+  int stmt1 = std::stoi(entry.getLeft());
+  if (entry.isIndirect()) {
+    if (indirectFollowsRecord.find(stmt1) == indirectFollowsRecord.end()) {
+      indirectFollowsRecord[stmt1] = std::vector<int>();
+    }
+    indirectFollowsRecord[stmt1].push_back(std::stoi(entry.getRight()));
+  } else {
+    if (followsRecord.find(stmt1) == followsRecord.end()) {
+      followsRecord[stmt1] = std::vector<int>();
+    }
+    followsRecord[stmt1].push_back(std::stoi(entry.getRight()));
+  }
+}
+
+// void StubPKBWriter::writeIndirect(FollowsEntry entry) {
+//   int stmt1 = entry.getLeft();
+//   if (indirectFollowsRecord.find(stmt1) == indirectFollowsRecord.end()) {
+//     indirectFollowsRecord[stmt1] = std::vector<int>();
+//   }
+//   indirectFollowsRecord[stmt1].push_back(entry.getRight());
+// }
+
+bool StubPKBWriter::isFollows(int stmt1, int stmt2, bool isDirect) {
+  auto recordToUse = isDirect ? followsRecord : indirectFollowsRecord;
+
+  if (recordToUse.find(stmt1) == recordToUse.end()) {
+    return false;
+  }
+  for (int i : recordToUse[stmt1]) {
+    if (i == stmt2) {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::unordered_map<int, std::vector<int>> StubPKBWriter::getAllFollowsRecord() { return followsRecord; }
+
+std::unordered_map<int, std::vector<int>> StubPKBWriter::getAllIndirectFollowsRecord() { return indirectFollowsRecord; }

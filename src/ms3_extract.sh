@@ -32,17 +32,17 @@ error_logs_dir="$data_dir/error_logs"
 
 # Clear the code directory
 if [ -d "$code_dir" ]; then
-    rm -rf "$code_dir"/*
+    rm -rf "${code_dir:?}"/*
 fi
 
 # Clear the GPT code directory
 if [ -d "$gpt_code_dir" ]; then
-    rm -rf "$gpt_code_dir"/*
+    rm -rf "${gpt_code_dir:?}"/*
 fi
 
 # Clear the test directory
 if [ -d "$test_dir" ]; then
-    rm -rf "$test_dir"/*
+    rm -rf "${test_dir:?}"/*
 fi
 
 # Remove the dataset file if exists
@@ -52,13 +52,13 @@ fi
 
 # Clear the error logs directory
 if [ -d "$error_logs_dir" ]; then
-    rm -rf "$error_logs_dir"/*
+    rm -rf "${error_logs_dir:?}"/*
 fi
 
 # Loop through all teams
 for team_number in $(seq 0 $team_numbers); do
   # Format team numbers with leading zeros
-  formatted_team_number=$(printf "%02d" $team_number)
+  formatted_team_number=$(printf "%02d" "$team_number")
   output="T$formatted_team_number.txt"
 
   # Ensure the test directory exists or create it
@@ -74,6 +74,6 @@ for team_number in $(seq 0 $team_numbers); do
   repo_name="$academic_year_semester-$team_type-spa-team-$formatted_team_number"
 
   # Extract for each team, redirect output and error to error log
-  echo "Extracting $source_dir/$repo_name into $destination_dir/$output"
+  echo "Extracting $source_dir/$repo_name into $data_dir"
   ./ace "$source_dir/$repo_name" "$code_dir/$output" "$gpt_code_dir" "$test_dir/T$formatted_team_number" "$dataset" 2>&1 | tee -a "$error_logs_dir/$output"
 done

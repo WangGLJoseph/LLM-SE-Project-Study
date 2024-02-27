@@ -1,0 +1,184 @@
+TEST_CASE("validate more than relational expression") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::GREATER_THAN, ">"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                         });
+  mustPass(tokens);
+
+  Tokens tokens2 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::NAME, "z"),
+                              TokenFactory::createToken(TokenTypeSP::LESS_THAN_OR_EQUALS, "<="),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "1000"),
+                          });
+  mustPass(tokens2);
+}
+
+TEST_CASE("validate conditional expression with logical operators") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::AND, "&&"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NOT, "!"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "y"),
+                             TokenFactory::createToken(TokenTypeSP::GREATER_THAN, ">"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "5"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                         });
+  mustPass(tokens);
+
+  Tokens tokens2 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                              TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                              TokenFactory::createToken(TokenTypeSP::LESS_THAN, "<"),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "0"),
+                              TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                              TokenFactory::createToken(TokenTypeSP::OR, "||"),
+                              TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                              TokenFactory::createToken(TokenTypeSP::NAME, "z"),
+                              TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "5"),
+                              TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                          });
+  mustPass(tokens2);
+}
+
+TEST_CASE("validate expression with arithmetic operators") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::PLUS, "+"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                         });
+  mustFail(tokens);
+
+  Tokens tokens2 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::NAME, "z"),
+                              TokenFactory::createToken(TokenTypeSP::TIMES, "*"),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "1000"),
+                          });
+  mustFail(tokens2);
+
+  Tokens tokens3 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::NAME, "y"),
+                              TokenFactory::createToken(TokenTypeSP::MINUS, "-"),
+                              TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                          });
+  mustFail(tokens3);
+
+  Tokens tokens4 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "10"),
+                              TokenFactory::createToken(TokenTypeSP::DIVIDE, "/"),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "2"),
+                          });
+  mustFail(tokens4);
+
+  Tokens tokens5 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "100"),
+                              TokenFactory::createToken(TokenTypeSP::MODULO, "%"),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "3"),
+                          });
+  mustFail(tokens5);
+}
+
+TEST_CASE("validate conditional expression with nested brackets") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::AND, "&&"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "y"),
+                             TokenFactory::createToken(TokenTypeSP::GREATER_THAN, ">"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "2"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::OR, "||"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "z"),
+                             TokenFactory::createToken(TokenTypeSP::LESS_THAN, "<"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "3"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                         });
+  mustPass(tokens);
+}
+
+TEST_CASE("parenthesized expressions with missing closing parenthesis") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::AND, "&&"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "y"),
+                             TokenFactory::createToken(TokenTypeSP::GREATER_THAN, ">"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "5"),
+                         });
+  mustFail(tokens);
+}
+
+TEST_CASE("Invalid token in the condition") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::PRINT, "print"),
+                         });
+  mustFail(tokens);
+}
+
+TEST_CASE("Incomplete condition - missing relational expression") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::NOT, "!"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             // Missing Relational Expression here
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                         });
+  mustFail(tokens);
+}
+
+TEST_CASE("just parantheses") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                         });
+  mustFail(tokens);
+}
+
+TEST_CASE("conditional operator without brackets") {
+  std::string input = "this && that";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  Tokens tokens = tokenizer.tokenize();
+  mustFail(tokens);
+}
+
+TEST_CASE("conditional with relational expr") {
+
+  std::string input = "(!((a != b) || (d + 3 >= e))) && (((c % 4 / e)) <= (((d))) * 5)";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  Tokens tokens = tokenizer.tokenize();
+  mustPass(tokens);
+}
+
+TEST_CASE("conditional with invalid relational expr") {
+
+  std::string input = "(!((a != b) || (d + 3 = e))) && (((c % 4 / e)) <= (((d))) * 5)";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  Tokens tokens = tokenizer.tokenize();
+  mustFail(tokens);
+}

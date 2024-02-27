@@ -22,5 +22,11 @@ public:
         }
     }
 
-    std::string getLine();
+    std::string getLine() {
+        std::string line;
+        if (std::getline(filestream, line)) {
+            return line;
+        }
+        return ""; // Return empty string if there are no more lines
+    }
 };

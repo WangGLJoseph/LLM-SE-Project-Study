@@ -1,0 +1,724 @@
+TEST_CASE("PKB Test", "[PKB]") {
+  PKB pkb;
+
+  SECTION("Insert and check Assign Manager") {
+    // insert to pkb using EntityManagerPoolCommands
+    pkb.insert<Assign, InsertAssignCommand>(Assign(1, "x", "1"));
+    pkb.insert<Assign, InsertAssignCommand>(Assign(2, "y", "2"));
+
+    std::unordered_set<Assign> result =
+        pkb.getAllEntities<Assign, ReadAllAssignQuery>();
+    REQUIRE(result.size() == 2);
+    // check that assign(1) and assign(2) are in result
+    REQUIRE(result.count(Assign(1, "x", "1")) == 1);
+    REQUIRE(result.count(Assign(2, "y", "2")) == 1);
+
+    REQUIRE(
+        pkb.containsEntity<Assign, ContainsAssignQuery>(Assign(1, "x", "1")));
+    REQUIRE(
+        pkb.containsEntity<Assign, ContainsAssignQuery>(Assign(2, "y", "2")));
+    REQUIRE_FALSE(
+        pkb.containsEntity<Assign, ContainsAssignQuery>(Assign(3, "z", "3")));
+  }
+
+  SECTION("Insert and check Call Manager") {
+    pkb.insert<Call, InsertCallCommand>(Call(3));
+    pkb.insert<Call, InsertCallCommand>(Call(4));
+
+    std::unordered_set<Call> result =
+        pkb.getAllEntities<Call, ReadAllCallQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Call, ContainsCallQuery>(Call(3)));
+    REQUIRE(pkb.containsEntity<Call, ContainsCallQuery>(Call(4)));
+    REQUIRE_FALSE(pkb.containsEntity<Call, ContainsCallQuery>(Call(5)));
+  }
+
+  SECTION("Insert and check Constant Manager") {
+    pkb.insert<Const, InsertConstantCommand>(Const(5));
+    pkb.insert<Const, InsertConstantCommand>(Const(6));
+
+    std::unordered_set<Const> result =
+        pkb.getAllEntities<Const, ReadAllConstantQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Const, ContainsConstantQuery>(Const(5)));
+    REQUIRE(pkb.containsEntity<Const, ContainsConstantQuery>(Const(6)));
+    REQUIRE_FALSE(pkb.containsEntity<Const, ContainsConstantQuery>(Const(7)));
+  }
+
+  SECTION("Insert and check Print Manager") {
+    pkb.insert<Print, InsertPrintCommand>(Print(7));
+    pkb.insert<Print, InsertPrintCommand>(Print(8));
+
+    std::unordered_set<Print> result =
+        pkb.getAllEntities<Print, ReadAllPrintQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Print, ContainsPrintQuery>(Print(7)));
+    REQUIRE(pkb.containsEntity<Print, ContainsPrintQuery>(Print(8)));
+    REQUIRE_FALSE(pkb.containsEntity<Print, ContainsPrintQuery>(Print(9)));
+  }
+
+  SECTION("Insert and check read manager") {
+    pkb.insert<Read, InsertReadCommand>(Read(9));
+    pkb.insert<Read, InsertReadCommand>(Read(10));
+
+    std::unordered_set<Read> result =
+        pkb.getAllEntities<Read, ReadAllReadQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Read, ContainsReadQuery>(Read(9)));
+    REQUIRE(pkb.containsEntity<Read, ContainsReadQuery>(Read(10)));
+    REQUIRE_FALSE(pkb.containsEntity<Read, ContainsReadQuery>(Read(11)));
+  }
+  SECTION("Insert and check Procedure Manager") {
+    pkb.insert<Procedure, InsertProcedureCommand>(Procedure("test 1"));
+    pkb.insert<Procedure, InsertProcedureCommand>(Procedure("test 2"));
+
+    std::unordered_set<Procedure> result =
+        pkb.getAllEntities<Procedure, ReadAllProcedureQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure("test 1")));
+    REQUIRE(pkb.containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure("test 2")));
+    REQUIRE_FALSE(pkb.containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure("test 3")));
+  }
+  SECTION("Insert and check Statement Manager") {
+    pkb.insert<Statement, InsertStatementCommand>(Statement(1));
+    pkb.insert<Statement, InsertStatementCommand>(Statement(2));
+
+    std::unordered_set<Statement> result =
+        pkb.getAllEntities<Statement, ReadAllStatementQuery>();
+
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(
+        pkb.containsEntity<Statement, ContainsStatementQuery>(Statement(1)));
+    REQUIRE(
+        pkb.containsEntity<Statement, ContainsStatementQuery>(Statement(2)));
+    REQUIRE_FALSE(
+        pkb.containsEntity<Statement, ContainsStatementQuery>(Statement(3)));
+  }
+
+  SECTION("Insert and check Variable Manager") {
+    pkb.insert<Variable, InsertVariableCommand>(Variable("x"));
+    pkb.insert<Variable, InsertVariableCommand>(Variable("y"));
+
+    std::unordered_set<Variable> result =
+        pkb.getAllEntities<Variable, ReadAllVariableQuery>();
+
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Variable, ContainsVariableQuery>(Variable("x")));
+    REQUIRE(pkb.containsEntity<Variable, ContainsVariableQuery>(Variable("y")));
+    REQUIRE_FALSE(
+        pkb.containsEntity<Variable, ContainsVariableQuery>(Variable("z")));
+  }
+
+  SECTION("Insert and check If Manager") {
+    pkb.insert<If, InsertIfCommand>(If(1));
+    pkb.insert<If, InsertIfCommand>(If(2));
+
+    std::unordered_set<If> result = pkb.getAllEntities<If, ReadAllIfQuery>();
+
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<If, ContainsIfQuery>(If(1)));
+    REQUIRE(pkb.containsEntity<If, ContainsIfQuery>(If(2)));
+    REQUIRE_FALSE(pkb.containsEntity<If, ContainsIfQuery>(If(3)));
+  }
+
+  SECTION("Insert and check While Manager") {
+    pkb.insert<While, InsertWhileCommand>(While(1));
+    pkb.insert<While, InsertWhileCommand>(While(2));
+
+    std::unordered_set<While> result =
+        pkb.getAllEntities<While, ReadAllWhileQuery>();
+
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<While, ContainsWhileQuery>(While(1)));
+    REQUIRE(pkb.containsEntity<While, ContainsWhileQuery>(While(2)));
+    REQUIRE_FALSE(pkb.containsEntity<While, ContainsWhileQuery>(While(3)));
+  }
+
+  SECTION("Insert and check Follows Manager") {
+    Read stmt1(1);
+    Call stmt2(2);
+    Assign stmt3(3, "x", "y");
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> fwddata = {
+        {stmt1, {stmt2}}, {stmt2, {stmt3}}};
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> bwddata = {
+        {stmt2, {stmt1}}, {stmt3, {stmt2}}};
+
+    pkb.insert<Statement, Statement, InsertFollowsCommand>(stmt1, stmt2);
+    pkb.insert<Statement, Statement, InsertFollowsCommand>(stmt2, stmt3);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Statement, GetAllSecondFollowsQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstFollowsQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt2)
+                .size() == 1);
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt3)
+                .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt1)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt1),
+        {stmt2}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt2),
+        {stmt3}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt3),
+        {stmt1}));
+
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt2)
+                .size() == 1);
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt1)
+                .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt3)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt3),
+        {stmt2}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt2),
+        {stmt1}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt1),
+        {stmt2}));
+  }
+
+  SECTION("Insert and check FollowsStar Manager") {
+    Print stmt1(1);
+    Call stmt2(2);
+    Assign stmt3(3, "x", "y");
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> fwddata = {
+        {stmt1, {stmt2, stmt3}}, {stmt2, {stmt3}}};
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> bwddata = {
+        {stmt2, {stmt1}}, {stmt3, {stmt2, stmt1}}};
+
+    pkb.insert<Statement, Statement, InsertFollowsStarCommand>(stmt1, stmt2);
+    pkb.insert<Statement, Statement, InsertFollowsStarCommand>(stmt1, stmt3);
+    pkb.insert<Statement, Statement, InsertFollowsStarCommand>(stmt2, stmt3);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Statement, GetAllSecondFollowsStarQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstFollowsStarQuery>(),
+        bwddata));
+    REQUIRE_FALSE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstFollowsStarQuery>(),
+        fwddata));
+
+    REQUIRE(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt1)
+            .size() == 2);
+    REQUIRE(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt3)
+            .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt2)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt1),
+        {stmt2, stmt3}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt2),
+        {stmt3}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt3),
+        {stmt2}));
+
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt3)
+                .size() == 2);
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt2)
+                .size() == 1);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt1)
+            .size() == 1);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt3),
+        {stmt2, stmt1}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt2),
+        {stmt1}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt1),
+        {stmt1}));
+  }
+
+  SECTION("Insert and check Parent Manager") {
+    If stmt1(1);
+    While stmt2(2);
+    If stmt3(3);
+    Assign stmt4(4, "x", "y");
+    Print stmt5(5);
+    Read stmt6(6);
+    Call stmt7(7);
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> fwddata = {
+        {stmt1, {stmt2, stmt3, stmt4}},
+        {stmt2, {stmt5, stmt6}},
+        {stmt3, {stmt7}}};
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> bwddata = {
+        {stmt2, {stmt1}}, {stmt3, {stmt1}}, {stmt4, {stmt1}},
+        {stmt5, {stmt2}}, {stmt6, {stmt2}}, {stmt7, {stmt3}}};
+
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt1, stmt2);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt1, stmt3);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt1, stmt4);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt2, stmt5);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt2, stmt6);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt3, stmt7);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Statement, GetAllSecondParentQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstParentQuery>(),
+        bwddata));
+    REQUIRE_FALSE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstParentQuery>(),
+        fwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt1)
+                .size() == 3);
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt4)
+                .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt2)
+            .size() == 0);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt1),
+        {stmt2, stmt3, stmt4}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt2),
+        {stmt5, stmt6}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt3),
+        {stmt5}));
+
+    REQUIRE(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt2).size() ==
+        1);
+    REQUIRE(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt1).size() ==
+        0);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt3).size() ==
+        0);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt3),
+        {stmt1}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt1), {}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt5),
+        {stmt1}));
+  }
+
+  SECTION("Insert and check ParentStar Manager") {
+    If stmt1(1);
+    While stmt2(2);
+    If stmt3(3);
+    Assign stmt4(4, "x", "y");
+    If stmt5(5);
+    While stmt6(6);
+    Call stmt7(7);
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> fwddata = {
+        {stmt1, {stmt2, stmt3, stmt4, stmt5, stmt6, stmt7}},
+        {stmt2, {stmt5, stmt6}},
+        {stmt3, {stmt7}}};
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> bwddata = {
+        {stmt2, {stmt1}},        {stmt3, {stmt1}},
+        {stmt4, {stmt1}},        {stmt5, {stmt1, stmt2}},
+        {stmt6, {stmt1, stmt2}}, {stmt7, {stmt1, stmt3}}};
+
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt2);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt3);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt4);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt5);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt6);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt7);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt2, stmt5);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt2, stmt6);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt3, stmt7);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Statement, GetAllSecondParentStarQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstParentStarQuery>(),
+        bwddata));
+    REQUIRE_FALSE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstParentStarQuery>(),
+        fwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt1)
+                .size() == 6);
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt2)
+                .size() == 2);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt3)
+            .size() == 0);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt1),
+        {stmt2, stmt3, stmt4, stmt5, stmt6, stmt7}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt2),
+        {stmt5, stmt6}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt3),
+        {stmt5}));
+
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt5)
+                .size() == 2);
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt1)
+                .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt3)
+            .size() == 0);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt5),
+        {stmt1, stmt2}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt2),
+        {stmt1}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt3),
+        {}));
+  }
+
+  SECTION("Insert and check UsesStManager") {
+    If stmt1(1);
+    Assign stmt2(2, "x", "y");
+    While stmt3(3);
+
+    Variable varX("x");
+    Variable varY("y");
+    Variable varZ("z");
+    std::unordered_map<Statement, std::unordered_set<Variable>> fwddata = {
+        {stmt1, {varX}},        // print(x)
+        {stmt2, {varY, varZ}},  // x = y + z
+        {stmt3, {varX, varY}}   // call("proc1") uses x, y
+    };
+
+    std::unordered_map<Variable, std::unordered_set<Statement>> bwddata = {
+        {varX, {stmt1, stmt3}}, {varY, {stmt2, stmt3}}, {varZ, {stmt2}}};
+
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt1, varX);
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt2, varY);
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt2, varZ);
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt3, varX);
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt3, varY);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Variable, GetAllSecondUsesStQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Variable, GetAllFirstUsesStQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt1)
+                .size() == 1);
+
+    REQUIRE(pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt2)
+                .size() == 2);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt3)
+            .size() == 1
+
+    );
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt1),
+        {varX}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt2),
+        {varY, varZ}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt3),
+        {varX}));
+
+    REQUIRE(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varX).size() ==
+        2);
+    REQUIRE(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varZ).size() ==
+        1);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varY).size() ==
+        1);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varX),
+        {stmt1, stmt3}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varY),
+        {stmt2, stmt3}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varZ), {stmt1}));
+  }
+
+  SECTION("Insert and check UsesPrManager") {
+    Procedure proc1("proc1");  // proc1 uses x y z
+    Procedure proc2("proc2");  // proc2 uses z
+
+    Variable varX("x");
+    Variable varY("y");
+    Variable varZ("z");
+    std::unordered_map<Procedure, std::unordered_set<Variable>> fwddata = {
+        {proc1, {varZ, varX, varY}}, {proc2, {varZ}}};
+
+    std::unordered_map<Variable, std::unordered_set<Procedure>> bwddata = {
+        {varX, {proc1}}, {varY, {proc1}}, {varZ, {proc1, proc2}}};
+
+    pkb.insert<Procedure, Variable, InsertUsesPrCommand>(proc1, varZ);
+    pkb.insert<Procedure, Variable, InsertUsesPrCommand>(proc1, varX);
+    pkb.insert<Procedure, Variable, InsertUsesPrCommand>(proc1, varY);
+    pkb.insert<Procedure, Variable, InsertUsesPrCommand>(proc2, varZ);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Procedure, Variable, GetAllSecondUsesPrQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Procedure, Variable, GetAllFirstUsesPrQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Procedure, Variable, GetSecondUsesPrQuery>(proc1)
+                .size() == 3);
+    REQUIRE_FALSE(
+        pkb.getSecond<Procedure, Variable, GetSecondUsesPrQuery>(proc2)
+            .size() == 3);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Procedure, Variable, GetSecondUsesPrQuery>(proc1),
+        {varZ, varX, varY}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Procedure, Variable, GetSecondUsesPrQuery>(proc2),
+        {varZ, varX}));
+
+    REQUIRE(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varZ).size() ==
+        2);
+    REQUIRE(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varY).size() ==
+        1);
+    REQUIRE_FALSE(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varX).size() ==
+        0);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varZ),
+        {proc1, proc2}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varY), {proc2}));
+  }
+
+  SECTION("Insert and check ModifiesStManager") {
+    Read stmt1(1);
+    Assign stmt2(2, "x", "y");
+    Call stmt3(3);
+
+    Variable varX("x");
+    Variable varY("y");
+
+    std::unordered_map<Statement, std::unordered_set<Variable>> fwddata = {
+        {stmt1, {varX}},       // read(x)
+        {stmt2, {varX}},       // x = y + z
+        {stmt3, {varX, varY}}  // call("proc1") modifies x, y
+    };
+
+    std::unordered_map<Variable, std::unordered_set<Statement>> bwddata = {
+        {varX, {stmt1, stmt2, stmt3}}, {varY, {stmt3}}};
+
+    pkb.insert<Statement, Variable, InsertModifiesStCommand>(stmt1, varX);
+    pkb.insert<Statement, Variable, InsertModifiesStCommand>(stmt2, varX);
+    pkb.insert<Statement, Variable, InsertModifiesStCommand>(stmt3, varX);
+    pkb.insert<Statement, Variable, InsertModifiesStCommand>(stmt3, varY);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Variable, GetAllSecondModifiesStQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Variable, GetAllFirstModifiesStQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Variable, GetSecondModifiesStQuery>(stmt3)
+                .size() == 2);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Variable, GetSecondModifiesStQuery>(stmt2)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondModifiesStQuery>(stmt3),
+        {varX, varY}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondModifiesStQuery>(stmt2),
+        {}));
+
+    REQUIRE(pkb.getFirst<Statement, Variable, GetFirstModifiesStQuery>(varX)
+                .size() == 3);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Variable, GetFirstModifiesStQuery>(varY)
+            .size() == 2);
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstModifiesStQuery>(varX),
+        {stmt1, stmt2, stmt3}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstModifiesStQuery>(varY),
+        {stmt1}));
+  }
+
+  SECTION("Insert and check ModifiesPrManager") {
+    Procedure proc1("proc1");  // proc1 modifies x y z
+    Procedure proc2("proc2");  // proc2 modifies z
+
+    Variable varX("x");
+    Variable varY("y");
+    Variable varZ("z");
+    std::unordered_map<Procedure, std::unordered_set<Variable>> fwddata = {
+        {proc1, {varZ, varX, varY}}, {proc2, {varZ}}};
+
+    std::unordered_map<Variable, std::unordered_set<Procedure>> bwddata = {
+        {varX, {proc1}}, {varY, {proc1}}, {varZ, {proc1, proc2}}};
+
+    pkb.insert<Procedure, Variable, InsertModifiesPrCommand>(proc1, varZ);
+    pkb.insert<Procedure, Variable, InsertModifiesPrCommand>(proc1, varX);
+    pkb.insert<Procedure, Variable, InsertModifiesPrCommand>(proc1, varY);
+    pkb.insert<Procedure, Variable, InsertModifiesPrCommand>(proc2, varZ);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Procedure, Variable, GetAllSecondModifiesPrQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Procedure, Variable, GetAllFirstModifiesPrQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Procedure, Variable, GetSecondModifiesPrQuery>(proc1)
+                .size() == 3);
+    REQUIRE_FALSE(
+        pkb.getSecond<Procedure, Variable, GetSecondModifiesPrQuery>(proc2)
+            .size() == 3);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Procedure, Variable, GetSecondModifiesPrQuery>(proc1),
+        {varZ, varX, varY}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Procedure, Variable, GetSecondModifiesPrQuery>(proc2),
+        {varZ, varX}));
+
+    REQUIRE(pkb.getFirst<Procedure, Variable, GetFirstModifiesPrQuery>(varZ)
+                .size() == 2);
+    REQUIRE_FALSE(
+        pkb.getFirst<Procedure, Variable, GetFirstModifiesPrQuery>(varX)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Procedure, Variable, GetFirstModifiesPrQuery>(varZ),
+        {proc1, proc2}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Procedure, Variable, GetFirstModifiesPrQuery>(varY),
+        {proc2}));
+  }
+
+  SECTION("Inserting and Check PatternManager") {
+    Assign stmt1(1, "x", "x y + ");  // x = x + y
+    Assign stmt2(2, "y", "x y + ");  // y = x + y
+    Assign stmt3(3, "z", "x z + ");  // z = x + z
+    Assign stmt4(4, "y", "x z + ");  // y = x + z
+
+    std::string postfix1("x y + ");
+    std::string postfix2("x z + ");
+
+    Variable varX("x");
+    Variable varY("y");
+    Variable varZ("z");
+
+    // Used as test for lhs variable and rhs postfix hashmap
+    std::unordered_map<std::string, std::unordered_set<Statement>>
+        rhsPostfixData = {{postfix1, {stmt1, stmt2}},
+                          {postfix2, {stmt3, stmt4}}};
+
+    std::unordered_map<Variable, std::unordered_set<Statement>> lhsVarData = {
+        {varX, {stmt1}}, {varY, {stmt2, stmt4}}, {varZ, {stmt3}}};
+
+    // Insert Statement nodes into RHSPostfix and LHSVar hashmap
+    pkb.insertPatternStmt<Assign, InsertPatternAssignCommand>(stmt1);
+    pkb.insertPatternStmt<Assign, InsertPatternAssignCommand>(stmt2);
+    pkb.insertPatternStmt<Assign, InsertPatternAssignCommand>(stmt3);
+    pkb.insertPatternStmt<Assign, InsertPatternAssignCommand>(stmt4);
+
+    // Check if the rhs postfix hashmap is retrieved correctly
+    REQUIRE(areSameMaps(
+        pkb.getAllPostfixStmt<GetAllPostfixStmtPatternAssignQuery>(),
+        rhsPostfixData));
+
+    //Check if the lhs variable hashmap is retrieved correctly
+    REQUIRE(areSameMaps(pkb.getAllVarStmt<GetAllVarStmtPatternAssignQuery>(),
+                        lhsVarData));
+
+    // Check if the rhs postfix size is correct
+    REQUIRE(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix1).size() ==
+        2);
+    REQUIRE(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix2).size() ==
+        2);
+    REQUIRE_FALSE(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix2).size() ==
+        1);
+
+    // Check if the statements are retrieved correctly using rhs postfix
+    REQUIRE(areSameSets(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix1),
+        {stmt1, stmt2}));
+    REQUIRE(areSameSets(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix2),
+        {stmt3, stmt4}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix2), {}));
+
+    // Check if the lhs variable size is correct
+    REQUIRE(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varX).size() == 1);
+    REQUIRE(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varY).size() == 2);
+    REQUIRE_FALSE(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varZ).size() ==
+                  2);
+
+    // Check if the statements are retrieved correctly using lhs var
+    REQUIRE(areSameSets(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varX),
+                        {stmt1}));
+    REQUIRE(areSameSets(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varY),
+                        {stmt4, stmt2}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varZ), {stmt3, stmt2}));
+  }
+}

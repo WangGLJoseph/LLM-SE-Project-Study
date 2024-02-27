@@ -1,0 +1,79 @@
+#include <memory>
+#include <string>
+#include <algorithm>
+#include "sp/Expr.h"
+#include "sp/Stmt.h"
+#include "sp/Token.h"
+
+class AstFactory {
+public:
+
+    static std::shared_ptr<Token> createTokens(TokenType tokenType, std::string lexeme) {
+        return std::make_shared<Token>(tokenType, lexeme);
+    }
+
+    // Expression creators
+    static std::shared_ptr<Binary> createBinary(std::shared_ptr<Expr> left, std::shared_ptr<Token> op, std::shared_ptr<Expr> right) {
+        return std::make_shared<Binary>(std::move(left), std::move(op), std::move(right));
+    }
+
+    static std::shared_ptr<Variable> createVariable(const std::string& name) {
+        return std::make_shared<Variable>(name);
+    }
+
+    static std::shared_ptr<Literal> createLiteral(int value) {
+        return std::make_shared<Literal>(value);
+    }
+
+    static std::shared_ptr<Unary> createUnary(std::shared_ptr<Token> op, std::shared_ptr<Expr> right) {
+        return std::make_shared<Unary>(std::move(op), std::move(right));
+    }
+
+    // Statement creators
+    static std::shared_ptr<Read> createRead(StmtNo stmtNo, std::shared_ptr<Variable> variable) {
+        return std::make_shared<Read>(stmtNo, std::move(variable));
+    }
+
+    static std::shared_ptr<Print> createPrint(StmtNo stmtNo, std::shared_ptr<Variable> variable) {
+        return std::make_shared<Print>(stmtNo, std::move(variable));
+    }
+
+    static std::shared_ptr<Call> createCall(StmtNo stmtNo, const std::string& procName) {
+        return std::make_shared<Call>(stmtNo, procName);
+    }
+
+    static std::shared_ptr<While> createWhile(StmtNo stmtNo, std::shared_ptr<Expr> condition, std::shared_ptr<StmtList> body) {
+        return std::make_shared<While>(stmtNo, std::move(condition), std::move(body));
+    }
+
+    static std::shared_ptr<If> createIf(StmtNo stmtNo, std::shared_ptr<Expr> condition, std::shared_ptr<StmtList> thenBranch, std::shared_ptr<StmtList> elseBranch) {
+        return std::make_shared<If>(stmtNo, std::move(condition), std::move(thenBranch), std::move(elseBranch));
+    }
+
+    static std::shared_ptr<Assign> createAssign(StmtNo stmtNo, std::shared_ptr<Expr> variable, std::shared_ptr<Expr> value) {
+        return std::make_shared<Assign>(stmtNo, std::move(variable), std::move(value));
+    }
+
+    // Create a StmtList from a vector of shared_ptr to Stmt
+    static std::shared_ptr<StmtList> createStmtList(std::vector<std::shared_ptr<Stmt>> stmts) {
+        auto stmtList = std::make_shared<StmtList>();
+        for (auto& stmt : stmts) {
+            stmtList->push_back(std::move(stmt));
+        }
+        return stmtList;
+    }
+
+    // Create a Procedure
+    static std::shared_ptr<Procedure> createProcedure(const std::string& name, std::shared_ptr<StmtList> body) {
+        return std::make_shared<Procedure>(name, std::move(body));
+    }
+
+    // Create a Program from a vector of shared_ptr to Procedure
+    static Program createProgram(std::vector<std::shared_ptr<Procedure>> procedures) {
+        auto program = std::make_shared<std::vector<std::shared_ptr<Procedure>>>();
+        for (auto& procedure : procedures) {
+            program->push_back(std::move(procedure));
+        }
+        return program;
+    }
+};

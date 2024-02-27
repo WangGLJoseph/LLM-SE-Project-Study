@@ -1,13 +1,3 @@
-int Parser::precedence(string s) {
-    if (s == "+"  || s == "-") {
-        return 1;
-    }
-    if (s == "*" || s == "/" || s == "%") {
-        return 2;
-    }
-    return 0;
-}
-
 vector<Token> Parser::infixToPostfix(vector<Token>& infix){
     stack<Token> stk;
     vector<Token> postfix;
@@ -41,7 +31,7 @@ vector<Token> Parser::infixToPostfix(vector<Token>& infix){
     return postfix;
 }
 
-ASTNode* Parser::parsePostfixAST(vector<Token>& tokens, int lineNum) {
+ASTNode* Parser::parsePostfixArithmeticAST(vector<Token>& tokens, int lineNum) {
     stack<ASTNode*> st;
     for(Token token: tokens) {
         ASTNode* node;
@@ -53,13 +43,13 @@ ASTNode* Parser::parsePostfixAST(vector<Token>& tokens, int lineNum) {
             st.push(node);
         }
         else {
-            node = new ExprNode(lineNum, token.getValue());
+            node = new ArithmeticOperatorNode(lineNum, token.getValue());
             ASTNode* secondChild = st.top();
             st.pop();
             ASTNode* firstChild = st.top();
             st.pop();
-            node->children.push_back(firstChild);
-            node->children.push_back(secondChild);
+            node->addChildNode(firstChild);
+            node->addChildNode(secondChild);
             st.push(node);
         }
     }

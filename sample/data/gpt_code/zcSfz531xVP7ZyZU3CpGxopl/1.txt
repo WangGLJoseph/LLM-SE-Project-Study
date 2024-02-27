@@ -1,0 +1,49 @@
+int PkbReaderManager::getFollowsRelationship(int id) {
+    return this->relationshipManager->getFollowsRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getFollowsStarRelationship(int id) {
+    return this->relationshipManager->getFollowsStarRelationship(id);
+}
+
+int PkbReaderManager::getFollowsByRelationship(int id) {
+    return this->relationshipManager->getFollowsByRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getFollowsByStarRelationship(int id) {
+    return this->relationshipManager->getFollowsByStarRelationship(id);
+}
+
+int PkbReaderManager::getParentRelationship(int id) {
+    return this->relationshipManager->getParentRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getParentStarRelationship(int id) {
+    return this->relationshipManager->getParentStarRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getChildRelationship(int id) {
+    return this->relationshipManager->getChildRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getChildStarRelationship(int id) {
+    return this->relationshipManager->getChildStarRelationship(id);
+}
+
+std::vector<std::string> PkbReaderManager::getModifiesRelationship(int id) {
+    return this->relationshipManager->getModifiesRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getModifiedByRelationship(
+    const std::string &variable) {
+    return this->relationshipManager->getModifiedByRelationship(variable);
+}
+
+std::vector<std::string> PkbReaderManager::getUsesRelationship(int id) {
+    return this->relationshipManager->getUsesRelationship(id);
+}
+
+std::vector<int> PkbReaderManager::getUsesByRelationship(
+    const std::string &variable) {
+    return this->relationshipManager->getUsesByRelationship(variable);
+}

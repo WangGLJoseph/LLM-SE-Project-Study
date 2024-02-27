@@ -1,0 +1,10 @@
+TEST_CASE("PkbWriteFacade::AddVariable adds a variable successfully", "[PkbWriteFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    SECTION("Add variable") {
+        writeFacade.AddVariable("x");
+        REQUIRE(readFacade.VariableExists("x") == true);
+    }
+}

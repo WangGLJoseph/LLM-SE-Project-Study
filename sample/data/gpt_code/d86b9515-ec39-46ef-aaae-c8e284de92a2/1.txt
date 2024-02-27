@@ -1,0 +1,23 @@
+TEST_CASE("Consecutive Commas Without Synonym Name", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "if", "a", ",", ",", ",", ",", "b", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap;
+
+	REQUIRE_THROWS_AS(parser.parse(tokens, synonymMap), SyntaxErrorException);
+}
+
+TEST_CASE("Non-Separated Synonym Names", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "procedure", "a", "b", "c", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap;
+
+	REQUIRE_THROWS_AS(parser.parse(tokens, synonymMap), SyntaxErrorException);
+}
+
+TEST_CASE("Numeric Synonym Names", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "constant", "1", "2", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap;
+
+	REQUIRE_THROWS_AS(parser.parse(tokens, synonymMap), SyntaxErrorException);
+}

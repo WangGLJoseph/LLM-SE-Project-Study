@@ -1,0 +1,36 @@
+TEST_CASE("intResult-intersect_emptyResult_returnsEmpty") {
+    std::vector<int> res1{};
+    std::shared_ptr<IntResult> intRes1 = std::make_shared<IntResult>(res1);
+
+    std::vector<int> res2{};
+    std::shared_ptr<IntResult> intRes2 = std::make_shared<IntResult>(res2);
+
+    std::vector<int> expectedRes{};
+
+    REQUIRE(intRes1->intersect(intRes2) == expectedRes);
+}
+
+TEST_CASE("intResult-intersect_emptyAndNonempty_returnsEmpty") {
+    std::vector<int> res1{1, 2, 3, 4, 5};
+    std::shared_ptr<IntResult> intRes1 = std::make_shared<IntResult>(res1);
+
+    std::vector<int> res2{};
+    std::shared_ptr<IntResult> intRes2 = std::make_shared<IntResult>(res2);
+
+    std::vector<int> expectedRes{};
+
+    REQUIRE(intRes1->intersect(intRes2) == expectedRes);
+}
+
+TEST_CASE("intResult-intersect_nonemptyOverlap_returnsIntersection") {
+    std::vector<int> res1{1, 2, 3, 4, 5};
+    std::shared_ptr<IntResult> intRes1 = std::make_shared<IntResult>(res1);
+
+    std::vector<int> res2{3, 4, 5, 6, 7};
+    std::shared_ptr<IntResult> intRes2 = std::make_shared<IntResult>(res2);
+
+    std::vector<int> expectedRes{3, 4, 5};
+
+    REQUIRE(intRes1->intersect(intRes2) == expectedRes);
+}
+//ai-end

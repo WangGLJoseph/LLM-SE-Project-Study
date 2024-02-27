@@ -1,0 +1,163 @@
+std::vector<TNode*> Parser::shuntingYard(std::vector<TNode*> tnodes) {
+            std::vector<TNode*> outputQueue;
+            std::stack<TNode*> operatorStack;
+            int unpairedBrackets = 0;
+            for (TNode* token : tnodes) {
+                if (token->getType() == TNodeType::OPEN_PARENTHESES) {
+                unpairedBrackets++;
+                } else if (token->getType() == TNodeType::CLOSE_PARENTHESES) {
+                unpairedBrackets--;
+            } }
+            if(unpairedBrackets != 0) {
+                throw std::invalid_argument("syntax error: invalid condition expression");
+            }
+            for (TNode* token : tnodes) {
+                if (token->getType() == TNodeType::CONSTANT || token->getType() == TNodeType::VARIABLE) {
+                    outputQueue.push_back(token);
+                } else if (token->getType() == TNodeType::NOT) {
+                    //skipping NOT for milestone 1
+                    //operatorStack.push(token);
+                    continue;
+                } else if (ParserHelper::isOperator(token)) {
+                    while (!operatorStack.empty() && precedence(operatorStack.top()) >= precedence(token)) {
+                        outputQueue.push_back(operatorStack.top());
+                        operatorStack.pop();
+                    }
+                    operatorStack.push(token);
+                } else if (token->getType() == TNodeType::OPEN_PARENTHESES) {
+                    operatorStack.push(token);
+                    unpairedBrackets++;
+                } else if (token->getType() == TNodeType::CLOSE_PARENTHESES) {
+                    unpairedBrackets--;
+                    while (!operatorStack.empty() && operatorStack.top()->getType() != TNodeType::OPEN_PARENTHESES) {
+                        outputQueue.push_back(operatorStack.top());
+                        operatorStack.pop();
+                    }
+                    operatorStack.pop();
+                }
+            }
+            while (!operatorStack.empty()) {
+                outputQueue.push_back(operatorStack.top());
+                operatorStack.pop();
+            }
+            if(unpairedBrackets != 0) {
+                throw std::invalid_argument("syntax error: invalid condition expression");
+            }
+            return outputQueue;
+    }
+
+    ExpressionNode* Parser::parseExpression(vector<Token> &tokens, int startIdx, int endIdx, int *stmtNum) {
+        std::vector<TNode*> tempVector;
+        parseTokens(tokens, startIdx, endIdx, stmtNum, tempVector);
+        ExpressionNode* expressionNode = new ExpressionNode();
+        expressionNode->setExpression(shuntingYard(tempVector));
+        return expressionNode;
+    }
+
+    ConditionNode *Parser::parseCondition(vector<Token> &tokens, int startIdx, int endIdx, int *stmtNum) {
+        std::vector<TNode*> tempVector;
+        parseTokens(tokens, startIdx, endIdx, stmtNum, tempVector);
+        ConditionNode* conditionNode = new ConditionNode();
+        conditionNode->setCondition(shuntingYard(tempVector));
+        return conditionNode;
+    }
+    void Parser::parseTokens(std::vector<Token>& tokens, int startIdx, int endIdx, int* stmtNum, std::vector<TNode*>& tempVector) {
+        for (int i = startIdx; i <= endIdx; i++) {
+            if (ParserHelper::isPotentialIdentifier(tokens[i].getType())) {
+                tempVector.push_back(new VariableNode(*stmtNum, tokens[i].getValue()));
+                continue;
+            }
+            switch (tokens[i].getType()) {
+                case TokenType::NUMBER:
+                    tempVector.push_back(new ConstNode(*stmtNum, std::stoi(tokens[i].getValue())));
+                    break;
+                case TokenType::IDENTIFIER:
+                    tempVector.push_back(new VariableNode(*stmtNum, tokens[i].getValue()));
+                    break;
+                case TokenType::READ:
+                    tempVector.push_back(new VariableNode(*stmtNum, "read"));
+                    break;
+                case TokenType::CALL:
+                    tempVector.push_back(new VariableNode(*stmtNum, "call"));
+                    break;
+                case TokenType::PRINT:
+                    tempVector.push_back(new VariableNode(*stmtNum, "print"));
+                    break;
+                case TokenType::WHILE:
+                    tempVector.push_back(new VariableNode(*stmtNum, "while"));
+                    break;
+                case TokenType::IF:
+                    tempVector.push_back(new VariableNode(*stmtNum, "if"));
+                    break;
+                case TokenType::THEN:
+                    tempVector.push_back(new VariableNode(*stmtNum, "then"));
+                    break;
+                case TokenType::PROCEDURE:
+                    tempVector.push_back(new VariableNode(*stmtNum, "procedure"));
+                    break;
+                case TokenType::ELSE:
+                    tempVector.push_back(new VariableNode(*stmtNum, "else"));
+                    break;
+                case TokenType::PLUS:
+                case TokenType::MINUS:
+                case TokenType::MULTIPLY:
+                case TokenType::DIVIDE:
+                case TokenType::MODULO:
+                case TokenType::OPEN_PARENTHESES:
+                case TokenType::CLOSE_PARENTHESES:
+                case TokenType::AND:
+                case TokenType::OR:
+                case TokenType::GREATEREQUAL:
+                case TokenType::GREATER:
+                case TokenType::LESSTHANEQUAL:
+                case TokenType::LESSTHAN:
+                case TokenType::EQUALEQUAL:
+                case TokenType::NOTEQUAL:
+                case TokenType::NOT:
+                    tempVector.push_back(new TNode(tokenTypeToNodeType(tokens[i].getType())));
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid token type");
+            }
+        }
+    }
+
+    TNodeType Parser::tokenTypeToNodeType(TokenType type) {
+        switch (type) {
+            case TokenType::PLUS:
+                return TNodeType::PLUS;
+            case TokenType::MINUS:
+                return TNodeType::MINUS;
+            case TokenType::MULTIPLY:
+                return TNodeType::MULTIPLY;
+            case TokenType::DIVIDE:
+                return TNodeType::DIVIDE;
+            case TokenType::MODULO:
+                return TNodeType::MODULO;
+            case TokenType::OPEN_PARENTHESES:
+                return TNodeType::OPEN_PARENTHESES;
+            case TokenType::CLOSE_PARENTHESES:
+                return TNodeType::CLOSE_PARENTHESES;
+            case TokenType::AND:
+                return TNodeType::AND;
+            case TokenType::OR:
+                return TNodeType::OR;
+            case TokenType::GREATEREQUAL:
+                return TNodeType::GREATEREQUAL;
+            case TokenType::GREATER:
+                return TNodeType::GREATER;
+            case TokenType::LESSTHANEQUAL:
+                return TNodeType::LESSTHANEQUAL;
+            case TokenType::LESSTHAN:
+                return TNodeType::LESSTHAN;
+            case TokenType::EQUALEQUAL:
+                return TNodeType::EQUALEQUAL;
+            case TokenType::NOTEQUAL:
+                return TNodeType::NOTEQUAL;
+            case TokenType::NOT:
+                return TNodeType::NOT;
+            default:
+                throw std::invalid_argument("Invalid token type");
+        }
+    }
+}

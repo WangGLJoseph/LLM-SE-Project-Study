@@ -1,0 +1,22 @@
+class Statement {
+ protected:
+  int lineNumber;  // Line number of the statement in the source code
+
+ public:
+  explicit Statement(int lineNumber) : lineNumber(lineNumber) {}
+
+  // Getters
+  int getLineNumber() const { return lineNumber; }
+
+  // Virtual destructor for proper cleanup of derived types
+  virtual ~Statement() = default;
+
+  bool operator==(const Statement& stmt) const {
+    return (lineNumber == stmt.lineNumber);
+  }
+
+  Statement& operator=(const Statement& stmt) {
+    lineNumber = stmt.lineNumber;
+    return *this;
+  }
+};

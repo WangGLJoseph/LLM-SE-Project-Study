@@ -1,4 +1,131 @@
 RepoName: 23s2-cp-spa-team-13
+File: Team13/Code13/src/spa/src/SP/Validator/SyntaxValidator.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/8zpPT0KiO2e7WE5jSHHLxE9p?model=gpt-4&mode=chat
+ChatId: 8zpPT0KiO2e7WE5jSHHLxE9p
+Code:
+bool SyntaxValidator::isRelExpr(vector<Token> tokens, int start, int end) {
+  std::vector<std::string> rel_operators = { ">", ">=", "<", "<=", "==", "!=" };
+  int operator_index = -1;
+  for (int i = start + 1; i < end; i++) {
+    if(std::find(rel_operators.begin(), rel_operators.end(), tokens[i].getValue()) != rel_operators.end()) {
+      operator_index = i;
+      break;
+    }
+  }
+  if (operator_index == -1) {
+    return false;
+  }
+  return isRelFactor(tokens, start, operator_index - 1) && isRelFactor(tokens, operator_index + 1, end);
+}
+
+bool SyntaxValidator::validateAssignStmt(vector<Token> tokens) {
+  cout << "VALIDATE ASSIGN STMT";
+  if (tokens[1].getTokenType() == EQUALS && tokens[tokens.size() - 1].getValue() == ";") {
+    return isExpr(tokens, 2, tokens.size() - 2);
+  } else {
+    return false;
+  }
+}
+
+bool SyntaxValidator::isCondExpr(vector<Token> tokens, int start, int end) {
+  cout << "ISCONDEXPR REACHED " << start << "," << end << "\n";
+  if (tokens[start].getValue() == "!") {
+    return (tokens[start+1].getValue() == "(") &&
+           isCondExpr(tokens, start + 2, end - 1) && (tokens[end].getValue() == ")");
+  }
+  else if ((tokens[start].getValue() == "(") && (tokens[end].getValue() == ")")) {
+    int i = start;
+    int paren_depth = 0;
+    while(i <= end-1) {
+      if (tokens[i].getValue() == "(") {
+        ++paren_depth;
+      }
+      else if (tokens[i].getValue() == ")") {
+        --paren_depth;
+      }
+      else if ((paren_depth == 0) && ((tokens[i].getValue() == "&&") || (tokens[i].getValue() == "||"))) {
+        return isCondExpr(tokens, start + 1, i - 2) &&
+               isCondExpr(tokens, i + 2, end - 1);
+      }
+      i++;
+    }
+  }
+  // If we are still not sure about what kind of expression it is (maybe we didn't encounter '&&' or '||')
+  // We should try to check if it's a rel_expr
+  else if (isRelExpr(tokens, start, end)) {
+    cout << "ISRELEXPR " << start << "," << end << "\n";
+    return true;
+  }
+  // Finally, if none of the above return statements were hit,
+  // we know the expression isn't valid, so return false.
+  return false;
+}
+
+bool SyntaxValidator::isRelFactor(vector<Token> tokens, int start, int end) {
+  if (start == end)
+    return isVarOrConst(tokens[start].getTokenType());  // check if single token is var_name or const_value
+  return isExpr(tokens, start, end);  // else check if it's an expression
+}
+
+bool SyntaxValidator::isExpr(vector<Token> tokens, int start, int end) {
+  cout << "REACHED ISEXPR: start=" << start << " end=" << end << "\n";
+  int i = start;
+  int paren_depth = 0;
+  while(i <= end-1) {
+    if (tokens[i].getValue() == "(") {
+      ++paren_depth;
+    }
+    else if (tokens[i].getValue() == ")") {
+      --paren_depth;
+    }
+  //... check for "+" and "-" operator and verify terms on both side recursively...
+    else if((paren_depth == 0) && (tokens[i].getValue() == "+" || tokens[i].getValue() == "-")) {
+      return isTerm(tokens, start, i - 1) && isExpr(tokens, i + 1, end);
+    }
+    i++;
+  }
+  return isTerm(tokens, start, end);
+}
+
+bool SyntaxValidator::isTerm(vector<Token> tokens, int start, int end) {
+  cout << "REACHED ISTERM: start=" << start << " end=" << end << "\n";
+  int i = start;
+  int paren_depth = 0;
+  while(i <= end-1) {
+    if (tokens[i].getValue() == "(") {
+      ++paren_depth;
+    }
+    else if (tokens[i].getValue() == ")") {
+      --paren_depth;
+    }
+    else if ((paren_depth == 0) && (tokens[i].getValue() == "*" || tokens[i].getValue() == "/" || tokens[i].getValue() == "%")) {
+      return isTerm(tokens, start, i - 1) && isTerm(tokens, i + 1, end);
+    }
+    i++;
+  }
+  return isFactor(tokens, start, end);
+}
+
+bool SyntaxValidator::isFactor(vector<Token> tokens, int start, int end) {
+  cout << "REACHED ISFACTOR: start=" << start << " end=" << end << "\n";
+  // check if it's a var_name or const_value
+  if (start == end && isVarOrConst(tokens[start].getTokenType())) {
+    return true;
+  }
+  // check if it's an expr enclosed in parentheses
+  else if (tokens[start].getValue() == "(" && tokens[end].getValue() == ")"){
+    return isExpr(tokens, start + 1, end - 1);
+  }
+  // if it's neither a var_name/const_value nor an expr with parentheses - it's not a valid factor
+  else {
+    return false;
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-13
 File: Team13/Code13/src/spa/src/SP/Parser/Parser.cpp
 Generator: gpt
 Intervention: 1
@@ -6,16 +133,6 @@ Language: e
 Prompt: https://platform.openai.com/playground/p/NUX1lMOIK7DCiEzSZgir8veZ?model=gpt-4&mode=chat
 ChatId: NUX1lMOIK7DCiEzSZgir8veZ
 Code:
-int Parser::precedence(string s) {
-    if (s == "+"  || s == "-") {
-        return 1;
-    }
-    if (s == "*" || s == "/" || s == "%") {
-        return 2;
-    }
-    return 0;
-}
-
 vector<Token> Parser::infixToPostfix(vector<Token>& infix){
     stack<Token> stk;
     vector<Token> postfix;
@@ -49,7 +166,7 @@ vector<Token> Parser::infixToPostfix(vector<Token>& infix){
     return postfix;
 }
 
-ASTNode* Parser::parsePostfixAST(vector<Token>& tokens, int lineNum) {
+ASTNode* Parser::parsePostfixArithmeticAST(vector<Token>& tokens, int lineNum) {
     stack<ASTNode*> st;
     for(Token token: tokens) {
         ASTNode* node;
@@ -61,13 +178,13 @@ ASTNode* Parser::parsePostfixAST(vector<Token>& tokens, int lineNum) {
             st.push(node);
         }
         else {
-            node = new ExprNode(lineNum, token.getValue());
+            node = new ArithmeticOperatorNode(lineNum, token.getValue());
             ASTNode* secondChild = st.top();
             st.pop();
             ASTNode* firstChild = st.top();
             st.pop();
-            node->children.push_back(firstChild);
-            node->children.push_back(secondChild);
+            node->addChildNode(firstChild);
+            node->addChildNode(secondChild);
             st.push(node);
         }
     }
@@ -106,15 +223,42 @@ bool SPTalker::assignStmt(int stmt) {
     return pkb.addAssign(stmt);
 }
 
+
+bool SPTalker::readStmt(int stmt) {
+    return pkb.addRead(stmt);
+}
+
+bool SPTalker::printStmt(int stmt) {
+    return pkb.addPrint(stmt);
+}
+
+bool SPTalker::callStmt(int stmt) {
+    return pkb.addCall(stmt);
+}
+
 bool SPTalker::followStmt(int stmt1, int stmt2) {
     pkb.addFollows(stmt1, stmt2);
     return true;
+}
+
+bool SPTalker::procedureName(std::string name) {
+    return pkb.addProcedureName(name);
+}
+
+bool SPTalker::constValue(int value, int stmt) {
+    pkb.addConstPattern(value, stmt);
+    return pkb.addConstValue(value);
 }
 
 bool SPTalker::parentStmt(int stmt, std::vector<int> list) {
     for (int i = 0; i < list.size(); i++) {
         pkb.addParentAndChild(stmt, list[i]);
     }
+    return true;
+}
+
+bool SPTalker::variableName(string varName, int stmtNo, bool isModified, bool isUses) {
+    pkb.addVariableName(varName, stmtNo, isModified, isUses);
     return true;
 }
 
@@ -279,7 +423,6 @@ Code:
 
     bool FollowsRelation::isFollows(int stmt1, int stmt2) {
         if (follows.count(stmt1) > 0 && !follows[stmt1].empty()) {
-            std::cout << follows[stmt1][0] << std::endl;
             return follows[stmt1][0] == stmt2;
         }
         return false;
@@ -297,11 +440,11 @@ Code:
     }
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-13
-Total Snippets: 5
-Total lines: 259
-SP Snippets: 1
-SP lines: 69
+Total Snippets: 6
+Total lines: 394
+SP Snippets: 2
+SP lines: 178
 PKB Snippets: 4
-PKB lines: 190
+PKB lines: 216
 QPS Snippets: 0
 QPS lines: 0

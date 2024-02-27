@@ -1,0 +1,10 @@
+std::shared_ptr<std::unordered_map<std::string, std::list<std::string>>>
+Query::vectorToMap(
+    const std::string& synonym1, const std::string& synonym2,
+    const std::vector<std::pair<std::string, std::string>>& vectorOfPairs) {
+  if (vectorOfPairs.empty()) {
+    return createEmptyEntry(synonym1, synonym2);
+  }
+  std::shared_ptr<std::unordered_map<std::string, std::list<std::string>>>
+      resultMap = std::make_shared<
+          std::unordered_map<std::string, std::list<std::string>>>();

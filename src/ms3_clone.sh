@@ -21,27 +21,27 @@ mkdir -p "$destination_dir"
 # Determine the branch name based on team number
 get_branch_name() {
   case $1 in
-    1) echo "sprint_1";;
-    2) echo "milestone-1";;
-    3) echo "master";;
+    1) echo "milestone1-2";;
+    2) echo "milestone1";;
+    3) echo "milestone1";;
     4) echo "master";;
-    5) echo "dev";;
-    6) echo "demo_1";;
-    7) echo "master";;
-    8) echo "EndToEndBranch";;
-    9) echo "master";;
-    10) echo "master";;
+    5) echo "milestone1-1";;
+    6) echo "master";;
+    7) echo "milestone1-1";;
+    8) echo "milestone1-1";;
+    9) echo "milestone1-1";;
+    10) echo "milestone1";;
     11) echo "milestone1";;
-    12) echo "milestone-1";;
+    12) echo "milestone1";;
     13) echo "master";;
-    14) echo "master";;
-    15) echo "master";;
-    16) echo "master";;
-    17) echo "staging";;
-    18) echo "dev";;
-    19) echo "master";;
-    20) echo "develop";;
-    21) echo "master";;
+    14) echo "milestone1";;
+    15) echo "milestone1-1";;
+    16) echo "milestone1-1";;
+    17) echo "milestone1";;
+    18) echo "milestone1-1";;
+    19) echo "milestone1";;
+    20) echo "master";;
+    21) echo "milestone1-1";;
     *) echo "master";; # Default case if team number is outside expected range
   esac
 }
@@ -49,10 +49,10 @@ get_branch_name() {
 # List of teams to clone
 for team_number in $(seq 1 $team_numbers); do
   # Format team numbers with leading zeros
-  formatted_team_number=$(printf "%02d" $team_number)
+  formatted_team_number=$(printf "%02d" "$team_number")
 
   # Determine the branch name based on team number
-  branch_name=$(get_branch_name $team_number)
+  branch_name=$(get_branch_name "$team_number")
 
   # Team 14 has different suffix (adjust based on your requirements)
   if [ "$formatted_team_number" == "14" ]; then

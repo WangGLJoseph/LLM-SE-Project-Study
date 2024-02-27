@@ -1,0 +1,10 @@
+for(auto& entry : parentStarTable){
+        unordered_set<int> visited;
+        DFS(entry.first, parentStarTable, visited);
+
+        // Erase source node from set, so it's not included in it's own set
+        visited.erase(entry.first);
+
+        for(auto& child : visited)
+            writeFacade.AddParentStarRelationship(entry.first, child);
+    }

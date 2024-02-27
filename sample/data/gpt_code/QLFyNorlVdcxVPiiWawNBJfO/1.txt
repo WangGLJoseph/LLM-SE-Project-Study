@@ -1,0 +1,38 @@
+TEST_CASE("Testing areSameSets for Generic types") {
+  std::unordered_set<int> set1 = {1, 2, 3, 4, 5};
+  std::unordered_set<int> set2 = {5, 4, 3, 2, 1};
+  std::unordered_set<int> set3 = {1, 2, 3};
+  std::unordered_set<int> set4 = {1, 2, 3, 4, 5, 6};
+  std::unordered_set<int> set_empty;
+  std::unordered_set<std::string> set5 = {"1", "2", "3", "4", "5"};
+
+  SECTION("Test for two equal sets") {
+    REQUIRE(areSameSets(set1, {5, 4, 3, 2, 1}));
+  }
+
+  SECTION("Test for two different sets") {
+    REQUIRE_FALSE(areSameSets(set1, {1, 2, 3}));
+  }
+
+  SECTION("Test for two sets where one is a subset of the other") {
+    REQUIRE_FALSE(areSameSets(set1, {1, 2, 3, 4, 5, 6}));
+  }
+
+  SECTION("Test for two empty sets") {
+    REQUIRE(areSameSets(set_empty, {}));
+  }
+
+  SECTION("Test for a set and an empty set") {
+    REQUIRE_FALSE(areSameSets(set1, {}));
+  }
+
+  SECTION("Test for two equal sets with a type different from above") {
+    REQUIRE(areSameSets(
+        set5, std::initializer_list<std::string>({"1", "2", "3", "4", "5"})));
+  }
+
+  SECTION("Test for two different sets with a type different from above") {
+    REQUIRE_FALSE(areSameSets(set5, std::initializer_list<std::string>(
+                                        {"1", "2", "3", "4", "5", "6"})));
+  }
+}

@@ -1,14 +1,17 @@
 TEST_CASE("SingleDeclarationRule_ValidDeclarations_NoError") {
     // Create a QueryObject with valid unique declarations
-    QueryObject qo;
+    IntermediateQuery qo;
 
-    auto assignEntity = std::make_shared<AssignEntity>(AssignEntity("z"));
-    auto printEntity = std::make_shared<PrintEntity>(PrintEntity("w"));
-    auto statementEntity = std::make_shared<StatementEntity>(StatementEntity("p"));
+    auto assignEntity = std::make_shared<DeclarationClause>(DeclarationClause());
+    assignEntity->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::ASSIGN), "x");
+    auto printEntity = std::make_shared<DeclarationClause>(DeclarationClause());
+    printEntity->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::PRINT), "p");
+    auto statementEntity = std::make_shared<DeclarationClause>(DeclarationClause());
+    statementEntity->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::STMT1), "s");
 
-    qo.addDeclaration(assignEntity);
-    qo.addDeclaration(printEntity);
-    qo.addDeclaration(statementEntity);
+    qo.addClause(assignEntity);
+    qo.addClause(printEntity);
+    qo.addClause(statementEntity);
 
     // Apply the SingleDeclarationRule
     SingleDeclarationRule rule;
@@ -20,11 +23,14 @@ TEST_CASE("SingleDeclarationRule_ValidDeclarations_NoError") {
 
 TEST_CASE("SingleDeclarationRule_DuplicateDeclarations_Error") {
     // Create a QueryObject with duplicate declarations
-    QueryObject qo;
-    auto assignEntity1 = std::make_shared<AssignEntity>(AssignEntity("x"));
-    auto assignEntity2 = std::make_shared<AssignEntity>(AssignEntity("x"));
-    qo.addDeclaration(assignEntity1);
-    qo.addDeclaration(assignEntity2);
+    IntermediateQuery qo;
+    auto assignEntity1 = std::make_shared<DeclarationClause>(DeclarationClause());
+    assignEntity1->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::ASSIGN), "x");
+    auto assignEntity2 = std::make_shared<DeclarationClause>(DeclarationClause());
+    assignEntity2->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::ASSIGN), "x");
+
+    qo.addClause(assignEntity1);
+    qo.addClause(assignEntity2);
 
     // Apply the SingleDeclarationRule
     SingleDeclarationRule rule;
@@ -36,15 +42,18 @@ TEST_CASE("SingleDeclarationRule_DuplicateDeclarations_Error") {
 
 TEST_CASE("SingleDeclarationRule_MixedDeclarations_Error") {
     // Create a QueryObject with a mix of unique and duplicate declarations
-    QueryObject qo;
+    IntermediateQuery qo;
 
-    auto assignEntity1 = std::make_shared<AssignEntity>(AssignEntity("x"));
-    auto printEntity = std::make_shared<PrintEntity>(PrintEntity("y"));
-    auto assignEntity2 = std::make_shared<AssignEntity>(AssignEntity("x"));
+    auto assignEntity1 = std::make_shared<DeclarationClause>(DeclarationClause());
+    assignEntity1->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::ASSIGN), "x");
+    auto printEntity = std::make_shared<DeclarationClause>(DeclarationClause());
+    printEntity->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::PRINT), "y");
+    auto assignEntity2 = std::make_shared<DeclarationClause>(DeclarationClause());
+    assignEntity2->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::ASSIGN), "x");
 
-    qo.addDeclaration(assignEntity1);
-    qo.addDeclaration(printEntity);
-    qo.addDeclaration(assignEntity2);
+    qo.addClause(assignEntity1);
+    qo.addClause(printEntity);
+    qo.addClause(assignEntity2);
 
     // Apply the SingleDeclarationRule
     SingleDeclarationRule rule;
@@ -56,7 +65,7 @@ TEST_CASE("SingleDeclarationRule_MixedDeclarations_Error") {
 
 TEST_CASE("SingleDeclarationRule_NoDeclarations_NoError") {
     // Create a QueryObject with no declarations
-    QueryObject qo;
+    IntermediateQuery qo;
 
     // Apply the SingleDeclarationRule
     SingleDeclarationRule rule;

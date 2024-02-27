@@ -1,0 +1,75 @@
+#include "../../../../spa/src/PKB/Managers/RelationshipManager.h"
+#include "catch.hpp"
+
+TEST_CASE("RelationshipManager is initialized correctly",
+          "[RelationshipManager]") {
+    RelationshipManager manager;
+
+    REQUIRE(manager.isFollowsEmpty() == true);
+    REQUIRE(manager.isParentEmpty() == true);
+    REQUIRE(manager.isModifiesEmpty() == true);
+    REQUIRE(manager.isUsesEmpty() == true);
+}
+
+TEST_CASE("Adding and getting relationships function correctly",
+          "[RelationshipManager]") {
+    RelationshipManager manager;
+    int beforeStmtId = 1, afterStmtId = 2;
+    std::string variable = "x";
+
+    // Add relationships to the manager
+    manager.addFollowsRelationship(beforeStmtId, afterStmtId);
+    manager.addParentRelationship(afterStmtId, beforeStmtId);
+    manager.addModifiesRelationship(beforeStmtId, variable);
+    manager.addUsesRelationship(afterStmtId, variable);
+
+    // Get relationships from the manager
+    int followedStmt = manager.getFollowsRelationship(beforeStmtId);
+    int parentStmt = manager.getParentRelationship(afterStmtId);
+    std::vector<std::string> modifiesRel =
+        manager.getModifiesRelationship(beforeStmtId);
+    std::vector<std::string> usesRel = manager.getUsesRelationship(afterStmtId);
+
+    // Verify that the relationships were added correctly
+    REQUIRE(followedStmt == afterStmtId);
+    REQUIRE(parentStmt == beforeStmtId);
+    REQUIRE(std::find(modifiesRel.begin(), modifiesRel.end(), variable) !=
+            modifiesRel.end());
+    REQUIRE(std::find(usesRel.begin(), usesRel.end(), variable) !=
+            usesRel.end());
+
+    // Verify the is-A-relationship functions
+    REQUIRE(manager.isAFollowRelationship(beforeStmtId, afterStmtId) == true);
+    REQUIRE(manager.isAParentRelationship(afterStmtId, beforeStmtId) == true);
+    REQUIRE(manager.isAModifyRelationship(beforeStmtId, variable) == true);
+    REQUIRE(manager.isAUseRelationship(afterStmtId, variable) == true);
+}
+
+TEST_CASE("Getting all relationships functions correctly",
+          "[RelationshipManager]") {
+    RelationshipManager manager;
+    int beforeStmtId = 1, afterStmtId = 2;
+    std::string variable = "x";
+
+    // Add relationships to the manager
+    manager.addFollowsRelationship(beforeStmtId, afterStmtId);
+    manager.addParentRelationship(afterStmtId, beforeStmtId);
+    manager.addModifiesRelationship(beforeStmtId, variable);
+    manager.addUsesRelationship(afterStmtId, variable);
+
+    // Get all relationships from the manager
+    auto allFollows = manager.getAllFollowRelationship();
+    auto allParents = manager.getAllParentRelationship();
+    auto allModifies = manager.getAllModifyRelationship();
+    auto allUses = manager.getAllUseRelationship();
+
+    // Verify that the relationships are present in the maps
+    REQUIRE(allFollows[beforeStmtId] == afterStmtId);
+    REQUIRE(allParents[afterStmtId] == beforeStmtId);
+    REQUIRE(std::find(allModifies[beforeStmtId].begin(),
+                      allModifies[beforeStmtId].end(),
+                      variable) != allModifies[beforeStmtId].end());
+    REQUIRE(std::find(allUses[afterStmtId].begin(),
+                      allUses[afterStmtId].end(),
+                      variable) != allUses[afterStmtId].end());
+}

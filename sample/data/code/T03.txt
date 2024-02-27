@@ -1,4 +1,142 @@
 RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/util/EntityTypeConverter.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/c3d59194-4f71-41b5-b045-642450edca7a
+ChatId: c3d59194-4f71-41b5-b045-642450edca7a
+Code:
+class EntityTypeConverter {
+
+public:
+    static EntityType getEnumFromString(const std::string &s);
+
+    static std::string getStringFromEnum(EntityType e);
+
+    static bool initialize();
+
+private:
+    static std::unordered_map<std::string, EntityType> stringToEntityTypeMap;
+    static std::unordered_map<EntityType, std::string> entityTypeToStringMap;
+    [[maybe_unused]] static bool initialized;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/util/EntityTypeConverter.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/c3d59194-4f71-41b5-b045-642450edca7a
+ChatId: c3d59194-4f71-41b5-b045-642450edca7a
+Code:
+std::unordered_map<std::string, EntityType> EntityTypeConverter::stringToEntityTypeMap = {
+        {"stmt",      EntityType::Stmt},
+        {"read",      EntityType::Read},
+        {"print",     EntityType::Print},
+        {"call",      EntityType::Call},
+        {"while",     EntityType::While},
+        {"if",        EntityType::If},
+        {"assign",    EntityType::Assign},
+        {"variable",  EntityType::Variable},
+        {"constant",  EntityType::Constant},
+        {"procedure", EntityType::Procedure}
+};
+
+std::unordered_map<EntityType, std::string> EntityTypeConverter::entityTypeToStringMap;
+
+bool EntityTypeConverter::initialized = initialize();
+
+bool EntityTypeConverter::initialize() {
+    for (const auto &pair: stringToEntityTypeMap) {
+        entityTypeToStringMap[pair.second] = pair.first;
+    }
+    return true;
+}
+
+EntityType EntityTypeConverter::getEnumFromString(const std::string &s) {
+    auto it = stringToEntityTypeMap.find(s);
+    if (it != stringToEntityTypeMap.end()) {
+        return it->second;
+    } else {
+        return EntityType::Unknown;
+    }
+}
+
+std::string EntityTypeConverter::getStringFromEnum(EntityType e) {
+    auto it = entityTypeToStringMap.find(e);
+    if (it != entityTypeToStringMap.end()) {
+        return it->second;
+    } else {
+        return "Unknown";
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/parser/DeclarationsParser.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// prompt 1: https://chat.openai.com/share/82e2cd52-da0f-49d9-8032-25cca59e34b3
+// prompt 2: https://chat.openai.com/share/d86b9515-ec39-46ef-aaae-c8e284de92a2
+std::vector<std::shared_ptr<Synonym>>
+DeclarationsParser::parse(const std::vector<std::string> &tokens,
+                          std::unordered_map<std::string, EntityType> &synonymMap) {
+
+    std::vector<std::shared_ptr<Synonym>> declarations;
+
+    // Try to parse first token as entity type
+    EntityType currEntityType = EntityTypeConverter::getEnumFromString(tokens[0]);
+
+    // Invalid Entity Type or declaration doesn't start with an entity type
+    if (currEntityType == EntityType::Unknown) {
+        throw SyntaxErrorException("Syntax Error: Invalid Entity Type");
+    }
+
+    // Flag to check if next token should be a synonym name
+    // Variable name expected after EntityType definition
+    bool expectNameNext = true;
+
+
+    // Iterate through the rest of the tokens, less the first (entity type) and last (semicolon)
+    // Tokenizer ensures that the last token confirm is semicolon
+    for (size_t i = 1; i < tokens.size() - 1; ++i) {
+        if (tokens[i] == ",") {
+            if (expectNameNext) { // Found consecutive commas or a comma after an invalid token
+                throw SyntaxErrorException("Syntax Error: Unexpected ',' in declaration");
+            }
+            expectNameNext = true; // Next token must be a valid synonym name
+        } else {
+            if (!expectNameNext) { // Did not find a comma where one was expected
+                throw SyntaxErrorException("Expected ',' between synonym names");
+            }
+            std::string name = tokens[i];
+            if (synonymMap.find(name) != synonymMap.end()) {
+                throw SemanticErrorException("Duplicate declaration of " + name);
+            }
+
+            if (!QueryValidator::isName(name)) { // Validate synonym name more rigorously
+                throw SyntaxErrorException("Invalid synonym name");
+            }
+
+            synonymMap[name] = currEntityType;
+            declarations.push_back(std::make_shared<Synonym>(currEntityType, name));
+            expectNameNext = false; // Reset flag since a valid name was found
+        }
+    }
+
+    // Check if the declaration ended expecting a name
+    // Cases: {"variable", "a", ",", ";" }
+    if (expectNameNext) {
+        throw SyntaxErrorException("Syntax Error: Incomplete declaration");
+    }
+
+    return declarations;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
 File: Team03/Code03/src/spa/src/qps/entity/evaluation/QueryEvaluationContext.cpp
 Generator: gpt
 Intervention: 1
@@ -6,106 +144,364 @@ Language: e
 Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 Code:
+// prompt 2: https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
 #include "QueryEvaluationContext.h"
 #include <algorithm>
 #include <string>
 #include <sstream>
 
-void QueryEvaluationContext::addSynonymValues(const SynonymValues& synonymValues) {
-    synonymValuesList.push_back(synonymValues);
+
+QueryEvaluationContext::QueryEvaluationContext() : queryManager(std::make_shared<QueryManager>()) {}
+
+void QueryEvaluationContext::addTableForSynonym(const Synonym& synonym, const std::shared_ptr<BaseTable>& table) {
+    synonymToTableMap[synonym] = table;
+}
+
+void QueryEvaluationContext::clearTables() {
+    synonymToTableMap.clear();
+}
+
+std::shared_ptr<BaseTable> QueryEvaluationContext::getTableForSynonym(const Synonym& synonym) const {
+    auto it = synonymToTableMap.find(synonym);
+    if (it != synonymToTableMap.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+bool QueryEvaluationContext::containsSynonym(const Synonym& synonym) const {
+    return synonymToTableMap.find(synonym) != synonymToTableMap.end();
+}
+
+std::vector<Synonym> QueryEvaluationContext::getSynonyms() const {
+    std::vector<Synonym> synonyms;
+    for (const auto& pair : synonymToTableMap) {
+        synonyms.push_back(pair.first);
+    }
+    return synonyms;
+}
+
+std::shared_ptr<QueryManager> QueryEvaluationContext::getQueryManager() const {
+    return queryManager;
+}
+
+void QueryEvaluationContext::setQueryManager(const std::shared_ptr<QueryManager>& queryManager) {
+    this->queryManager = queryManager;
+}
+
+std::vector<std::string> QueryEvaluationContext::getResults() const {
+    if (resultTable == nullptr) {
+        throw std::runtime_error("No result table present");
+    }
+    return resultTable->toStrings();
+}
+
+void QueryEvaluationContext::setResultTable(const shared_ptr<BaseTable> &_resultTable) {
+    this->resultTable = _resultTable;
+}
+
+/**
+ * Checks whether the result is empty. Returns true if any of the tables in the context is empty.
+ */
+bool QueryEvaluationContext::isCurrentResultEmpty() const {
+    if (resultMustBeEmpty) {
+        return true;
+    }
+    for (const auto& pair : synonymToTableMap) {
+        if (pair.second->isEmpty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::shared_ptr<BaseTable> QueryEvaluationContext::getResultTable() const {
+    return resultTable;
+}
+
+void QueryEvaluationContext::setSynonymGroups(
+        const vector<SynonymPtrSet> &synonymGroups) {
+    this->synonymGroups = synonymGroups;
 }
 --------------------
 RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.h
-Generator: gpt
-Intervention: 1
-Language: e
-Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-Code:
-#pragma once
-
-#include "qps/entity/query/Synonym.h"
-#include "common/Entity.h"
-#include <vector>
-#include <memory>
-
-// Represents a list of possible values for a synonym.
-class SynonymValues {
-private:
-    shared_ptr<Synonym> synonym;
-    std::vector<std::shared_ptr<Entity>> values;
-
-public:
-    explicit SynonymValues(const shared_ptr<Synonym> &syn) : synonym(syn) {}
-    void addValue(const std::shared_ptr<Entity>& value);
-    [[nodiscard]] const std::vector<std::shared_ptr<Entity>>& getValues() const;
-    [[nodiscard]] shared_ptr<Synonym> getSynonym() const { return synonym; }
-    [[nodiscard]] vector<string> toStringList() const;
-    bool operator==(const SynonymValues &rhs) const;
-};
---------------------
-RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.cpp
-Generator: gpt
-Intervention: 1
-Language: e
-Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-Code:
-#include "SynonymValues.h"
-#include "common/Entity.h"
-#include <algorithm>
-
-
-void SynonymValues::addValue(const std::shared_ptr<Entity>& value) {
-    values.push_back(value);
-}
-
-const std::vector<std::shared_ptr<Entity>>& SynonymValues::getValues() const {
-    return values;
-}
---------------------
-RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.cpp
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/QueryEvaluationContext.cpp
 Generator: gpt
 Intervention: 0
 Language: e
-Prompt: https://chat.openai.com/share/dc4fa5ec-550d-4bf8-b28d-2d6a9d8bf4a2
-ChatId: dc4fa5ec-550d-4bf8-b28d-2d6a9d8bf4a2
+Prompt: https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192
+ChatId: 7c590366-8e0e-40e2-863f-2862fa1ae192
 Code:
-bool SynonymValues::operator==(const SynonymValues &rhs) const {
-    // First, check if the synonyms are different
-    if (synonym != rhs.synonym) {
-        return false;
+bool QueryEvaluationContext::isTableInitialized(const Synonym& synonym) const {
+    return synonymToTableMap.find(synonym) != synonymToTableMap.end();
+}
+
+void QueryEvaluationContext::putTableForSynonymGroup(const Synonym& synonym, const std::shared_ptr<BaseTable>& table) {
+    // Find the synonym group for the given synonym
+    for (const auto& group : synonymGroups) {
+        if (group.find(std::make_shared<Synonym>(synonym)) != group.end()) {
+            // For each synonym in the group, initialize the table
+            for (const auto& syn : group) {
+                synonymToTableMap[*syn] = table;
+            }
+            break;
+        }
+    }
+}
+
+void QueryEvaluationContext::setResultToFalse() {
+    resultMustBeEmpty = true;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymGraph.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/7b6dae68-063a-4ce8-9fd0-bd2ac43f9fe4
+ChatId: 7b6dae68-063a-4ce8-9fd0-bd2ac43f9fe4
+Code:
+SynonymGraph::SynonymGraph(const std::vector<std::shared_ptr<Predicate>>& predicates) : predicates(predicates) {
+    for (const auto& predicate : predicates) {
+        auto synonyms = predicate->getSynonyms();
+        // add self loop for each synonym
+        for (const auto& synonym : synonyms) {
+            addEdge(synonym, synonym);
+        }
+        for (size_t i = 0; i < synonyms.size(); ++i) {
+            for (size_t j = i + 1; j < synonyms.size(); ++j) {
+                addEdge(synonyms[i], synonyms[j]);
+                addEdge(synonyms[j], synonyms[i]);
+            }
+        }
+    }
+}
+
+void SynonymGraph::addEdge(const std::shared_ptr<Synonym>& u, const std::shared_ptr<Synonym>& v) {
+    adjList[u].push_back(v);
+}
+
+std::vector<SynonymPtrSet> SynonymGraph::groupSynonyms() {
+    std::vector<SynonymPtrSet> groups;
+    for (const auto& pair : adjList) {
+        if (visited.find(pair.first) == visited.end()) {
+            SynonymPtrSet component;
+            DFS(pair.first, component);
+            groups.push_back(component);
+        }
+    }
+    return groups;
+}
+
+void SynonymGraph::DFS(std::shared_ptr<Synonym> v, SynonymPtrSet & component) {
+    visited.insert(v);
+    component.insert(v);
+    for (auto& adjSynonym : adjList[v]) {
+        if (visited.find(adjSynonym) == visited.end()) {
+            DFS(adjSynonym, component);
+        }
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/HeaderTable.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+ChatId: 69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+Code:
+#ifndef TABLE_H
+#define TABLE_H
+
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include "qps/entity/query/Synonym.h" // Assuming Synonym and Entity classes are defined elsewhere
+#include "common/Entity.h"
+#include "qps/entity/evaluation/TableRow.h"
+#include "BaseTable.h"
+
+using namespace std;
+
+// Class to represent the table itself.
+class HeaderTable : public BaseTable {
+private:
+    std::vector<shared_ptr<Synonym>> headers;
+    std::unordered_map<Synonym, int> headerIndexMap; // Mapping from synonym to index
+    bool isValidRow(const TableRow& row) const override;
+
+public:
+    HeaderTable() = default;
+    HeaderTable(const vector<shared_ptr<Synonym>>& headers, const vector<vector<shared_ptr<Entity>>>& entities);
+    HeaderTable(const vector<shared_ptr<Synonym>>& headers, BaseTable& baseTable);
+    void setHeaders(const vector<shared_ptr<Synonym>>& headers);
+    [[nodiscard]] const vector<shared_ptr<Synonym>>& getHeaders() const;
+    [[nodiscard]] HeaderTable selectColumns(const vector<shared_ptr<Synonym>>& synonyms) const; // Projection operation
+    shared_ptr<BaseTable> join(BaseTable& other) override;
+
+    void updateHeaderIndexMap(); // Utility function to update headerIndexMap
+    int indexOf(const Synonym& synonym) const; // Get index of a synonym
+    bool hasHeader(const Synonym& synonym) const; // Check if a header exists
+    bool operator==(const BaseTable& other) const override;
+};
+
+#endif // TABLE_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/HeaderTable.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/eadbc02c-9e25-4f11-b2bb-c215c525d944
+ChatId: eadbc02c-9e25-4f11-b2bb-c215c525d944
+Code:
+#include "HeaderTable.h"
+#include <algorithm>
+#include <unordered_set>
+#include <memory>
+#include "common/spa_exception/QPSEvaluationException.h"
+#include "BooleanTable.h"
+
+bool rowsAreCompatible(const TableRow &row1, const TableRow &row2,
+                       const HeaderTable &table1, const HeaderTable &table2,
+                       const std::vector<shared_ptr<Synonym>> &commonHeaders);
+
+
+std::vector<std::shared_ptr<Entity>> createJoinedRow(const TableRow &row1, const TableRow &row2,
+                                                     const HeaderTable &table1, const HeaderTable &table2,
+                                                     const std::vector<shared_ptr<Synonym>> &newHeaders);
+
+
+bool HeaderTable::isValidRow(const TableRow &row) const {
+    if (row.getValues().size() == headers.size()) {
+        // Checks if the types of the entities in the row match the types of the headers
+        for (size_t i = 0; i < headers.size(); ++i) {
+            if (!row.getValues()[i]->isOfType(headers[i]->getType())) {
+                return false;
+            }
+        }
+    }
+    return row.getValues().size() == headers.size();
+}
+
+void HeaderTable::setHeaders(const vector<shared_ptr<Synonym>> &headers) {
+    this->headers = headers;
+    setColumnCount(headers.size());
+    updateHeaderIndexMap();
+}
+
+const vector<shared_ptr<Synonym>>& HeaderTable::getHeaders() const {
+    return headers;
+}
+
+HeaderTable HeaderTable::selectColumns(const vector<shared_ptr<Synonym>> &synonyms) const {
+    HeaderTable newTable;
+    vector<shared_ptr<Synonym>> newHeaders;
+    vector<int> indices;
+
+    // Find the indices of the selected synonyms in the current headers
+    for (const auto &syn: synonyms) {
+        for (size_t i = 0; i < headers.size(); ++i) {
+            if (*headers[i] == *syn) {
+                newHeaders.push_back(syn);
+                indices.push_back(i);
+                break;
+            }
+        }
     }
 
-    // No need to sort the original vectors if they are of different sizes
-    if (values.size() != rhs.values.size()) {
-        return false;
+    newTable.setHeaders(newHeaders);
+
+    // Project rows to new table based on selected columns
+    for (const auto &row: getRows()) {
+        vector<shared_ptr<Entity>> newRowValues;
+        for (int idx: indices) {
+            newRowValues.push_back(row.getValues()[idx]);
+        }
+        newTable.addRow(TableRow(newRowValues));
     }
 
-    // Sort a copy of the vectors based on the names of the entities
-    auto sortedValues = values; // Make a copy to sort
-    auto sortedRhsValues = rhs.values; // Make a copy to sort
+    return newTable;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/TableRow.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/eadbc02c-9e25-4f11-b2bb-c215c525d944
+ChatId: eadbc02c-9e25-4f11-b2bb-c215c525d944
+Code:
+#ifndef SPA_TABLEROW_H
+#define SPA_TABLEROW_H
 
-    std::sort(sortedValues.begin(), sortedValues.end(),
-              [](const std::shared_ptr<Entity>& a, const std::shared_ptr<Entity>& b) {
-                  return a->getName() < b->getName();
-              });
 
-    std::sort(sortedRhsValues.begin(), sortedRhsValues.end(),
-              [](const std::shared_ptr<Entity>& a, const std::shared_ptr<Entity>& b) {
-                  return a->getName() < b->getName();
-              });
+#include "common/Entity.h"
+#include <vector>
+#include <memory>
+#include <string>
+#include <sstream>
 
-    // Now that both are sorted, compare element by element
-    for (size_t i = 0; i < sortedValues.size(); ++i) {
-        if (!(sortedValues[i]->getName() == sortedRhsValues[i]->getName())) {
+// Class to represent a row in the table.
+class TableRow {
+private:
+    vector<shared_ptr<Entity>> values; // Stores the values of the row
+
+public:
+    explicit TableRow(const vector<shared_ptr<Entity>>& v);
+    [[nodiscard]] const vector<shared_ptr<Entity>>& getValues() const;
+    bool operator==(const TableRow& other) const;
+    [[nodiscard]] string toString() const;
+    [[nodiscard]] std::shared_ptr<Entity> getByIndex(int index) const; // New function for direct access
+    friend class HeaderTable; // Allows HeaderTable to access private members of TableRow
+    bool operator<(const TableRow& other) const;
+};
+
+
+#endif //SPA_TABLEROW_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/TableRow.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/eadbc02c-9e25-4f11-b2bb-c215c525d944
+ChatId: eadbc02c-9e25-4f11-b2bb-c215c525d944
+Code:
+#include "TableRow.h"
+
+// Implementation of TableRow
+TableRow::TableRow(const vector<shared_ptr<Entity>> &values) : values(values) {}
+
+const vector<shared_ptr<Entity>> &TableRow::getValues() const {
+    return values;
+}
+
+bool TableRow::operator==(const TableRow &other) const {
+    if (values.size() != other.values.size()) {
+        return false;
+    }
+    for (size_t i = 0; i < values.size(); ++i) {
+        if (
+                values[i]->getName() != other.values[i]->getName() ||
+                values[i]->getType() != other.values[i]->getType()
+                ) {
             return false;
         }
     }
     return true;
+}
+
+string TableRow::toString() const {
+    ostringstream oss;
+    for (auto it = values.begin(); it != values.end(); ++it) {
+        if (it != values.begin()) {
+            oss << " "; // Add space before all but the first entity's name
+        }
+        oss << (*it)->getName(); // Dereference the iterator and shared_ptr to call getName
+    }
+    return oss.str();
 }
 --------------------
 RepoName: 23s2-cp-spa-team-03
@@ -116,56 +512,1037 @@ Language: e
 Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
 Code:
+// prompt 2: https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
 #pragma once
 
-#include "SynonymValues.h"
+#ifndef QUERYEVALUATIONCONTEXT_H
+#define QUERYEVALUATIONCONTEXT_H
+
+#include <memory>
+#include <unordered_map>
+#include <vector>
+#include "BaseTable.h" // Include the BaseTable class header
+#include "qps/entity/query/Synonym.h"
 #include "pkb/QueryPKB.h"
-#include <list>
 
 class QueryEvaluationContext {
 private:
-    std::list<SynonymValues> synonymValuesList;
-    shared_ptr<QueryManager> queryManager;
+    std::unordered_map<Synonym, std::shared_ptr<BaseTable>> synonymToTableMap;
+    bool resultMustBeEmpty = false;    // A quick indicator of empty result, for early termination
+    std::shared_ptr<QueryManager> queryManager;
+    std::shared_ptr<BaseTable> resultTable;
+    std::vector<SynonymPtrSet> synonymGroups;
 
 public:
     QueryEvaluationContext();
-    void addSynonymValues(const SynonymValues& synonymValues);
-    void clearSynonymValuesList();
-    [[nodiscard]] SynonymValues getSynonymValues(const Synonym& synonym) const;
+    void addTableForSynonym(const Synonym& synonym, const std::shared_ptr<BaseTable>& table);
+    void clearTables();
+    [[nodiscard]] std::shared_ptr<BaseTable> getTableForSynonym(const Synonym& synonym) const;
     [[nodiscard]] bool containsSynonym(const Synonym& synonym) const;
-    [[nodiscard]] std::list<Synonym> getSynonyms() const;
-    [[nodiscard]] shared_ptr<QueryManager> getQueryManager() const;
-    [[nodiscard]] vector<string>getResults() const;
-    void setQueryManager(const shared_ptr<QueryManager>& queryManager1);
+    [[nodiscard]] bool isTableInitialized(const Synonym& synonym) const;
+    void putTableForSynonymGroup(const Synonym& synonym, const std::shared_ptr<BaseTable>& table);
+    [[nodiscard]] std::vector<Synonym> getSynonyms() const;
+    [[nodiscard]] std::shared_ptr<QueryManager> getQueryManager() const;
+    void setQueryManager(const std::shared_ptr<QueryManager>& queryManager);
+    [[nodiscard]] std::vector<std::string> getResults() const;
+    void setResultTable(const std::shared_ptr<BaseTable>& _resultTable);
+    [[nodiscard]] std::shared_ptr<BaseTable> getResultTable() const;
+    [[nodiscard]] bool isCurrentResultEmpty() const;
+    void setSynonymGroups(const std::vector<SynonymPtrSet>& synonymGroups);
+    void setResultToFalse();
 };
+
+#endif // QUERY_EVALUATION_CONTEXT_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymGraph.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/7b6dae68-063a-4ce8-9fd0-bd2ac43f9fe4
+ChatId: 7b6dae68-063a-4ce8-9fd0-bd2ac43f9fe4
+Code:
+#ifndef SYNONYMGRAPH_H
+#define SYNONYMGRAPH_H
+
+#include <vector>
+#include <memory>
+#include <unordered_map>
+#include <unordered_set>
+#include "qps/entity/query/Query.h"
+
+class SynonymGraph {
+public:
+    SynonymGraph(const std::vector<std::shared_ptr<Predicate>>& predicates);
+    std::vector<SynonymPtrSet> groupSynonyms();
+
+private:
+    void addEdge(const std::shared_ptr<Synonym>& u, const std::shared_ptr<Synonym>& v);
+    void DFS(std::shared_ptr<Synonym> v, SynonymPtrSet & component);
+
+    std::vector<std::shared_ptr<Predicate>> predicates;
+    std::unordered_map<std::shared_ptr<Synonym>, std::vector<std::shared_ptr<Synonym>>, SynonymPtrHash, SynonymPtrEqual> adjList;
+    std::unordered_set<std::shared_ptr<Synonym>> visited;
+};
+
+#endif // SYNONYMGRAPH_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/query/Synonym.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+ChatId: 69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+Code:
+#ifndef SPA_SYNONYM_H
+#define SPA_SYNONYM_H
+
+#include "common/EntityType.h"
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <memory>
+
+
+#include <functional> // Required for std::hash
+
+class Synonym {
+private:
+    EntityType type;
+    std::string name;
+public:
+    Synonym(EntityType type, const std::string &name);
+    Synonym(const std::string& synonymName, const std::unordered_map<std::string, EntityType>& synonymMap);
+
+    [[nodiscard]] EntityType getType() const;
+
+    [[nodiscard]] const std::string &getName() const;
+
+    bool operator==(const Synonym &other) const;
+
+};
+
+// Define the hash function for Synonym within the std namespace
+namespace std {
+    template<>
+    struct hash<Synonym> {
+        size_t operator()(const Synonym &synonym) const {
+            // Combine the hash of the name and the type for the Synonym
+            return hash<string>()(synonym.getName())
+                   ^ (hash<int>()(static_cast<int>(synonym.getType())) << 1);
+        }
+    };
+}
+
+struct SynonymPtrHash {
+    size_t operator()(const std::shared_ptr<Synonym>& synonym) const {
+        return std::hash<Synonym>()(*synonym);
+    }
+};
+
+struct SynonymPtrEqual {
+    bool operator()(const std::shared_ptr<Synonym>& lhs, const std::shared_ptr<Synonym>& rhs) const {
+        return *lhs == *rhs;
+    }
+};
+
+using SynonymPtrSet = std::unordered_set<std::shared_ptr<Synonym>, SynonymPtrHash, SynonymPtrEqual>;
+
+#endif //SPA_SYNONYM_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/FollowsPredicate.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#ifndef FOLLOWSPREDICATE_H
+#define FOLLOWSPREDICATE_H
+
+#include "Predicate.h"
+#include <memory>
+#include <variant>
+#include "PredicateUtils.h"
+
+
+// Forward declaration of Strategy to avoid circular dependency
+class Strategy;
+
+class FollowsPredicate : public Predicate {
+private:
+    StatementRef lhs; // Left-hand side can be an int, Synonym, or "_"
+    StatementRef rhs; // Right-hand side can be a Synonym or "_"
+    bool isValidRow(const std::vector<std::shared_ptr<Entity>>& row) const;
+public:
+    FollowsPredicate(StatementRef lhs, StatementRef rhs);
+    ~FollowsPredicate() override = default;
+    [[nodiscard]] shared_ptr<BaseTable> getTable(QueryManager& qm) override;
+    std::string toString() const override;
+};
+
+#endif // FOLLOWSPREDICATE_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/ParentPredicate.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#ifndef PARENTPREDICATE_H
+#define PARENTPREDICATE_H
+
+#include "Predicate.h"
+#include "qps/entity/evaluation/HeaderTable.h"
+#include "PredicateUtils.h"
+#include "common/spa_exception/SyntaxErrorException.h"
+#include "common/spa_exception/QPSEvaluationException.h"
+#include <memory>
+
+class ParentPredicate : public Predicate {
+private:
+    StatementRef lhs;
+    StatementRef rhs;
+    bool isValidRow(const std::vector<std::shared_ptr<Entity>>& row) const;
+
+public:
+    ParentPredicate(StatementRef lhs, StatementRef rhs);
+    std::shared_ptr<BaseTable> getTable(QueryManager &qm) override;
+    std::string toString() const override;
+};
+
+#endif // PARENTPREDICATE_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/ParentTPredicate.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#ifndef PARENTTPREDICATE_H
+#define PARENTTPREDICATE_H
+
+#include "Predicate.h"
+#include <memory>
+#include <variant>
+#include "PredicateUtils.h"
+#include "qps/entity/evaluation/HeaderTable.h"
+#include "common/spa_exception/SyntaxErrorException.h"
+#include "common/spa_exception/QPSEvaluationException.h"
+
+
+class Strategy;
+
+class ParentTPredicate : public Predicate {
+private:
+    StatementRef lhs; // Ancestor statement reference
+    StatementRef rhs; // Descendant statement reference
+    bool isValidRow(const std::vector<std::shared_ptr<Entity>>& row) const;
+public:
+    ParentTPredicate(StatementRef lhs, StatementRef rhs);
+    ~ParentTPredicate() override = default;
+    std::shared_ptr<BaseTable> getTable(QueryManager &qm) override;
+    std::string toString() const override;
+
+};
+
+#endif // PARENTTPREDICATE_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/ParentTPredicate.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#include "ParentTPredicate.h"
+#include "common/spa_exception/SyntaxErrorException.h"
+
+ParentTPredicate::ParentTPredicate(StatementRef lhs, StatementRef rhs)
+        : lhs(std::move(lhs)), rhs(std::move(rhs)) {
+    if (!isValidStatementRef(this->lhs) || !isValidStatementRef(this->rhs)) {
+        throw SemanticErrorException("Invalid arguments for ParentTPredicate constructor");
+    }
+    if (std::holds_alternative<Synonym>(this->lhs)) {
+        auto synonym = std::get<Synonym>(this->lhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+    if (std::holds_alternative<Synonym>(this->rhs)) {
+        auto synonym = std::get<Synonym>(this->rhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+}
+
+std::shared_ptr<BaseTable> ParentTPredicate::getTable(QueryManager &qm) {
+    // Step 1: Fetch all parent relationships as a BaseTable
+    auto allParents = BaseTable(
+            qm.getParentT(), 2); // Assuming getParentS returns data compatible with BaseTable constructor
+
+    // Step 2: Filter based on lhs and rhs
+    auto filteredParentT = allParents.filter([this](const std::vector<std::shared_ptr<Entity>>& row) {
+        return isValidRow(row);
+    });
+
+    // Step 3: Project to keep columns associated with a Synonym or determine a boolean result
+    bool isLhsSynonym = std::holds_alternative<Synonym>(lhs);
+    bool isRhsSynonym = std::holds_alternative<Synonym>(rhs);
+    shared_ptr<BaseTable> resultTable = filteredParentT->project({isLhsSynonym, isRhsSynonym});
+    if (!resultTable->isBoolean()) {
+        if (synonyms.size() == 2 && *synonyms[0] == *synonyms[1]) {
+            resultTable = resultTable->filter([](const std::vector<std::shared_ptr<Entity>> &row) {
+                return row[0] == row[1];
+            });
+        }
+        resultTable = std::make_shared<HeaderTable>(synonyms, *resultTable);
+    }
+    return resultTable;
+}
+
+bool ParentTPredicate::isValidRow(const std::vector<std::shared_ptr<Entity>>& row) const {
+    if (row.size() != 2) {
+        throw QPSEvaluationException("ParentTPredicate: got a row with size != 2 from PKB");
+    }
+
+    auto parentStatement = std::dynamic_pointer_cast<Statement>(row[0]);
+    auto childStatement = std::dynamic_pointer_cast<Statement>(row[1]);
+    if (parentStatement == nullptr || childStatement == nullptr) {
+        throw QPSEvaluationException("ParentTPredicate: non-statement entity in the row from PKB");
+    }
+
+    bool lhsMatch = std::holds_alternative<std::string>(lhs) && std::get<std::string>(lhs) == "_";
+    bool rhsMatch = std::holds_alternative<std::string>(rhs) && std::get<std::string>(rhs) == "_";
+
+    if (std::holds_alternative<int>(lhs)) {
+        int lhsInt = std::get<int>(lhs);
+        lhsMatch = parentStatement->getStatementNumber() == lhsInt;
+    } else if (std::holds_alternative<Synonym>(lhs)) {
+        auto lhsSynonym = std::get<Synonym>(lhs);
+        lhsMatch = parentStatement->isOfType(lhsSynonym.getType());
+    }
+
+    if (std::holds_alternative<int>(rhs)) {
+        int rhsInt = std::get<int>(rhs);
+        rhsMatch = childStatement->getStatementNumber() == rhsInt;
+    } else if (std::holds_alternative<Synonym>(rhs)) {
+        auto rhsSynonym = std::get<Synonym>(rhs);
+        rhsMatch = childStatement->isOfType(rhsSynonym.getType());
+    }
+
+    return lhsMatch && rhsMatch;
+}
+
+std::string ParentTPredicate::toString() const {
+    std::string lhsStr = std::visit(overloaded {
+            [](const int val) { return std::to_string(val); },
+            [](const Synonym& syn) { return syn.getName(); },
+            [](const std::string& str) { return str; },
+            [](const auto&) { return std::string("Unsupported Type"); }
+    }, lhs);
+
+    std::string rhsStr = std::visit(overloaded {
+            [](const int val) { return std::to_string(val); },
+            [](const Synonym& syn) { return syn.getName(); },
+            [](const std::string& str) { return str; },
+            [](const auto&) { return std::string("Unsupported Type"); }
+    }, rhs);
+
+    return "ParentTPredicate " + lhsStr + " " + rhsStr;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/FollowsTPredicate.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#ifndef FOLLOWSTPREDICATE_H
+#define FOLLOWSTPREDICATE_H
+
+#include "Predicate.h"
+#include <memory>
+#include <variant>
+#include "PredicateUtils.h"
+
+// Forward declaration of Strategy to avoid circular dependency
+class Strategy;
+
+class FollowsTPredicate : public Predicate {
+private:
+    StatementRef lhs; // Left-hand statement reference
+    StatementRef rhs; // Right-hand statement reference
+    [[nodiscard]] bool isValidRow(const std::vector<std::shared_ptr<Entity>> &row) const;
+
+public:
+    FollowsTPredicate(StatementRef lhs, StatementRef rhs);
+    ~FollowsTPredicate() override = default;
+
+    [[nodiscard]] std::shared_ptr<BaseTable> getTable(QueryManager &qm) override;
+};
+
+#endif // FOLLOWSTPREDICATE_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/ParentPredicate.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#include "ParentPredicate.h"
+
+
+ParentPredicate::ParentPredicate(StatementRef lhs, StatementRef rhs) {
+    if (!isValidStatementRef(lhs) || !isValidStatementRef(rhs)) {
+        throw SemanticErrorException("Invalid argument for ParentPredicate constructor");
+    }
+
+    this->lhs = std::move(lhs);
+    this->rhs = std::move(rhs);
+
+    if (std::holds_alternative<Synonym>(this->lhs)) {
+        auto synonym = std::get<Synonym>(this->lhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+    if (std::holds_alternative<Synonym>(this->rhs)) {
+        auto synonym = std::get<Synonym>(this->rhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+}
+
+
+std::shared_ptr<BaseTable> ParentPredicate::getTable(QueryManager &qm) {
+    // Step 1: Fetch all parent relationships as a BaseTable
+    auto allParents = BaseTable(
+            qm.getParentS(), 2); // Assuming getParentS returns data compatible with BaseTable constructor
+
+    // Step 2: Filter based on lhs and rhs
+    auto filteredParents = allParents.filter([this](const std::vector<std::shared_ptr<Entity>>& row) {
+        return isValidRow(row);
+    });
+
+    // Step 3: Project to keep columns associated with a Synonym or determine a boolean result
+    bool isLhsSynonym = std::holds_alternative<Synonym>(lhs);
+    bool isRhsSynonym = std::holds_alternative<Synonym>(rhs);
+    shared_ptr<BaseTable> resultTable = filteredParents->project({isLhsSynonym, isRhsSynonym});
+    if (!resultTable->isBoolean()) {
+        if (synonyms.size() == 2 && *synonyms[0] == *synonyms[1]) {
+            resultTable = resultTable->filter([](const std::vector<std::shared_ptr<Entity>> &row) {
+                return row[0] == row[1];
+            });
+        }
+        resultTable = std::make_shared<HeaderTable>(synonyms, *resultTable);
+    }
+
+    return resultTable;
+}
+
+bool ParentPredicate::isValidRow(const std::vector<std::shared_ptr<Entity>>& row) const {
+    if (row.size() != 2) {
+        throw QPSEvaluationException("ParentPredicate: got a row with size != 2 from PKB");
+    }
+
+    auto parentStatement = std::dynamic_pointer_cast<Statement>(row[0]);
+    auto childStatement = std::dynamic_pointer_cast<Statement>(row[1]);
+    if (parentStatement == nullptr || childStatement == nullptr) {
+        throw QPSEvaluationException("ParentPredicate: non-statement entity in the row from PKB");
+    }
+
+    bool lhsMatch = std::holds_alternative<std::string>(lhs) && std::get<std::string>(lhs) == "_";
+    bool rhsMatch = std::holds_alternative<std::string>(rhs) && std::get<std::string>(rhs) == "_";
+
+    if (std::holds_alternative<int>(lhs)) {
+        int lhsInt = std::get<int>(lhs);
+        lhsMatch = parentStatement->getStatementNumber() == lhsInt;
+    } else if (std::holds_alternative<Synonym>(lhs)) {
+        auto lhsSynonym = std::get<Synonym>(lhs);
+        lhsMatch = parentStatement->isOfType(lhsSynonym.getType());
+    }
+
+    if (std::holds_alternative<int>(rhs)) {
+        int rhsInt = std::get<int>(rhs);
+        rhsMatch = childStatement->getStatementNumber() == rhsInt;
+    } else if (std::holds_alternative<Synonym>(rhs)) {
+        auto rhsSynonym = std::get<Synonym>(rhs);
+        rhsMatch = childStatement->isOfType(rhsSynonym.getType());
+    }
+
+    return lhsMatch && rhsMatch;
+}
+
+std::string ParentPredicate::toString() const {
+    std::string lhsStr = std::visit(overloaded {
+            [](const int val) { return std::to_string(val); },
+            [](const Synonym& syn) { return syn.getName(); },
+            [](const std::string& str) { return str; },
+            [](const auto&) { return std::string("Unsupported Type"); }
+    }, lhs);
+
+    std::string rhsStr = std::visit(overloaded {
+            [](const int val) { return std::to_string(val); },
+            [](const Synonym& syn) { return syn.getName(); },
+            [](const std::string& str) { return str; },
+            [](const auto&) { return std::string("Unsupported Type"); }
+    }, rhs);
+
+    return "ParentPredicate " + lhsStr + " " + rhsStr;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/FollowsTPredicate.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#include "FollowsTPredicate.h"
+#include "common/spa_exception/SyntaxErrorException.h"
+#include "common/spa_exception/QPSEvaluationException.h"
+#include "qps/entity/evaluation/HeaderTable.h"
+
+FollowsTPredicate::FollowsTPredicate(StatementRef lhs, StatementRef rhs) {
+    if (!isValidStatementRef(lhs) || !isValidStatementRef(rhs)) {
+        throw SemanticErrorException("Invalid arguments for FollowsTPredicate constructor");
+    }
+
+    this->lhs = std::move(lhs);
+    this->rhs = std::move(rhs);
+
+    if (std::holds_alternative<Synonym>(this->lhs)) {
+        auto synonym = std::get<Synonym>(this->lhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+    if (std::holds_alternative<Synonym>(this->rhs)) {
+        auto synonym = std::get<Synonym>(this->rhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+}
+
+std::shared_ptr<BaseTable> FollowsTPredicate::getTable(QueryManager &qm) {
+    // Step 1: Fetch all followsT relationships as BaseTable
+    auto allFollowsT = BaseTable(qm.getFollowT(), 2);
+
+    //Step 2: Filter based on lhs and rhs
+    auto filteredFollowsT = allFollowsT.filter([this](const std::vector<std::shared_ptr<Entity>>& row) {
+        return isValidRow(row);
+    });
+
+    //Step 3: Project to keep columns associated with a Synonym or determine boolean result
+    bool isLhsSynonym = std::holds_alternative<Synonym>(lhs);
+    bool isRhsSynonym = std::holds_alternative<Synonym>(rhs);
+
+    shared_ptr<BaseTable> resultTable = filteredFollowsT->project({isLhsSynonym, isRhsSynonym});
+    if(!resultTable->isBoolean()) {
+        if (synonyms.size() == 2 && *synonyms[0] == *synonyms[1]) {
+            resultTable = resultTable->filter([](const std::vector<std::shared_ptr<Entity>> &row) {
+                return row[0] == row[1];
+            });
+        }
+        resultTable = std::make_shared<HeaderTable>(synonyms, *resultTable);
+    }
+    return resultTable;
+}
+
+bool FollowsTPredicate::isValidRow(const std::vector<std::shared_ptr<Entity>> &row) const {
+    if (row.size() != 2) {
+        throw QPSEvaluationException("FollowsTPredicate: got a row with size != 2 from PKB");
+    }
+    bool lhsMatch = true; // Default to true for wildcard "-"
+    bool rhsMatch = true; // Same as above
+    auto lhsStatement = std::dynamic_pointer_cast<Statement>(row[0]);
+    auto rhsStatement = std::dynamic_pointer_cast<Statement>(row[1]);
+    if (lhsStatement == nullptr || rhsStatement == nullptr) {
+        throw QPSEvaluationException("FollowsTPredicate: got a non-statement entity in the row from PKB");
+    }
+
+    if (std::holds_alternative<int>(lhs)) {
+        int lhsInt = std::get<int>(lhs);
+        lhsMatch = lhsStatement->getStatementNumber() == lhsInt;
+    } else if (std::holds_alternative<Synonym>(lhs)) {
+        auto lhsSynonym = std::get<Synonym>(lhs);
+        lhsMatch = lhsStatement->isOfType(lhsSynonym.getType());
+    }
+
+    if (std::holds_alternative<int>(rhs)) {
+        int rhsInt = std::get<int>(rhs);
+        rhsMatch = rhsStatement->getStatementNumber() == rhsInt;
+    } else if (std::holds_alternative<Synonym>(rhs)) {
+        auto rhsSynonym = std::get<Synonym>(rhs);
+        rhsMatch = rhsStatement->isOfType(rhsSynonym.getType());
+    }
+
+    return lhsMatch && rhsMatch;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/FollowsPredicate.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#include "FollowsPredicate.h"
+#include "common/spa_exception/SyntaxErrorException.h"
+#include "common/spa_exception/QPSEvaluationException.h"
+#include "qps/entity/evaluation/HeaderTable.h"
+
+FollowsPredicate::FollowsPredicate(StatementRef lhs, StatementRef rhs) {
+    if (!isValidStatementRef(lhs) || !isValidStatementRef(rhs)) {
+        throw SemanticErrorException("Invalid argument for FollowsPredicate constructor");
+    }
+
+    this->lhs = std::move(lhs);
+    this->rhs = std::move(rhs);
+
+    if (std::holds_alternative<Synonym>(this->lhs)) {
+        auto synonym = std::get<Synonym>(this->lhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+    if (std::holds_alternative<Synonym>(this->rhs)) {
+        auto synonym = std::get<Synonym>(this->rhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+}
+
+
+shared_ptr<BaseTable> FollowsPredicate::getTable(QueryManager &qm) {
+    // Step 1: Fetch all follows relationships as a BaseTable
+    auto allFollows = BaseTable(
+            qm.getFollowS(), 2); // Assuming getFollowS returns data compatible with BaseTable constructor
+    // Step 2: Filter based on lhs and rhs
+    // The filtering logic will depend on the nature of lhs and rhs (integer, wildcard, synonym)
+    auto filteredFollows = allFollows.filter([this](const std::vector<std::shared_ptr<Entity>>& row) {
+        return isValidRow(row);
+    });
+
+    // Step 3: Project to keep columns associated with a Synonym or determine a boolean result
+    bool isLhsSynonym = std::holds_alternative<Synonym>(lhs);
+    bool isRhsSynonym = std::holds_alternative<Synonym>(rhs);
+    shared_ptr<BaseTable> resultTable = filteredFollows->project({isLhsSynonym, isRhsSynonym});
+    if (!resultTable->isBoolean()) {
+        // an additional filter to drop row if all headers are the same and the values are different
+        if (synonyms.size() == 2 && *synonyms[0] == *synonyms[1]) {
+            resultTable = resultTable->filter([](const std::vector<std::shared_ptr<Entity>> &row) {
+                return row[0] == row[1];
+            });
+        }
+        resultTable = std::make_shared<HeaderTable>(synonyms, *resultTable);
+    }
+    return resultTable;
+}
+
+bool FollowsPredicate::isValidRow(const vector<shared_ptr<Entity>>& row) const {
+    if (row.size() != 2) {
+        throw QPSEvaluationException("FollowsPredicate: got a row with size != 2 from PKB");
+    }
+
+    bool lhsMatch = true; // Default to true for wildcard "_"
+    bool rhsMatch = true; // Same as above
+    auto lhsStatement = std::dynamic_pointer_cast<Statement>(row[0]);
+    auto rhsStatement = std::dynamic_pointer_cast<Statement>(row[1]);
+    if (lhsStatement == nullptr || rhsStatement == nullptr) {
+        throw QPSEvaluationException("FollowsPredicate: got a non-statement entity in the row from PKB");
+    }
+
+    if (std::holds_alternative<int>(lhs)) {
+        int lhsInt = std::get<int>(lhs);
+        lhsMatch = lhsStatement->getStatementNumber() == lhsInt; // Assuming row[0] is the lhs entity and has an ID method
+    } else if (std::holds_alternative<Synonym>(lhs)) {
+        auto lhsSynonym = std::get<Synonym>(lhs);
+        lhsMatch = lhsStatement->isOfType(lhsSynonym.getType());
+    }
+
+    if (std::holds_alternative<int>(rhs)) {
+        int rhsInt = std::get<int>(rhs);
+        rhsMatch = rhsStatement->getStatementNumber() == rhsInt; // Assuming row[1] is the rhs entity and has an ID method
+    } else if (std::holds_alternative<Synonym>(rhs)) {
+        auto rhsSynonym = std::get<Synonym>(rhs);
+        rhsMatch = rhsStatement->isOfType(rhsSynonym.getType());
+    }
+
+    return lhsMatch && rhsMatch;
+}
+
+std::string FollowsPredicate::toString() const {
+    // Temp implementation for debugging, TODO: replace with proper implementation
+    // get string presentation of lhs and rhs based on their types
+    std::string lhsStr;
+    std::string rhsStr;
+    if (std::holds_alternative<int>(lhs)) {
+        lhsStr = std::to_string(std::get<int>(lhs));
+    } else if (std::holds_alternative<Synonym>(lhs)) {
+        lhsStr = std::get<Synonym>(lhs).getName();
+    } else {
+        lhsStr = "_";
+    }
+    if (std::holds_alternative<int>(rhs)) {
+        rhsStr = std::to_string(std::get<int>(rhs));
+    } else if (std::holds_alternative<Synonym>(rhs)) {
+        rhsStr = std::get<Synonym>(rhs).getName();
+    } else {
+        rhsStr = "_";
+    }
+    return "FollowsPredicate " + lhsStr + " " + rhsStr;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/ModifiesPredicate.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#include "ModifiesPredicate.h"
+#include "common/spa_exception/SyntaxErrorException.h"
+#include "common/spa_exception/QPSEvaluationException.h"
+#include "qps/entity/evaluation/HeaderTable.h"
+
+
+
+ModifiesPredicate::ModifiesPredicate(ModifiesLhsRef lhs, EntityRef rhs)
+        : lhs(std::move(lhs)), rhs(std::move(rhs)) {
+    if (!isValidModifiesLhsRef(this->lhs) || !isValidVariable(this->rhs)) {
+        throw SemanticErrorException("Invalid arguments for ModifiesPredicate constructor");
+    }
+
+    if (std::holds_alternative<Synonym>(this->lhs)) {
+        auto synonym = std::get<Synonym>(this->lhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+    if (std::holds_alternative<Synonym>(this->rhs)) {
+        auto synonym = std::get<Synonym>(this->rhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+}
+
+shared_ptr<BaseTable> ModifiesPredicate::getTable(QueryManager& qm) {
+    // Step 1: Fetch all follows relationships as a BaseTable
+    auto allModifies = BaseTable(qm.getModifyAll(), 2); 
+
+    // Step 2: Filter based on lhs and rhs
+    // The filtering logic will depend on the nature of lhs and rhs (integer, wildcard, synonym)
+    auto filteredModifies = allModifies.filter([this](const std::vector<std::shared_ptr<Entity>>& row) { 
+        return isValidRow(row); 
+    });
+
+    // Step 3: Project to keep columns associated with a Synonym or determine a boolean result
+    bool isLhsSynonym = std::holds_alternative<Synonym>(lhs);
+    bool isRhsSynonym = std::holds_alternative<Synonym>(rhs);
+    shared_ptr<BaseTable> resultTable = filteredModifies->project({isLhsSynonym, isRhsSynonym});
+    if (!resultTable->isBoolean()) {
+        if (synonyms.size() == 2 && *synonyms[0] == *synonyms[1]) {
+            resultTable = resultTable->filter([](const std::vector<std::shared_ptr<Entity>> &row) {
+                return row[0] == row[1];
+            });
+        }
+        resultTable = std::make_shared<HeaderTable>(synonyms, *resultTable);
+    }
+    return resultTable;
+}
+
+bool ModifiesPredicate::isValidRow(const vector<shared_ptr<Entity>>& row) const {
+    if (row.size() != 2) {
+        throw QPSEvaluationException("ModifiesPredicate: got a row with size != 2 from PKB");
+    }
+
+    bool lhsMatch = true; // Default to true for wildcard "_"
+    bool rhsMatch = true; // Same as above
+    auto lhsStatement = std::dynamic_pointer_cast<Statement>(row[0]);
+    auto rhsVariable = std::dynamic_pointer_cast<Variable>(row[1]);
+    if (lhsStatement == nullptr || rhsVariable == nullptr) {
+        throw QPSEvaluationException(
+            "ModifiesPredicate: got a non-statement entity in the row from PKB");
+    }
+
+    if (std::holds_alternative<int>(lhs)) {
+        int lhsInt = std::get<int>(lhs);
+        lhsMatch = lhsStatement->getStatementNumber() == lhsInt; // Assuming row[0] is the lhs entity and has an ID method
+    } else if (std::holds_alternative<Synonym>(lhs)) {
+        auto lhsSynonym = std::get<Synonym>(lhs);
+        lhsMatch = lhsStatement->isOfType(lhsSynonym.getType());
+    }
+
+    if (std::holds_alternative<std::string>(rhs)) {
+        std::string rhsString = std::get<std::string>(rhs);
+        rhsMatch = rhsString == "_" || rhsVariable->getName() == rhsString; // Assuming row[1] is the rhs entity and has an ID method
+    } else if (std::holds_alternative<Synonym>(rhs)) {
+        auto rhsSynonym = std::get<Synonym>(rhs);
+        rhsMatch = rhsVariable->isOfType(rhsSynonym.getType());
+    }
+
+    return lhsMatch && rhsMatch;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/UsesPredicate.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#include "UsesPredicate.h"
+#include "common/spa_exception/SyntaxErrorException.h"
+#include "common/spa_exception/QPSEvaluationException.h"
+#include "qps/entity/evaluation/HeaderTable.h"
+
+UsesPredicate::UsesPredicate(UsesLhsRef lhs, EntityRef rhs)
+        : lhs(std::move(lhs)), rhs(std::move(rhs)) {
+    if (!isValidUsesLhsRef(this->lhs) || !isValidVariable(this->rhs)) {
+        throw SemanticErrorException("Invalid arguments for UsesPredicate constructor");
+    }
+
+    if (std::holds_alternative<Synonym>(this->lhs)) {
+        auto synonym = std::get<Synonym>(this->lhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+    if (std::holds_alternative<Synonym>(this->rhs)) {
+        auto synonym = std::get<Synonym>(this->rhs);
+        this->synonyms.push_back(std::make_shared<Synonym>(synonym));
+    }
+}
+
+shared_ptr<BaseTable> UsesPredicate::getTable(QueryManager& qm) {
+    // Step 1: Fetch all follows relationships as a BaseTable
+    auto allUses =
+            BaseTable(qm.getUseAll(),
+                      2);
+    // Assuming getFollowS returns data compatible with BaseTable constructor
+    int count = 0;
+    for (auto row: allUses.getRows()) {
+        if (row.getValues()[0]->getName() == "3") {
+            count++;
+        }
+    }
+
+    // Step 2: Filter based on lhs and rhs
+    // The filtering logic will depend on the nature of lhs and rhs (integer, wildcard, synonym)
+    auto filteredUses = allUses.filter(
+            [this](const std::vector<std::shared_ptr<Entity>>& row) { return isValidRow(row); });
+
+    // Step 3: Project to keep columns associated with a Synonym or determine a boolean result
+    bool isLhsSynonym = std::holds_alternative<Synonym>(lhs);
+    bool isRhsSynonym = std::holds_alternative<Synonym>(rhs);
+    shared_ptr<BaseTable> resultTable = filteredUses->project({isLhsSynonym, isRhsSynonym});
+    if (!resultTable->isBoolean()) {
+        if (synonyms.size() == 2 && *synonyms[0] == *synonyms[1]) {
+            resultTable = resultTable->filter([](const std::vector<std::shared_ptr<Entity>> &row) {
+                return row[0] == row[1];
+            });
+        }
+        resultTable = std::make_shared<HeaderTable>(synonyms, *resultTable);
+    }
+    return resultTable;
+}
+
+bool UsesPredicate::isValidRow(const vector<shared_ptr<Entity>>& row) const {
+    if (row.size() != 2) {
+        throw QPSEvaluationException("UsesPredicate: got a row with size != 2 from PKB");
+    }
+
+    bool lhsMatch = true; // Default to true for wildcard "_"
+    bool rhsMatch = true; // Same as above
+    auto lhsStatement = std::dynamic_pointer_cast<Statement>(row[0]);
+    auto rhsExpression = std::dynamic_pointer_cast<Variable>(row[1]);
+    if (lhsStatement == nullptr || rhsExpression == nullptr) {
+        throw QPSEvaluationException(
+            "UsesPredicate: got a non-statement entity in the row from PKB");
+    }
+
+    if (std::holds_alternative<int>(lhs)) {
+        int lhsInt = std::get<int>(lhs);
+        lhsMatch = lhsStatement->getStatementNumber() ==
+                   lhsInt; // Assuming row[0] is the lhs entity and has an ID method
+    } else if (std::holds_alternative<Synonym>(lhs)) {
+        auto lhsSynonym = std::get<Synonym>(lhs);
+        lhsMatch = lhsStatement->isOfType(lhsSynonym.getType());
+    } else if (std::holds_alternative<std::string>(lhs)) {
+        std::string lhsString = std::get<std::string>(lhs);
+        lhsMatch = lhsString == "_" || lhsStatement->getName() == lhsString;
+    }
+
+    if (std::holds_alternative<std::string>(rhs)) {
+        std::string rhsString = std::get<std::string>(rhs);
+        rhsMatch = rhsString == "_" || rhsExpression->getName() == rhsString; // Assuming row[1] is the rhs entity and has an ID method
+    } else if (std::holds_alternative<Synonym>(rhs)) {
+        auto rhsSynonym = std::get<Synonym>(rhs);
+        rhsMatch = rhsExpression->isOfType(rhsSynonym.getType());
+    }
+
+    return lhsMatch && rhsMatch;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/ModifiesPredicate.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#ifndef MODIFIESPREDICATE_H
+#define MODIFIESPREDICATE_H
+
+#include "Predicate.h"
+#include <memory>
+#include <variant>
+#include "PredicateUtils.h"
+
+
+class Strategy;
+
+using ModifiesLhsRef = std::variant<int, Synonym, std::string>; // Combination of procedure and statements ref
+
+class ModifiesPredicate : public Predicate {
+private:
+    ModifiesLhsRef lhs; // Directly holds int, Synonym, or std::string
+    EntityRef rhs; // Can be a synonym of type variable, a variable name, or "_"
+    bool isValidRow(const std::vector<std::shared_ptr<Entity>>& row) const;
+  public:
+    ModifiesPredicate(ModifiesLhsRef lhs, EntityRef rhs);
+    ~ModifiesPredicate() override = default;
+    [[nodiscard]] shared_ptr<BaseTable> getTable(QueryManager& qm) override;
+
+    static bool isValidLhs(const ModifiesLhsRef& lhs);
+    static bool isValidRhs(const EntityRef& rhs);
+};
+
+#endif // MODIFIESPREDICATE_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/Predicate.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/649c7ba0-9712-44e7-aa24-ca6262c5a922
+ChatId: 649c7ba0-9712-44e7-aa24-ca6262c5a922
+Code:
+#ifndef RELATIONSHIPPREDICATE_H
+#define RELATIONSHIPPREDICATE_H
+
+#include <string>
+#include <variant>
+#include "qps/entity/strategy/Strategy.h"
+#include "common/spa_exception/SemanticErrorException.h"
+
+
+
+/**
+ * Base class for all filtering conditions in a query, including relationship, pattern and with
+ * clauses. Each predicate has a corresponding strategy that is used to filter the results of the
+ * query.
+ */
+class Predicate {
+protected:
+    vector<shared_ptr<Synonym>> synonyms; // Synonyms used in the predicate
+public:
+    virtual ~Predicate() = default; // Ensure proper polymorphic deletion
+    [[nodiscard]] vector<shared_ptr<Synonym>> getSynonyms() const { return synonyms; }
+    [[nodiscard]] virtual shared_ptr<BaseTable> getTable(QueryManager& qm) {
+        // Temp implementation to get code compiling, TODO: remove and set pure virtual
+        return make_shared<BaseTable>();
+    };
+    virtual std::string toString() const {
+        return "Predicate";
+    };
+};
+
+#endif // RELATIONSHIPPREDICATE_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/entity/clause/UsesPredicate.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
+Code:
+#ifndef USESPREDICATE_H
+#define USESPREDICATE_H
+
+#include "Predicate.h"
+#include <memory>
+#include <variant>
+#include "PredicateUtils.h"
+
+
+class Strategy;
+
+using UsesLhsRef = std::variant<int, Synonym, std::string>; // Combination of procedure and statements ref
+
+class UsesPredicate : public Predicate {
+private:
+    UsesLhsRef lhs; // Directly holds int, Synonym, or std::string
+    EntityRef rhs; // Can be a synonym of type variable, a variable name, or "_"
+    bool isValidRow(const std::vector<std::shared_ptr<Entity>>& row) const;
+  public:
+    UsesPredicate(UsesLhsRef lhs, EntityRef rhs);
+    ~UsesPredicate() override = default;
+    [[nodiscard]] shared_ptr<BaseTable> getTable(QueryManager& qm) override;
+};
+
+#endif // USESPREDICATE_H
 --------------------
 RepoName: 23s2-cp-spa-team-03
 File: Team03/Code03/src/spa/src/qps/entity/strategy/ProjectionStrategy.cpp
 Generator: gpt
-Intervention: 0
+Intervention: 1
 Language: e
 Prompt: https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758
 ChatId: b4e5ee0e-2ffc-4b9b-810c-871f71f82758
 Code:
+// prompt 2: https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+
 #include "ProjectionStrategy.h"
 #include <algorithm>
+#include "qps/entity/evaluation/HeaderTable.h"
 
 ProjectionStrategy::ProjectionStrategy(std::shared_ptr<Synonym> synonym) : targetSynonym(std::move(synonym)) {}
 
 void ProjectionStrategy::execute(QueryEvaluationContext &context) {
-    if (!context.containsSynonym(*targetSynonym)) {
-        return; // If the target synonym is not present, no action is needed.
+    // Check all tables in the context; if any is empty, return an empty table directly.
+    if (context.isCurrentResultEmpty()) {
+        HeaderTable emptyTable;
+        emptyTable.setHeaders({targetSynonym});
+        context.setResultTable(std::make_shared<HeaderTable>(emptyTable));
+        return;
     }
 
-    auto targetSynonymValues = context.getSynonymValues(*targetSynonym);
+    // Proceed if no empty tables are found
+    auto table = context.getTableForSynonym(*targetSynonym);
+    if (!table) {
+        // Synonym not used in constructing tables, query QueryManager for entities by type
+        auto entities = context.getQueryManager()->getAllEntitiesByType(targetSynonym->getType());
+        HeaderTable newTable;
+        newTable.setHeaders({targetSynonym}); // Assuming setHeaders method exists
 
-    std::list<SynonymValues> updatedList;
-    updatedList.push_back(targetSynonymValues); // Add only the target synonym values to the list.
+        for (const auto& entity : entities) {
+            // Convert entity to TableRow and add to newTable
+            // This step assumes you have a mechanism to convert an Entity to a TableRow
+            newTable.addRow(TableRow({entity}));
+        }
 
-    // Replace the existing list with the updated one.
-    context.clearSynonymValuesList();
-    for (const auto& synonymValues : updatedList) {
-        context.addSynonymValues(synonymValues);
+        context.setResultTable(std::make_shared<HeaderTable>(newTable));
+    } else {
+        // If the synonym's table exists and is not empty, select the column and project it.
+        auto castedTable = std::dynamic_pointer_cast<HeaderTable>(table);
+        if (!castedTable) {
+            throw std::runtime_error("ProjectionStrategy: table for synonym is not a HeaderTable");
+        }
+        HeaderTable projectedTable = castedTable->selectColumns({targetSynonym});
+        context.setResultTable(std::make_shared<HeaderTable>(projectedTable));
     }
 }
 --------------------
@@ -186,6 +1563,7 @@ Code:
 
 class ProjectionStrategy : public Strategy {
 public:
+    // TODO: support multiple synonyms
     explicit ProjectionStrategy(std::shared_ptr<Synonym> synonym);
     void execute(QueryEvaluationContext &context) override;
 
@@ -196,144 +1574,445 @@ private:
 #endif // PROJECTIONSTRATEGY_H
 --------------------
 RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/spa/src/qps/entity/strategy/DeclarationStrategy.cpp
+File: Team03/Code03/src/spa/src/qps/entity/strategy/JoinWithPredicateStrategy.cpp
 Generator: gpt
 Intervention: 1
 Language: e
-Prompt: 
-ChatId: 
+Prompt: https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192
+ChatId: 7c590366-8e0e-40e2-863f-2862fa1ae192
 Code:
-// prompt 1: https://chat.openai.com/share/f0da3797-ca97-4fe7-938b-ca4e00bbe8e1
-// prompt 2: https://chat.openai.com/share/90842ec5-59d1-44c7-b7cc-52c6bfa1c405
-#include "DeclarationStrategy.h"
-#include "pkb/QueryPKB.h"
-#include <memory>
-#include <vector>
+JoinWithPredicateStrategy::JoinWithPredicateStrategy(std::shared_ptr<Predicate> pred)
+        : predicate(std::move(pred)) {}
 
+void JoinWithPredicateStrategy::execute(QueryEvaluationContext& context) {
 
-DeclarationStrategy::DeclarationStrategy(const std::vector<shared_ptr<Synonym>>& synonyms)
-        : synonyms(synonyms) {}
-
-std::vector<std::shared_ptr<Entity>> DeclarationStrategy::getEntitiesByType(EntityType entityType, QueryManager &queryManager) {
-    std::vector<std::shared_ptr<Entity>> baseClassEntities;
-
-    switch (entityType) {
-        case EntityType::Procedure: {
-            auto entities = queryManager.getAllProcedures();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        case EntityType::Stmt: {
-            auto entities = queryManager.getAllStatements();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        case EntityType::Assign: {
-            auto entities = queryManager.getAllAssignStatements();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        case EntityType::Print: {
-            auto entities = queryManager.getAllPrintStatements();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        case EntityType::Read: {
-            auto entities = queryManager.getAllReadStatements();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        case EntityType::Call: {
-            auto entities = queryManager.getAllCallStatements();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        case EntityType::If: {
-            auto entities = queryManager.getAllIfStatements();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        case EntityType::While: {
-            auto entities = queryManager.getAllWhileStatements();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        case EntityType::Variable: {
-            auto entities = queryManager.getAllVariables();
-            baseClassEntities.insert(baseClassEntities.end(), entities.begin(), entities.end());
-            break;
-        }
-        default:
-            // Raise exception for unknown entity type
-            throw std::invalid_argument("Unknown entity type");
+    if (context.isCurrentResultEmpty()) {
+        // short-circuit if the result is already empty
+        return;
     }
 
-    return baseClassEntities;
+    auto synonyms = predicate->getSynonyms();
+
+    if (synonyms.empty()) {
+        // No synonym involved in the predicate, returns boolean table
+        auto table = predicate->getTable(*context.getQueryManager());
+        if (table->isEmpty()) {
+            context.setResultToFalse();
+        }
+        return;
+    }
+
+    // Check if the table is initialized for the synonyms
+    // Check one synonym is enough as all synonyms in the group share the same table
+    bool isTableInitialized = context.isTableInitialized(*synonyms[0]);
+
+    if (!isTableInitialized) {
+        // If no table is initialized, fetch the table for the predicate and initialize for the group
+        auto targetTable = predicate->getTable(*context.getQueryManager());
+        if (targetTable) {
+            if (targetTable->isEmpty()) {
+                context.setResultToFalse();
+                return;
+            }
+            // Initialize the table for the first synonym, which implicitly covers the whole group
+            context.putTableForSynonymGroup(*synonyms[0], targetTable);
+        }
+    } else {
+        // If the table is already initialized, update the table for the corresponding group
+        for (const auto& synonym : synonyms) {
+            auto currentTable = context.getTableForSynonym(*synonym);
+            auto targetTable = predicate->getTable(*context.getQueryManager());
+            if (currentTable && targetTable) {
+                auto updatedTable = currentTable->join(*targetTable);
+                if (updatedTable->isEmpty()) {
+                    context.setResultToFalse();
+                }
+                // Update the table for the entire synonym group
+                context.putTableForSynonymGroup(*synonym, updatedTable);
+                break; // Once updated, no need to process further synonyms in the group
+            }
+        }
+    }
 }
 
-
-/**
- * Execute the declaration strategy. For each synonym, get all entities of the type and add them to the context.
- * @param context the query evaluation context that provides the query manager and stores the synonym values.
- */
-void DeclarationStrategy::execute(QueryEvaluationContext &context) {
-    shared_ptr<QueryManager> queryManager = context.getQueryManager();
-    for (const auto& synonym : synonyms) {
-        auto entities = getEntitiesByType(synonym->getType(), *queryManager);
-        SynonymValues synonymValues(synonym);
-        for (const auto& entity : entities) {
-            synonymValues.addValue(entity);
-        }
-        context.addSynonymValues(synonymValues);
-    }
+std::string JoinWithPredicateStrategy::toString() const {
+    return "JoinWithPredicateStrategy" + predicate->toString();
 }
 --------------------
 RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/spa/src/qps/QueryParser.cpp
-Generator: gpt
-Intervention: 1
+File: Team03/Code03/src/spa/src/qps/QueryValidator.cpp
+Generator: copilot
+Intervention: 2
 Language: e
 Prompt: 
 ChatId: 
 Code:
-// https://chat.openai.com/share/56b9766f-27cb-4a36-a0ed-188e5b5a598a
+// Check if token is a single letter
+bool QueryValidator::isLetter(std::string const& token) {
+    return token.length() == 1 && std::isalpha(token[0]);
+}
 
-    EntityType entityType{};
+// Check if token is a single digit from 0-9
+bool QueryValidator::isDigit(std::string const& token) {
+    return token.length() == 1 && isdigit(token[0]);
+}
 
-    if (curr == "stmt") {
-        entityType = EntityType::Stmt;
+// Check if token is a single non-zero digit from 1-9
+bool QueryValidator::isNzDigit(std::string const& token) {
+    return isDigit(token) && token[0] >= '1';
+}
+
+// Check if token is a number (can be multiple digits)
+// Definition of integer: 0 | NZDIGIT ( DIGIT )* - no leading zero
+bool QueryValidator::isInteger(std::string const& token) {
+    if (token.empty()) {
+        return false;
     }
-    else if (curr == "read") {
-        entityType = EntityType::Read;
+
+    // If single digit, check if it is digit
+    if (token.length() == 1) {
+        return isDigit(token);
     }
-    else if (curr == "print") {
-        entityType = EntityType::Print;
+
+    // If multiple digits, check if first digit is non-zero and rest are digits
+    return isNzDigit(token.substr(0, 1)) && std::all_of(token.begin() + 1, token.end(), ::isdigit);
+}
+
+// Check if token is a valid identifier
+// Definition of identifier: LETTER ( LETTER | DIGIT )*
+bool QueryValidator::isIdent(std::string const& token) {
+
+    if (token.empty()) {
+        return false;
     }
-    else if (curr == "call") {
-        entityType = EntityType::Call;
+
+    // Check if first character is a letter
+    if (!isLetter(token.substr(0, 1))) {
+        return false;
     }
-    else if (curr == "while") {
-        entityType = EntityType::While;
+
+    // Check if rest of the characters are letters or digits
+    for (size_t i = 1; i < token.length(); i++) {
+        if (!isalnum(token[i])) {
+            return false;
+        }
     }
-    else if (curr == "if") {
-        entityType = EntityType::If;
+
+    // Token is not empty, starts with letter, and rest are letters or digits
+    return true;
+}
+
+// Check if token is a valid name
+// Definition of name: LETTER ( LETTER | DIGIT )*
+bool QueryValidator::isName(std::string const& token) { return isIdent(token); }
+
+// Check if token is a valid synonym
+// Definition of synonym: IDENT
+bool QueryValidator::isSynonym(std::string const& token) { return isIdent(token); }
+
+// Check if token is a valid statement reference
+// Definition of stmtRef: synonym | '_' | INTEGER
+bool QueryValidator::isStmtRef(std::string const& token) {
+    return isSynonym(token) || token == "_" || isInteger(token);
+}
+
+// Check if token is a valid entity reference
+// Definition of entRef: synonym | '_' | '"' IDENT '"'
+bool QueryValidator::isEntRef(std::string const& token) {
+    return isSynonym(token) || token == "_" ||
+           (token.length() > 2 && token.front() == '"' && token.back() == '"' &&
+            isIdent(token.substr(1, token.length() - 2)));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/QueryEvaluator.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/cc725a19-b2cb-4541-9910-0b2b77365e00
+ChatId: cc725a19-b2cb-4541-9910-0b2b77365e00
+Code:
+#ifndef SPA_QUERYEVALUATOR_H
+#define SPA_QUERYEVALUATOR_H
+
+#include <string>
+#include <memory>
+#include "qps/entity/evaluation/QueryEvaluationContext.h"
+#include "qps/entity/query/Query.h"
+
+class QueryEvaluator {
+private:
+    std::shared_ptr<QueryEvaluationContext> context;
+    std::vector<std::shared_ptr<Strategy>> strategies;
+
+public:
+    QueryEvaluator();
+    void setStrategies(const std::vector<std::shared_ptr<Strategy>>& strategies);
+    std::vector<std::string> evaluate(const std::shared_ptr<Query>& query);
+    std::shared_ptr<QueryEvaluationContext> getContext() const;
+};
+
+
+#endif //SPA_QUERYEVALUATOR_H
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/QueryEvaluator.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/cc725a19-b2cb-4541-9910-0b2b77365e00
+ChatId: cc725a19-b2cb-4541-9910-0b2b77365e00
+Code:
+#include "QueryEvaluator.h"
+
+
+QueryEvaluator::QueryEvaluator() : context(std::make_shared<QueryEvaluationContext>()) {}
+
+void QueryEvaluator::setStrategies(const std::vector<std::shared_ptr<Strategy>>& newStrategies) {
+    strategies = newStrategies;
+}
+
+std::vector<std::string> QueryEvaluator::evaluate(const std::shared_ptr<Query>& query) {
+    for (const auto& strategy : strategies) {
+        strategy->execute(*context);
     }
-    else if (curr == "assign") {
-        entityType = EntityType::Assign;
+    return context->getResults();
+}
+
+std::shared_ptr<QueryEvaluationContext> QueryEvaluator::getContext() const {
+    return context;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/qps/QueryTokenizer.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/4ba78f27-8cc9-4e4b-887d-4f9689d236b1
+ChatId: 4ba78f27-8cc9-4e4b-887d-4f9689d236b1
+Code:
+/*
+Tokenizing steps:
+1. Split query into tokens using space or punctuations as delimters. Keep delimiters in the list if it is not a space.
+2. Split tokens into multiple lists, each list is a component of a query (Declarations, Selections, Clauses).
+3. Each list contains items, where each item is a list of tokens 
+4. Identifying a Declaration: ends with `;`
+5. Identifying a Selection: EITHER first word of list == "Select" and second token != `<`, end here OR last token is `>`.
+6. Identifying a Clause: ends with `)`, only when all opening `(` have been closed by a matching `)`
+*/
+std::vector<std::vector<std::vector<std::string>>> QueryTokenizer::tokenize(const std::string& query) {
+    std::vector<std::string> tokens;
+    std::string token;
+    bool trailingWhitespace = false;
+
+    for (char c : query) {
+        if (isspace(c)) {
+            if (!token.empty()) {
+                if (trailingWhitespace) {
+                    // Remove trailing whitespace from token
+                    while (!token.empty() && isspace(token.back())) {
+                        token.pop_back();
+                    }
+                    if (!token.empty()) {
+                        tokens.push_back(token);
+                        token.clear();
+                    }
+                }
+                else {
+                    tokens.push_back(token);
+                    token.clear();
+                }
+                trailingWhitespace = true;
+            }
+        }
+        else {
+            token.push_back(c);
+            trailingWhitespace = false;
+        }
+
+        if (token.size() > 1 && isPunctuation(token.front())) {
+            std::string punct(1, token.front());
+            token.erase(0, 1); // Remove the leading punctuation
+            tokens.push_back(punct);
+        }
+
+        if (token.size() > 1 && isPunctuation(token.back())) {
+            std::string punct(1, token.back());
+            token.pop_back();
+            tokens.push_back(token);
+            tokens.push_back(punct);
+            token.clear();
+        }
     }
-    else if (curr == "variable") {
-        entityType = EntityType::Variable;
+
+    // Add the last token if it's not empty
+    if (!token.empty()) {
+        tokens.push_back(token);
     }
-    else if (curr == "constant") {
-        entityType = EntityType::Constant;
+
+    return splitTokens(tokens);
+}
+
+bool QueryTokenizer::isPunctuation(char c) {
+    return c == ',' || c == ';' || c == '(' || c == ')' || c == '<' || c == '>' || c == '_';
+}
+
+std::vector<std::vector<std::vector<std::string>>> QueryTokenizer::splitTokens(const std::vector<std::string>& tokens) {
+    std::vector<std::string> currentList;
+    int openParenthesesCount = 0;
+
+    std::vector<std::vector<std::vector<std::string>>> splitTokens = {};
+    std::vector<std::vector<std::string>> declarations;
+    std::vector<std::vector<std::string>> selections;
+    std::vector<std::vector<std::string>> clauses;
+
+    bool isClause = false;
+
+    for (const auto& token : tokens) {
+        currentList.push_back(token);
+
+        if (token == "(") {
+            openParenthesesCount++;
+        }
+        else if (token == ")") {
+            openParenthesesCount--;
+            if (openParenthesesCount < 0) {
+                throw SyntaxErrorException("Mismatched parentheses");
+            }
+            else if (openParenthesesCount == 0) {
+                if (!isClause) {
+                    throw SyntaxErrorException("Incorrect order in query");
+                }
+                clauses.push_back(currentList);
+                currentList.clear();
+            }
+        }
+        else if (token == ";") {
+            if (isClause) {
+                throw SyntaxErrorException("Incorrect order in query");
+            }
+            declarations.push_back(currentList);
+            currentList.clear();
+        }
+        else if (token == ">") {
+            if (isClause) {
+                throw SyntaxErrorException("Incorrect order in query");
+            }
+            selections.push_back(currentList);
+            currentList.clear();
+            isClause = true;
+        }
+        else if (currentList.size() == 2 && currentList[0] == "Select" && token != "<") {
+            // If the list starts with "Select", and the next token is not "<", end the list
+            if (isClause) {
+                throw SyntaxErrorException("Incorrect order in query");
+            }
+            selections.push_back(currentList);
+            currentList.clear();
+            isClause = true;
+        }
     }
-    else if (curr == "procedure") {
-        entityType = EntityType::Procedure;
+
+    // Query does not end properly
+    if (!currentList.empty()) {
+        throw SyntaxErrorException("Invalid query syntax");
     }
-    else {
-        //None of the above, gives a Unknown Entity type
-        entityType = EntityType::Unknown;
+
+    splitTokens.push_back(declarations);
+    splitTokens.push_back(selections);
+    splitTokens.push_back(clauses);
+
+    return splitTokens;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/spa/src/pkb/pattern_store/AssignPatternStore.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/NO2qblo8fQIgUUtE5l7Cz01B?model=gpt-4&mode=chat
+ChatId: NO2qblo8fQIgUUtE5l7Cz01B
+Code:
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%');
+}
+
+string infixToPostfix(std::string expression) {
+    string result = "";
+    stack<char> operators;
+    map<char, int> precedence;
+    precedence['+'] = precedence['-'] = 1;
+    precedence['*'] = precedence['/'] = precedence['%'] = 2;
+    if (isOperator(expression[0])) {
+        throw SyntaxErrorException();
     }
+
+    for (size_t i = 0; i < expression.length(); ++i) {
+        if (isdigit(expression[i])) {
+            while (i < expression.length() && isdigit(expression[i])) {
+                result += expression[i];
+                ++i;
+            }
+            --i;
+            result += " ";
+        } else if (expression[i] == '(') {
+            int count = 1;
+            i++;
+            string temp;
+            // Find the proper end
+            while (i < expression.length() && count > 0) {
+                if (expression[i] == '(') {
+                    count++;
+                }
+                if (expression[i] == ')') {
+                    count--;
+                    if (count > 0) {
+                        temp += expression[i];
+                    }
+                    // no need brackets if 0
+                } else {
+                    // normal
+                    temp += expression[i];
+                }
+                i++;
+            }
+            if (count > 0) {
+                // throw error
+                throw SyntaxErrorException("[QPS] Assign pattern mismatched parentheses, too many (");
+            }
+            i--;
+            // recurse sub-expression
+            string res = infixToPostfix(temp);
+            result += res;
+        } else if (expression[i] == ')') {
+            throw SyntaxErrorException("[QPS] Assign pattern mismatched parentheses, too many )");
+        } else if (!isOperator(expression[i])) {
+            // is a synonym: assumes no spaces and no random '(' or ')' characters
+            // reads in until the next operator
+            // validation should be already done in QPS
+            while (i < expression.length() && !isOperator(expression[i])) {
+                result += expression[i];
+                ++i;
+            }
+            --i;
+            result += " ";
+        } else {
+            while (!operators.empty() && precedence[operators.top()] >= precedence[expression[i]]) {
+                result += operators.top();
+                result += " ";
+                operators.pop();
+            }
+            operators.push(expression[i]);
+        }
+    }
+
+    while (!operators.empty()) {
+        result += operators.top();
+        result += " ";
+        operators.pop();
+    }
+    return result;
+}
 --------------------
 RepoName: 23s2-cp-spa-team-03
 File: Team03/Code03/src/spa/src/common/EntityType.h
@@ -354,365 +2033,915 @@ enum class EntityType {
     Variable,   // Represents variables
     Constant,   // Represents constants
     Procedure,   // Represents procedures
+    Operation,  // Represents arithmetic/conditional/relational operations
+    Arithmetic,  // Represents arithmetic operations
+    Conditional,  // Represents conditional operations
+    Relational,  // Represents relational operations
+    Expression,  // Represents expressions
 --------------------
 RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/unit_testing/src/QPS/TestQueryEvaluationContext.cpp
+File: Team03/Code03/src/unit_testing/src/QPS/predicate/TestPredicateConstructors.cpp
 Generator: gpt
 Intervention: 0
 Language: e
-Prompt: https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-ChatId: 8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-Code:
-#include <catch.hpp>
-
-#include "common/Entity.h"
-#include "qps/entity/query/Synonym.h"
-#include "qps/entity/evaluation/SynonymValues.h"
-#include "qps/entity/evaluation/QueryEvaluationContext.h"
-#include <memory>
-
-// MockEntity inheriting from Entity for test purposes
-class MockEntity : public Entity {
-    std::string name;
-public:
-    explicit MockEntity(const std::string& name) : name(name) {}
-    std::string getName() const override { return name; } // Assuming Entity has getName()
-    void accept(shared_ptr<Visitor> visitor) override {}
-};
-
-TEST_CASE("QueryEvaluationContext::resultToString throws when multiple SynonymValues are present", "[QueryEvaluationContext]") {
-    QueryEvaluationContext qec;
-
-    auto synonym1 = std::make_shared<Synonym>(EntityType::Stmt, "s1");
-    SynonymValues sv1(synonym1);
-    sv1.addValue(std::make_shared<MockEntity>("value1"));
-
-    auto synonym2 = std::make_shared<Synonym>(EntityType::Stmt, "s2");
-    SynonymValues sv2(synonym2);
-    sv2.addValue(std::make_shared<MockEntity>("value2"));
-
-    qec.addSynonymValues(sv1);
-    qec.addSynonymValues(sv2);
-
-    REQUIRE_THROWS_AS(qec.getResults(), std::runtime_error);
-}
-
-TEST_CASE("QueryEvaluationContext::resultToString throws when no SynonymValues are present", "[QueryEvaluationContext]") {
-    QueryEvaluationContext qec;
-
-    REQUIRE_THROWS_AS(qec.getResults(), std::runtime_error);
-}
-
-TEST_CASE("QueryEvaluationContext::resultToString returns empty string for empty SynonymValues", "[QueryEvaluationContext]") {
-    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
-    SynonymValues sv(synonym);
-
-    QueryEvaluationContext qec;
-    qec.addSynonymValues(sv);
-
-    vector<std::string> result = qec.getResults();
-    REQUIRE(result.empty());
-}
-TEST_CASE("QueryEvaluationContext::resultToString handles special characters in entity names", "[QueryEvaluationContext]") {
-    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
-    SynonymValues sv(synonym);
-    sv.addValue(std::make_shared<MockEntity>("$1"));
-    sv.addValue(std::make_shared<MockEntity>("value#2"));
-    sv.addValue(std::make_shared<MockEntity>("value, 3"));
-
-    QueryEvaluationContext qec;
-    qec.addSynonymValues(sv);
-
-    vector<std::string> result = qec.getResults();
-//    REQUIRE(result == "$1, value#2, value, 3");
-}
---------------------
-RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/unit_testing/src/QPS/TestQueryParser.cpp
-Generator: gpt
-Intervention: 0
-Language: e
-Prompt: 
-ChatId: 
-Code:
-//https://chat.openai.com/share/72133ed9-d959-44ae-9c81-143998296122
-
-TEST_CASE("convertStringToEntityType should produce accurate entity type") {
-	QueryParser queryParser;
-
-	SECTION("Test valid entity types") {
-		REQUIRE(queryParser.convertStringToEntityType("stmt") == EntityType::Stmt);
-		REQUIRE(queryParser.convertStringToEntityType("read") == EntityType::Read);
-		REQUIRE(queryParser.convertStringToEntityType("print") == EntityType::Print);
-		REQUIRE(queryParser.convertStringToEntityType("call") == EntityType::Call);
-		REQUIRE(queryParser.convertStringToEntityType("while") == EntityType::While);
-		REQUIRE(queryParser.convertStringToEntityType("if") == EntityType::If);
-		REQUIRE(queryParser.convertStringToEntityType("assign") == EntityType::Assign);
-		REQUIRE(queryParser.convertStringToEntityType("variable") == EntityType::Variable);
-		REQUIRE(queryParser.convertStringToEntityType("constant") == EntityType::Constant);
-		REQUIRE(queryParser.convertStringToEntityType("procedure") == EntityType::Procedure);
-	}
-
-	SECTION("Test unknown entity type") {
-		REQUIRE(queryParser.convertStringToEntityType("unknown") == EntityType::Unknown);
-	}
-}
---------------------
-RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/unit_testing/src/QPS/strategy/TestProjectionStrategy.cpp
-Generator: gpt
-Intervention: 0
-Language: e
-Prompt: 
-ChatId: 
+Prompt: https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0
+ChatId: 4018fd98-2d4f-488f-a857-7769d6a30be0
 Code:
 #include "catch.hpp"
-#include "FakeQueryManager.cpp"
-#include "qps/entity/evaluation/QueryEvaluationContext.h"
-#include "qps/entity/strategy/ProjectionStrategy.h"
 #include "qps/entity/query/Synonym.h"
+#include "qps/entity/clause/ModifiesPredicate.h"
+#include "qps/entity/clause/UsesPredicate.h"
+#include "qps/entity/clause/FollowsPredicate.h"
+#include "qps/entity/clause/FollowsTPredicate.h"
+#include "qps/entity/clause/ParentPredicate.h"
+#include "qps/entity/clause/ParentTPredicate.h"
+#include "qps/entity/clause/AssignPatternPredicate.h"
 
-TEST_CASE("ProjectionStrategy updates context with only targeted SynonymValues", "[ProjectionStrategy]") {
-    auto queryManager = std::make_shared<FakeQueryManager>();
-    QueryEvaluationContext context;
-    context.setQueryManager(queryManager);
+TEST_CASE("Predicates Input Validations", "[Predicates]") {
+    Synonym stmtSyn(EntityType::Stmt, "s1");
+    Synonym stmtSyn2(EntityType::Stmt, "s2");
+    Synonym varSyn(EntityType::Variable, "v");
+    Synonym procSyn(EntityType::Procedure, "p");
+    Synonym assignSyn(EntityType::Assign, "a");
+    std::string validString = "procName"; // Example of a valid non-empty string for procedure names
+    std::string wildcard = "_";
+    std::string exactMatch = "x*y";
+    std::string partialMatch = "_\"x*y\"_";
 
-    // Setup fake entities for testing
-    auto targetSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
-    auto otherSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
-    auto targetEntity = std::make_shared<Variable>("x");
-    auto otherEntity = std::make_shared<Procedure>("Main");
+    SECTION("ModifiesPredicate and UsesPredicate Validation") {
+        // ModifiesPredicate: LHS can be stmt, proc (synonym or string); RHS must be a variable (synonym or string)
+        REQUIRE_NOTHROW(ModifiesPredicate(stmtSyn, varSyn));
+        REQUIRE_NOTHROW(ModifiesPredicate(procSyn, varSyn));
+        REQUIRE_NOTHROW(ModifiesPredicate(validString, varSyn)); // LHS as procedure name string
+        REQUIRE_NOTHROW(ModifiesPredicate(wildcard, varSyn)); // LHS as wildcard
 
-    // Setup initial SynonymValues in context
-    SynonymValues targetSynonymValues(targetSynonym);
-    targetSynonymValues.addValue(targetEntity);
-    context.addSynonymValues(targetSynonymValues);
-
-    SynonymValues otherSynonymValues(otherSynonym);
-    otherSynonymValues.addValue(otherEntity);
-    context.addSynonymValues(otherSynonymValues);
-
-    // Execute ProjectionStrategy targeting "v"
-    ProjectionStrategy strategy(targetSynonym);
-    strategy.execute(context);
-
-    SECTION("Context should only contain SynonymValues for targeted synonym 'v'") {
-        REQUIRE(context.containsSynonym(*targetSynonym));
-        REQUIRE_FALSE(context.containsSynonym(*otherSynonym));
+        // UsesPredicate: Similar to Modifies, but for "uses" relationships
+        REQUIRE_NOTHROW(UsesPredicate(stmtSyn, varSyn));
+        REQUIRE_NOTHROW(UsesPredicate(procSyn, varSyn));
+        REQUIRE_NOTHROW(UsesPredicate(validString, varSyn)); // LHS as procedure name string
+        REQUIRE_NOTHROW(UsesPredicate(wildcard, varSyn)); // LHS as wildcard
     }
 
-    SECTION("Targeted SynonymValues should remain intact") {
-        auto resultingSynonymValues = context.getSynonymValues(*targetSynonym);
-        REQUIRE(resultingSynonymValues.getValues().size() == 1);
-        REQUIRE(*(resultingSynonymValues.getValues().front()) == *targetEntity);
+    SECTION("FollowsPredicate and FollowsTPredicate Validation") {
+        // Both predicates expect stmt references (synonym or int)
+        REQUIRE_NOTHROW(FollowsPredicate(stmtSyn, stmtSyn2));
+        REQUIRE_THROWS(FollowsPredicate(procSyn, stmtSyn2)); // Invalid LHS type
+        REQUIRE_NOTHROW(FollowsTPredicate(stmtSyn, stmtSyn2));
+        REQUIRE_THROWS(FollowsTPredicate(procSyn, stmtSyn2)); // Invalid LHS type for FollowsT
     }
-}
 
-TEST_CASE("ProjectionStrategy with non-existing target synonym does not alter context", "[ProjectionStrategy]") {
-    auto queryManager = std::make_shared<FakeQueryManager>();
-    QueryEvaluationContext context;
-    context.setQueryManager(queryManager);
+    SECTION("ParentPredicate and ParentTPredicate Validation") {
+        // Both predicates expect stmt references (synonym or int) for parent-child relationships
+        REQUIRE_NOTHROW(ParentPredicate(stmtSyn, stmtSyn2));
+        REQUIRE_THROWS(ParentPredicate(procSyn, stmtSyn2)); // Procedure cannot be a parent
+        REQUIRE_NOTHROW(ParentTPredicate(stmtSyn, stmtSyn2));
+        REQUIRE_THROWS(ParentTPredicate(procSyn, stmtSyn2)); // Invalid LHS type for ParentT
+    }
 
-    // Setup a Synonym and SynonymValues that are not targeted
-    auto nonTargetSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
-    auto nonTargetEntity = std::make_shared<Procedure>("Main");
-    SynonymValues nonTargetSynonymValues(nonTargetSynonym);
-    nonTargetSynonymValues.addValue(nonTargetEntity);
-    context.addSynonymValues(nonTargetSynonymValues);
+    SECTION("AssignPatternPredicate Validation") {
+        REQUIRE_NOTHROW(AssignPatternPredicate(assignSyn, varSyn, wildcard));
+        REQUIRE_NOTHROW(AssignPatternPredicate(assignSyn, wildcard, exactMatch));
+        REQUIRE_NOTHROW(AssignPatternPredicate(assignSyn, validString, partialMatch));
+        REQUIRE_THROWS(AssignPatternPredicate(procSyn, varSyn, wildcard)); // Pattern predicate must be assign
+        REQUIRE_THROWS(AssignPatternPredicate(assignSyn, procSyn, wildcard)); // LHS cannot be procedure synonym
+    }
 
-    // Execute ProjectionStrategy with a synonym that does not exist in context
-    auto nonexistentSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
-    ProjectionStrategy strategy(nonexistentSynonym);
-    strategy.execute(context);
-
-    SECTION("Context should remain unchanged when targeted synonym does not exist") {
-        REQUIRE(context.containsSynonym(*nonTargetSynonym));
-        REQUIRE(context.getSynonymValues(*nonTargetSynonym).getValues().size() == 1);
-        REQUIRE(*(context.getSynonymValues(*nonTargetSynonym).getValues().front()) == *nonTargetEntity);
+    SECTION("Wildcard and Non-empty String Checks") {
+        // Ensuring wildcard and non-empty strings are valid for LHS where applicable
+        REQUIRE_NOTHROW(ParentTPredicate(wildcard, stmtSyn2));
+        REQUIRE_NOTHROW(FollowsTPredicate(wildcard, stmtSyn2));
+        REQUIRE_NOTHROW(ModifiesPredicate(wildcard, varSyn));
+        REQUIRE_NOTHROW(UsesPredicate(validString, varSyn)); // Procedure name as LHS
+        REQUIRE_THROWS(ModifiesPredicate("", varSyn)); // Empty string for LHS should throw
+        REQUIRE_THROWS(UsesPredicate("", varSyn)); // Empty string for LHS should throw
     }
 }
 --------------------
 RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/unit_testing/src/QPS/strategy/TestDeclarationStrategy.cpp
+File: Team03/Code03/src/unit_testing/src/QPS/TestDeclarationsParser.cpp
 Generator: gpt
-Intervention: 0
+Intervention: 1
 Language: e
-Prompt: https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517
-ChatId: 5a9de667-07bb-4d68-86ec-9b4e16053517
+Prompt: https://chat.openai.com/share/82e2cd52-da0f-49d9-8032-25cca59e34b3
+ChatId: 82e2cd52-da0f-49d9-8032-25cca59e34b3
 Code:
-TEST_CASE("DeclarationStrategy processes synonyms and updates context with SynonymValues", "[DeclarationStrategy]") {
-    auto queryManager = std::make_shared<FakeQueryManager>();
-    QueryEvaluationContext context = QueryEvaluationContext();
-    context.setQueryManager(queryManager);
+TEST_CASE("Valid Declarations", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "variable", "a", ",", "b", ",", "x", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap = {};
+	auto declarations = DeclarationsParser::parse(tokens, synonymMap);
 
-    // Setup fake responses in FakeQueryManager
-    std::vector<std::shared_ptr<Procedure>> fakeProcedures = {std::make_shared<Procedure>("Main"), std::make_shared<Procedure>("Helper")};
-    std::vector<std::shared_ptr<Variable>> fakeVariables = {std::make_shared<Variable>("x"), std::make_shared<Variable>("y")};
-    queryManager->addFakeResponse("Procedure", fakeProcedures);
-    queryManager->addFakeResponse("Variable", fakeVariables);
+	REQUIRE(declarations.size() == 3);
+	REQUIRE(synonymMap.size() == 3);
 
-    // Synonyms setup
-    auto procSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
-    auto varSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
-    std::vector<std::shared_ptr<Synonym>> synonyms = {procSynonym, varSynonym};
+	REQUIRE(synonymMap["a"] == EntityType::Variable);
+	REQUIRE(synonymMap["b"] == EntityType::Variable);
+	REQUIRE(synonymMap["x"] == EntityType::Variable);
 
-    // DeclarationStrategy execution
-    DeclarationStrategy strategy(synonyms);
-    strategy.execute(context);
-
-    // Assertions
-    SECTION("Context should contain SynonymValues for each synonym") {
-        REQUIRE(context.containsSynonym(*procSynonym));
-        REQUIRE(context.containsSynonym(*varSynonym));
-    }
-
-    SECTION("SynonymValues should contain correct entities") {
-        auto procSynonymValues = context.getSynonymValues(*procSynonym);
-        auto expectedSynonymValues = SynonymValues(procSynonym);
-        expectedSynonymValues.addValue(fakeProcedures[0]);
-        expectedSynonymValues.addValue(fakeProcedures[1]);
-
-
-        auto varSynonymValues = context.getSynonymValues(*varSynonym);
-        auto expectedVarSynonymValues = SynonymValues(varSynonym);
-        expectedVarSynonymValues.addValue(fakeVariables[0]);
-        expectedVarSynonymValues.addValue(fakeVariables[1]);
-
-        REQUIRE(procSynonymValues == expectedSynonymValues);
-        REQUIRE(varSynonymValues == expectedVarSynonymValues);
-    }
 }
 
+TEST_CASE("Single Declaration", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "variable", "a", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap = {};
+	auto declarations = DeclarationsParser::parse(tokens, synonymMap);
 
-TEST_CASE("DeclarationStrategy Comprehensive Tests", "[DeclarationStrategy]") {
-    auto queryManager = std::make_shared<FakeQueryManager>();
-    QueryEvaluationContext context;
-    context.setQueryManager(queryManager);
+    REQUIRE(declarations[0].get()->getName() == "a");
+    REQUIRE(declarations[0].get()->getType() == EntityType::Variable);
+	REQUIRE(declarations.size() == 1);
+	REQUIRE(synonymMap.find("a") != synonymMap.end());
+}
 
-    SECTION("No declared synonyms") {
-        std::vector<std::shared_ptr<Synonym>> synonyms = {}; // Explicitly declared empty vector
+TEST_CASE("Invalid First Token", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "InvalidType", "a", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap = { {"Variable", EntityType::Variable} };
 
-        DeclarationStrategy strategy(synonyms);
-        strategy.execute(context);
+	REQUIRE_THROWS_AS(parser.parse(tokens, synonymMap), SyntaxErrorException);
+}
 
-        REQUIRE(context.getSynonyms().empty());
-    }
+TEST_CASE("Duplicate Names", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "while", "a", ",", "a", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap = { {"Variable", EntityType::Variable} };
 
-    SECTION("Declared synonyms but no entities returned") {
-        std::vector<std::shared_ptr<Procedure>> emptyProcedures; // Explicitly declare empty vector
-        std::vector<std::shared_ptr<Variable>> emptyVariables; // Explicitly declare empty vector
-        queryManager->addFakeResponse("Procedure", emptyProcedures);
-        queryManager->addFakeResponse("Variable", emptyVariables);
-
-        auto procSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
-        auto varSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
-        std::vector<std::shared_ptr<Synonym>> synonyms = {procSynonym, varSynonym};
-
-        DeclarationStrategy strategy(synonyms);
-        strategy.execute(context);
-
-        REQUIRE(context.getSynonymValues(*procSynonym).getValues().empty());
-        REQUIRE(context.getSynonymValues(*varSynonym).getValues().empty());
-    }
-
-    SECTION("Mixed entity availability for declared synonyms") {
-        std::vector<std::shared_ptr<Procedure>> proceduresWithEntities = {std::make_shared<Procedure>("Main")}; // Procedures with entities
-        std::vector<std::shared_ptr<Variable>> emptyVariables; // Explicitly declare empty vector for Variables
-        queryManager->addFakeResponse("Procedure", proceduresWithEntities);
-        queryManager->addFakeResponse("Variable", emptyVariables);
-
-        auto procSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
-        auto varSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
-        std::vector<std::shared_ptr<Synonym>> synonyms = {procSynonym, varSynonym};
-
-        DeclarationStrategy strategy(synonyms);
-        strategy.execute(context);
-
-        REQUIRE(context.getSynonymValues(*procSynonym).getValues().size() == 1);
-        REQUIRE(context.getSynonymValues(*varSynonym).getValues().empty());
-    }
-
-    SECTION("All declared synonyms with entities returned") {
-        std::vector<std::shared_ptr<Procedure>> proceduresWithEntities = {std::make_shared<Procedure>("Main"), std::make_shared<Procedure>("Helper")};
-        std::vector<std::shared_ptr<Variable>> variablesWithEntities = {std::make_shared<Variable>("x"), std::make_shared<Variable>("y")};
-        queryManager->addFakeResponse("Procedure", proceduresWithEntities);
-        queryManager->addFakeResponse("Variable", variablesWithEntities);
-
-        auto procSynonym = std::make_shared<Synonym>(EntityType::Procedure, "p");
-        auto varSynonym = std::make_shared<Synonym>(EntityType::Variable, "v");
-        std::vector<std::shared_ptr<Synonym>> synonyms = {procSynonym, varSynonym};
-
-        DeclarationStrategy strategy(synonyms);
-        strategy.execute(context);
-
-        REQUIRE(context.containsSynonym(*procSynonym));
-        REQUIRE(context.containsSynonym(*varSynonym));
-        REQUIRE(context.getSynonymValues(*procSynonym).getValues().size() == 2);
-        REQUIRE(context.getSynonymValues(*varSynonym).getValues().size() == 2);
-    }
+	REQUIRE_THROWS_AS(parser.parse(tokens, synonymMap), SemanticErrorException);
 }
 --------------------
 RepoName: 23s2-cp-spa-team-03
-File: Team03/Code03/src/unit_testing/src/QPS/strategy/FakeQueryManager.cpp
+File: Team03/Code03/src/unit_testing/src/QPS/TestDeclarationsParser.cpp
 Generator: gpt
 Intervention: 0
 Language: e
-Prompt: https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517
-ChatId: 5a9de667-07bb-4d68-86ec-9b4e16053517
+Prompt: https://chat.openai.com/share/d86b9515-ec39-46ef-aaae-c8e284de92a2
+ChatId: d86b9515-ec39-46ef-aaae-c8e284de92a2
+Code:
+TEST_CASE("Consecutive Commas Without Synonym Name", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "if", "a", ",", ",", ",", ",", "b", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap;
+
+	REQUIRE_THROWS_AS(parser.parse(tokens, synonymMap), SyntaxErrorException);
+}
+
+TEST_CASE("Non-Separated Synonym Names", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "procedure", "a", "b", "c", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap;
+
+	REQUIRE_THROWS_AS(parser.parse(tokens, synonymMap), SyntaxErrorException);
+}
+
+TEST_CASE("Numeric Synonym Names", "[DeclarationsParser]") {
+	DeclarationsParser parser;
+	std::vector<std::string> tokens = { "constant", "1", "2", ";" };
+	std::unordered_map<std::string, EntityType> synonymMap;
+
+	REQUIRE_THROWS_AS(parser.parse(tokens, synonymMap), SyntaxErrorException);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/fakeEntities/FakeQueryManager.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+ChatId: 69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
 Code:
 class FakeQueryManager : public QueryManager {
 private:
-    std::map<std::string, std::vector<std::shared_ptr<Entity>>> fakeResponses;
+    // Mapping from EntityType as a string to a vector of Entity shared pointers
+    std::map<EntityType, std::vector<std::shared_ptr<Entity>>> fakeResponses;
+
+    vector<vector<shared_ptr<Entity>>> fakeFollows;
+    vector<vector<shared_ptr<Entity>>> fakeFollowsT;
+
+    vector<vector<shared_ptr<Entity>>> fakeParents;
+    vector<vector<shared_ptr<Entity>>> fakeParentT;
+
+    vector<vector<shared_ptr<Entity>>> fakeUses;
+
+    vector<vector<shared_ptr<Entity>>> fakeModifies;
+
+    vector<shared_ptr<AssignStatement>> fakeAssignsWithPattern;
+    vector<shared_ptr<Variable>> allFakeVariables;  // Special case, since PKB doesn't return entity, TODO: fix
 
 public:
     FakeQueryManager() = default;
 
-    // Template method remains unchanged, as it's generic enough
+    // Override to add responses for specific entity types
     template<typename T>
-    void addFakeResponse(const std::string& entityType, std::vector<std::shared_ptr<T>> response) {
-        std::vector<std::shared_ptr<Entity>> genericResponse;
-        for (auto& item : response) {
-            genericResponse.push_back(std::static_pointer_cast<Entity>(item));
-        }
+    void addFakeResponse(EntityType entityType, std::vector<std::shared_ptr<T>> response) {
+        // Convert T (derived from Entity) vector to Entity vector
+        std::vector<std::shared_ptr<Entity>> genericResponse(response.begin(), response.end());
         fakeResponses[entityType] = genericResponse;
     }
 
-    // Specific overrides for Procedure and Variable
-    std::vector<std::shared_ptr<Procedure>> getAllProcedures() override {
-        auto it = fakeResponses.find("Procedure");
+    // Specifies the return value of getAssignPattern()
+    void setFakeAssignsWithPattern(vector<shared_ptr<AssignStatement>> stmt) {
+        fakeAssignsWithPattern = stmt;
+    }
+
+    vector<shared_ptr<AssignStatement>> getAssignPattern(string useless1, string useless2, bool useless3) override {
+        return fakeAssignsWithPattern;
+    }
+
+    vector<shared_ptr<Variable>> getAllVariables() override {
+        return allFakeVariables;
+    }
+
+    void setAllFakeVariable(vector<shared_ptr<Variable>> var) {
+        allFakeVariables = var;
+    }
+
+    void addFakeFollows(shared_ptr<Statement> stmt1, shared_ptr<Statement> stmt2) {
+        fakeFollows.push_back({stmt1, stmt2});
+    }
+
+    void addFakeFollowsT(shared_ptr<Statement> stmt1, shared_ptr<Statement> stmt2) {
+        fakeFollowsT.push_back({stmt1, stmt2});
+    }
+
+    void addFakeParent(shared_ptr<Statement> stmt1, shared_ptr<Statement> stmt2) {
+        fakeParents.push_back({stmt1, stmt2});
+    }
+
+    void addFakeParentT(shared_ptr<Statement> stmt1, shared_ptr<Statement> stmt2) {
+        fakeParentT.push_back({stmt1, stmt2});
+    }
+  
+    void addFakeUses(shared_ptr<Statement> stmt, shared_ptr<Variable> var) {
+        fakeUses.push_back({ stmt, var });
+    }
+
+    void addFakeModifies(shared_ptr<Statement> stmt, shared_ptr<Variable> var) {
+        fakeModifies.push_back({ stmt, var });
+    }
+
+    // New method to get all entities by type
+    std::vector<std::shared_ptr<Entity>> getAllEntitiesByType(EntityType entityType)
+    override {
+        auto it = fakeResponses.find(entityType);
         if (it != fakeResponses.end()) {
-            // Convert back to specific shared_ptr type
-            std::vector<std::shared_ptr<Procedure>> specificResponse;
-            for (auto& entity : it->second) {
-                specificResponse.push_back(std::static_pointer_cast<Procedure>(entity));
-            }
-            return specificResponse;
+            return it->second;
         }
         return {};
     }
 
-    std::vector<std::shared_ptr<Variable>> getAllVariables() override {
-        auto it = fakeResponses.find("Variable");
-        if (it != fakeResponses.end()) {
-            // Convert back to specific shared_ptr type
-            std::vector<std::shared_ptr<Variable>> specificResponse;
-            for (auto& entity : it->second) {
-                specificResponse.push_back(std::static_pointer_cast<Variable>(entity));
-            }
-            return specificResponse;
-        }
-        return {};
+    vector<vector<shared_ptr<Entity>>> getFollowS()
+    override {
+        return fakeFollows;
     }
 
-    // Optionally, implement other getAll* methods if needed, returning empty vectors
+    vector<vector<shared_ptr<Entity>>> getFollowT() override {
+        return fakeFollowsT;
+    }
+
+    vector<vector<shared_ptr<Entity>>> getParentS() override {
+        return fakeParents;
+    }
+
+    vector<vector<shared_ptr<Entity>>> getParentT() override {
+                return fakeParentT;
+    }
+  
+    vector<vector<shared_ptr<Entity>>> getUseAll() override {
+        return fakeUses;
+    }
+
+    vector<vector<shared_ptr<Entity>>> getModifyAll() override {
+        return fakeModifies;
+    }
+
+    // Implement other necessary virtual functions from QueryManager
 };
 --------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/evaluation/TestSynonymGraph.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192
+ChatId: 7c590366-8e0e-40e2-863f-2862fa1ae192
+Code:
+#include <catch.hpp>
+#include <memory>
+#include <vector>
+#include "qps/entity/evaluation/SynonymGraph.h"
+#include "qps/entity/clause/FollowsPredicate.h"
+
+using namespace std;
+
+// Utility function to create a synonym
+shared_ptr<Synonym> makeSynonym(const string& name, EntityType type) {
+    return make_shared<Synonym>(type, name);
+}
+
+// Test case for no predicates
+TEST_CASE("SynonymGraph with no predicates results in no groups", "[SynonymGraph]") {
+    vector<shared_ptr<Predicate>> predicates;
+    SynonymGraph graph(predicates);
+    auto groups = graph.groupSynonyms();
+    REQUIRE(groups.empty());
+}
+
+// Test case for single FollowsPredicate connecting two synonyms
+TEST_CASE("Single FollowsPredicate connects two synonyms into one group", "[SynonymGraph]") {
+    auto s1 = makeSynonym("s1", EntityType::Stmt);
+    auto s2 = makeSynonym("s2", EntityType::Stmt);
+    auto predicate = make_shared<FollowsPredicate>(*s1, *s2);
+
+    vector<shared_ptr<Predicate>> predicates{predicate};
+    SynonymGraph graph(predicates);
+    auto groups = graph.groupSynonyms();
+
+    REQUIRE(groups.size() == 1);
+    REQUIRE(groups[0].size() == 2);
+    REQUIRE(groups[0].count(s1) == 1);
+    REQUIRE(groups[0].count(s2) == 1);
+}
+
+// Test case for isolated synonyms (no predicates connecting them)
+TEST_CASE("Isolated synonyms are not grouped", "[SynonymGraph]") {
+    auto s1 = makeSynonym("s1", EntityType::Stmt);
+    auto s2 = makeSynonym("s2", EntityType::Stmt);
+    // No predicates connecting s1 and s2
+
+    vector<shared_ptr<Predicate>> predicates;
+    SynonymGraph graph(predicates);
+    auto groups = graph.groupSynonyms();
+
+    REQUIRE(groups.empty());
+}
+
+// Test case for multiple FollowsPredicates forming separate groups
+TEST_CASE("Multiple FollowsPredicates form separate groups for connected synonyms", "[SynonymGraph]") {
+    auto s1 = makeSynonym("s1", EntityType::Stmt);
+    auto s2 = makeSynonym("s2", EntityType::Stmt);
+    auto s3 = makeSynonym("s3", EntityType::Stmt);
+    auto predicate1 = make_shared<FollowsPredicate>(*s1, *s2);
+    auto predicate2 = make_shared<FollowsPredicate>(*s3, "_"); // s3 is isolated
+
+    vector<shared_ptr<Predicate>> predicates{predicate1, predicate2};
+    SynonymGraph graph(predicates);
+    auto groups = graph.groupSynonyms();
+
+    REQUIRE(groups.size() == 2);
+
+    if (groups[0].size() == 2) {
+        REQUIRE(groups[0].size() == 2);
+        REQUIRE(groups[0].count(s1) == 1);
+        REQUIRE(groups[0].count(s2) == 1);
+    } else {
+        REQUIRE(groups[1].size() == 2);
+        REQUIRE(groups[1].count(s1) == 1);
+        REQUIRE(groups[1].count(s2) == 1);
+    }
+}
+
+// Test case for circular dependencies between synonyms
+TEST_CASE("Circular dependencies between synonyms are correctly grouped", "[SynonymGraph]") {
+    auto s1 = makeSynonym("s1", EntityType::Stmt);
+    auto s2 = makeSynonym("s2", EntityType::Stmt);
+    auto s3 = makeSynonym("s3", EntityType::Stmt);
+    auto predicate1 = make_shared<FollowsPredicate>(*s1, *s2);
+    auto predicate2 = make_shared<FollowsPredicate>(*s2, *s3);
+    auto predicate3 = make_shared<FollowsPredicate>(*s3, *s1);
+
+    vector<shared_ptr<Predicate>> predicates{predicate1, predicate2, predicate3};
+    SynonymGraph graph(predicates);
+    auto groups = graph.groupSynonyms();
+
+    REQUIRE(groups.size() == 1);
+    REQUIRE(groups[0].size() == 3);
+    REQUIRE(groups[0].count(s1) == 1);
+    REQUIRE(groups[0].count(s2) == 1);
+    REQUIRE(groups[0].count(s3) == 1);
+}
+
+TEST_CASE("FollowsPredicate with no synonyms does not form groups", "[SynonymGraph]") {
+    auto predicate = make_shared<FollowsPredicate>(StatementRef(1), StatementRef("_"));
+
+    vector<shared_ptr<Predicate>> predicates{predicate};
+    SynonymGraph graph(predicates);
+    auto groups = graph.groupSynonyms();
+
+    REQUIRE(groups.empty());
+}
+
+TEST_CASE("Synonyms with subtypes of stmt are correctly grouped", "[SynonymGraph]") {
+    auto assignSynonym = makeSynonym("a", EntityType::Assign);
+    auto whileSynonym = makeSynonym("w", EntityType::While);
+    auto predicate = make_shared<FollowsPredicate>(*assignSynonym, *whileSynonym);
+
+    vector<shared_ptr<Predicate>> predicates{predicate};
+    SynonymGraph graph(predicates);
+    auto groups = graph.groupSynonyms();
+
+    REQUIRE(groups.size() == 1);
+    REQUIRE(groups[0].size() == 2);
+    REQUIRE(groups[0].count(assignSynonym) == 1);
+    REQUIRE(groups[0].count(whileSynonym) == 1);
+}
+TEST_CASE("SynonymGraph initialized with empty predicates results in no groups", "[SynonymGraph]") {
+    vector<shared_ptr<Predicate>> predicates; // Empty list of predicates
+    SynonymGraph graph(predicates);
+    auto groups = graph.groupSynonyms();
+
+    REQUIRE(groups.empty());
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/evaluation/TestQueryEvaluationContext.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192
+ChatId: 7c590366-8e0e-40e2-863f-2862fa1ae192
+Code:
+TEST_CASE("QueryEvaluationContext::getResults throws when multiple tables are present and one is empty", "[QueryEvaluationContext]") {
+    QueryEvaluationContext qec;
+
+    auto synonym1 = std::make_shared<Synonym>(EntityType::Stmt, "s1");
+    auto table1 = std::make_shared<HeaderTable>();
+    table1->setHeaders({synonym1});
+    table1->addRow(TableRow({std::make_shared<MockEntity>("value1")}));
+    qec.addTableForSynonym(*synonym1, table1);
+
+    auto synonym2 = std::make_shared<Synonym>(EntityType::Stmt, "s2");
+    auto table2 = std::make_shared<HeaderTable>(); // Empty table
+    qec.addTableForSynonym(*synonym2, table2);
+
+    REQUIRE(qec.isCurrentResultEmpty());
+}
+
+TEST_CASE("QueryEvaluationContext::getResults throws when no tables are present", "[QueryEvaluationContext]") {
+    QueryEvaluationContext qec;
+
+    REQUIRE_THROWS_AS(qec.getResults(), std::runtime_error);
+}
+
+TEST_CASE("QueryEvaluationContext::getResults returns empty vector for context with empty tables", "[QueryEvaluationContext]") {
+    QueryEvaluationContext qec;
+    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
+    auto table = std::make_shared<HeaderTable>(); // Empty table
+    qec.addTableForSynonym(*synonym, table);
+
+    REQUIRE(qec.isCurrentResultEmpty());
+}
+
+TEST_CASE("QueryEvaluationContext::getResults handles special characters in entity names", "[QueryEvaluationContext]") {
+    QueryEvaluationContext qec;
+    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
+    auto table = std::make_shared<HeaderTable>();
+    table->setHeaders({synonym});
+    table->addRow(TableRow({std::make_shared<MockEntity>("$1")}));
+    table->addRow(TableRow({std::make_shared<MockEntity>("value#2")}));
+    table->addRow(TableRow({std::make_shared<MockEntity>("value, 3")}));
+    qec.setResultTable(table);
+
+    auto result = qec.getResults();
+    REQUIRE(result.size() == 3);
+    REQUIRE(result[0] == "$1");
+    REQUIRE(result[1] == "value#2");
+    REQUIRE(result[2] == "value, 3");
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/evaluation/TestTable.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192
+ChatId: 7c590366-8e0e-40e2-863f-2862fa1ae192
+Code:
+#include "qps/entity/evaluation/HeaderTable.h"
+#include "qps/entity/evaluation/TableRow.h"
+#include "../fakeEntities/MockEntity.cpp"
+#include "catch.hpp"
+
+TEST_CASE("HeaderTable Join Functionality", "[HeaderTable]") {
+    using std::make_shared;
+    using std::dynamic_pointer_cast;
+
+    SECTION("Empty table with headers joins empty table") {
+        HeaderTable table1;
+        table1.setHeaders({make_shared<Synonym>(EntityType::Variable, "A"), make_shared<Synonym>(EntityType::Variable, "B")});
+        HeaderTable table2; // Empty table
+
+        auto resultBaseTable = table1.join(table2);
+        auto resultTable = dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+        REQUIRE(resultTable->getSize() == 0);
+        REQUIRE(resultTable->getHeaders().size() == 2); // Headers are unchanged
+    }
+
+    SECTION("Empty table without rows joins non-empty table") {
+        HeaderTable table1;
+        table1.setHeaders({make_shared<Synonym>(EntityType::Variable, "A"), make_shared<Synonym>(EntityType::Variable, "B")});
+
+        HeaderTable table2;
+        table2.setHeaders({make_shared<Synonym>(EntityType::Variable, "B"), make_shared<Synonym>(EntityType::Variable, "C")});
+        table2.addRow(TableRow({make_shared<MockEntity>("Entity2B"), make_shared<MockEntity>("Entity2C")}));
+
+        auto resultBaseTable = table1.join(table2);
+        auto resultTable = dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+        REQUIRE(resultTable->getSize() == 0); // No rows to join, but headers should be updated
+        REQUIRE(resultTable->getHeaders().size() == 3); // "A", "B", and "C"
+    }
+
+    SECTION("Empty table without rows and headers joins non-empty table") {
+        HeaderTable table1; // Completely empty table
+
+        HeaderTable table2;
+        table2.setHeaders({make_shared<Synonym>(EntityType::Variable, "B"), make_shared<Synonym>(EntityType::Variable, "C")});
+        table2.addRow(TableRow({make_shared<MockEntity>("Entity2B"), make_shared<MockEntity>("Entity2C")}));
+
+        auto resultBaseTable = table1.join(table2);
+        auto resultTable = dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+        REQUIRE(resultTable->getSize() == 0); // Still no rows
+        REQUIRE(resultTable->getHeaders().size() == 2); // Headers from table2 are copied
+    }
+
+    SECTION("Normal join") {
+        HeaderTable table1;
+        table1.setHeaders({make_shared<Synonym>(EntityType::Variable, "A"), make_shared<Synonym>(EntityType::Variable, "B")});
+        table1.addRow(TableRow({make_shared<MockEntity>("Entity1A"), make_shared<MockEntity>("Entity1B")}));
+
+        HeaderTable table2;
+        table2.setHeaders({make_shared<Synonym>(EntityType::Variable, "B"), make_shared<Synonym>(EntityType::Variable, "C")});
+        table2.addRow(TableRow({make_shared<MockEntity>("Entity1B"), make_shared<MockEntity>("Entity2C")}));
+
+        auto resultBaseTable = table1.join(table2);
+        auto resultTable = dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+        REQUIRE(resultTable->getSize() == 1);
+        REQUIRE(resultTable->getHeaders().size() == 3); // Joined headers "A", "B", and "C"
+    }
+
+    SECTION("The table to be joined with current one is a subset of current table") {
+        HeaderTable table1;
+        table1.setHeaders({make_shared<Synonym>(EntityType::Stmt, "A"), make_shared<Synonym>(EntityType::Variable, "B"), make_shared<Synonym>(EntityType::Procedure, "C")});
+        table1.addRow(TableRow({make_shared<MockEntity>("Entity1A"), make_shared<MockEntity>("Entity1B"), make_shared<MockEntity>("Entity1C")}));
+
+        HeaderTable table2;
+        table2.setHeaders({make_shared<Synonym>(EntityType::Variable, "B")});
+        table2.addRow(TableRow({make_shared<MockEntity>("Entity1B")}));
+
+        auto resultBaseTable = table1.join(table2);
+        auto resultTable = dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+        REQUIRE(resultTable->getSize() == 1);
+        REQUIRE(resultTable->getHeaders().size() == 3); // Headers are unchanged
+    }
+
+    SECTION("No common columns") {
+        HeaderTable table1;
+        table1.setHeaders({make_shared<Synonym>(EntityType::Stmt, "A")});
+        table1.addRow(TableRow({make_shared<MockEntity>("Entity1A")}));
+
+        HeaderTable table2;
+        table2.setHeaders({make_shared<Synonym>(EntityType::Print, "B")});
+        table2.addRow(TableRow({make_shared<MockEntity>("Entity2B")}));
+
+        auto resultBaseTable = table1.join(table2);
+        auto resultTable = dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+        REQUIRE(resultTable->getSize() == 1); // Cartesian product results in 1 row since both tables have 1 row each.
+        REQUIRE(resultTable->getHeaders().size() == 2); // "A" and "B"
+    }
+
+    SECTION("Tables with multiple rows and common column") {
+        HeaderTable table1;
+        table1.setHeaders({make_shared<Synonym>(EntityType::Stmt, "A"), make_shared<Synonym>(EntityType::Variable, "B")});
+        table1.addRow(TableRow({make_shared<MockEntity>("Entity1A"), make_shared<MockEntity>("Entity1B")}));
+        table1.addRow(TableRow({make_shared<MockEntity>("Entity2A"), make_shared<MockEntity>("Entity2B")}));
+
+        HeaderTable table2;
+        table2.setHeaders({make_shared<Synonym>(EntityType::Variable, "B"), make_shared<Synonym>(EntityType::Call, "C")});
+        table2.addRow(TableRow({make_shared<MockEntity>("Entity1B"), make_shared<MockEntity>("Entity2C")}));
+        table2.addRow(TableRow({make_shared<MockEntity>("Entity2B"), make_shared<MockEntity>("Entity3C")}));
+
+        auto resultBaseTable = table1.join(table2);
+        auto resultTable = dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+        REQUIRE(resultTable->getSize() == 2); // Assuming join condition matches for both rows
+        REQUIRE(resultTable->getHeaders().size() == 3); // "A", "B", and "C"
+    }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/evaluation/strategy/TestProjectionStrategy.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+ChatId: 69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+Code:
+TEST_CASE("ProjectionStrategy sets empty table when context has an empty table", "[ProjectionStrategy]") {
+    QueryEvaluationContext qec;
+    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
+    auto emptyTable = std::make_shared<HeaderTable>(); // Intentionally empty
+    emptyTable->setHeaders({synonym}); // Adapting for vector<shared_ptr<Synonym>>
+    qec.addTableForSynonym(*synonym, emptyTable);
+    ProjectionStrategy strategy({synonym});
+
+    strategy.execute(qec);
+
+    auto resultBaseTable = qec.getResultTable();
+    auto resultTable = std::dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+    REQUIRE(resultTable != nullptr);
+    REQUIRE(resultTable->isEmpty());
+    REQUIRE(resultTable->getHeaders().front() == synonym);
+}
+
+TEST_CASE("ProjectionStrategy queries and sets new table when synonym not in any table", "[ProjectionStrategy]") {
+    auto fakeManager = std::make_shared<FakeQueryManager>();
+    auto mockEntity = std::make_shared<MockEntity>("mockName");
+    fakeManager->addFakeResponse<MockEntity>(EntityType::Stmt, {mockEntity});
+
+    QueryEvaluationContext qec;
+    qec.setQueryManager(fakeManager);
+
+    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
+    ProjectionStrategy strategy({synonym});
+
+    strategy.execute(qec);
+
+    auto resultBaseTable = qec.getResultTable();
+    auto resultTable = std::dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+    REQUIRE(resultTable != nullptr);
+    REQUIRE_FALSE(resultTable->isEmpty());
+    REQUIRE(resultTable->getSize() == 1);
+    REQUIRE(resultTable->toStrings().front() == "mockName");
+}
+
+TEST_CASE("ProjectionStrategy projects column correctly when table with synonym exists", "[ProjectionStrategy]") {
+    QueryEvaluationContext qec;
+    auto synonym = std::make_shared<Synonym>(EntityType::Stmt, "s");
+    auto table = std::make_shared<HeaderTable>();
+    table->setHeaders({synonym});
+    table->addRow(TableRow({std::make_shared<MockEntity>("entityValue")}));
+    qec.addTableForSynonym(*synonym, table);
+
+    ProjectionStrategy strategy({synonym});
+
+    strategy.execute(qec);
+
+    auto resultBaseTable = qec.getResultTable();
+    auto resultTable = std::dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+
+    REQUIRE(resultTable != nullptr);
+    REQUIRE_FALSE(resultTable->isEmpty());
+    REQUIRE(resultTable->getSize() == 1);
+    REQUIRE(resultTable->toStrings().front() == "entityValue");
+}
+
+TEST_CASE("ProjectionStrategy with multiple tables, some empty", "[ProjectionStrategy]") {
+    QueryEvaluationContext qec;
+    auto synonym1 = std::make_shared<Synonym>(EntityType::Stmt, "s1");
+    auto table1 = std::make_shared<HeaderTable>();
+    table1->setHeaders({synonym1});
+    table1->addRow(TableRow({std::make_shared<MockEntity>("entity1")}));
+
+    auto synonym2 = std::make_shared<Synonym>(EntityType::Stmt, "s2");
+    auto emptyTable = std::make_shared<HeaderTable>(); // Intentionally empty
+    qec.addTableForSynonym(*synonym1, table1);
+    qec.addTableForSynonym(*synonym2, emptyTable);
+
+    ProjectionStrategy strategy({synonym1});
+    strategy.execute(qec);
+
+    auto resultBaseTable = qec.getResultTable();
+    auto resultTable = std::dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+    REQUIRE(resultTable->isEmpty());
+}
+
+TEST_CASE("ProjectionStrategy with table having multiple columns", "[ProjectionStrategy]") {
+    QueryEvaluationContext qec;
+    auto synonym1 = std::make_shared<Synonym>(EntityType::Stmt, "s1");
+    auto synonym2 = std::make_shared<Synonym>(EntityType::Variable, "v1");
+    auto table = std::make_shared<HeaderTable>();
+    table->setHeaders({synonym1, synonym2});
+    table->addRow(TableRow({std::make_shared<MockEntity>("entity1"), std::make_shared<MockEntity>("var1")}));
+    qec.addTableForSynonym(*synonym1, table);
+
+    ProjectionStrategy strategy({synonym1});
+    strategy.execute(qec);
+
+    auto resultBaseTable = qec.getResultTable();
+    auto resultTable = std::dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+    REQUIRE_FALSE(resultTable->isEmpty());
+    REQUIRE(resultTable->getSize() == 1);
+    REQUIRE(resultTable->toStrings().front() == "entity1");
+}
+
+TEST_CASE("ProjectionStrategy selects specific column when multiple synonyms exist", "[ProjectionStrategy]") {
+    QueryEvaluationContext qec;
+    auto synonym1 = std::make_shared<Synonym>(EntityType::Stmt, "s1");
+    auto synonym2 = std::make_shared<Synonym>(EntityType::Variable, "v1");
+    auto table = std::make_shared<HeaderTable>();
+    table->setHeaders({synonym1, synonym2});
+    table->addRow(TableRow({std::make_shared<MockEntity>("entity1"), std::make_shared<MockEntity>("var1")}));
+    table->addRow(TableRow({std::make_shared<MockEntity>("entity2"), std::make_shared<MockEntity>("var2")}));
+    qec.addTableForSynonym(*synonym1, table);
+    qec.addTableForSynonym(*synonym2, table);
+
+    ProjectionStrategy strategy({synonym2}); // Projecting only the second column
+    strategy.execute(qec);
+
+    auto resultBaseTable = qec.getResultTable();
+    auto resultTable = std::dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+    REQUIRE(resultTable->getSize() == 2);
+    REQUIRE(resultTable->toStrings()[0] == "var1");
+    REQUIRE(resultTable->toStrings()[1] == "var2");
+}
+
+TEST_CASE("ProjectionStrategy with multiple non-empty tables", "[ProjectionStrategy]") {
+    QueryEvaluationContext qec;
+    auto synonym1 = std::make_shared<Synonym>(EntityType::Stmt, "s1");
+    auto synonym2 = std::make_shared<Synonym>(EntityType::Variable, "v1");
+    auto table1 = std::make_shared<HeaderTable>();
+    table1->setHeaders({synonym1});
+    table1->addRow(TableRow({std::make_shared<MockEntity>("entity1")}));
+    auto table2 = std::make_shared<HeaderTable>();
+    table2->setHeaders({synonym2});
+    table2->addRow(TableRow({std::make_shared<MockEntity>("var1")}));
+    qec.addTableForSynonym(*synonym1, table1);
+    qec.addTableForSynonym(*synonym2, table2);
+
+    ProjectionStrategy strategy({synonym1}); // Projecting only the first synonym
+    strategy.execute(qec);
+
+    auto resultBaseTable = qec.getResultTable();
+    auto resultTable = std::dynamic_pointer_cast<HeaderTable>(resultBaseTable);
+    REQUIRE(resultTable->getSize() == 1);
+    REQUIRE(resultTable->toStrings()[0] == "entity1");
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/TestQueryValidator.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/c3dec1ba-84fd-4fdb-ab11-c7f34bf4ef59
+ChatId: c3dec1ba-84fd-4fdb-ab11-c7f34bf4ef59
+Code:
+#include <catch.hpp>
+#include "qps/QueryValidator.h"
+
+QueryValidator validator;
+
+TEST_CASE("Test isLetter method", "[isLetter]") {
+	REQUIRE(validator.isLetter("a"));
+	REQUIRE(validator.isLetter("A"));
+	REQUIRE(!validator.isLetter("1"));
+	REQUIRE(!validator.isLetter("*"));
+	REQUIRE(!validator.isLetter(""));
+}
+
+TEST_CASE("Test isDigit method", "[isDigit]") {
+	REQUIRE(validator.isDigit("0"));
+	REQUIRE(validator.isDigit("5"));
+	REQUIRE(validator.isDigit("9"));
+	REQUIRE(!validator.isDigit("10"));
+	REQUIRE(!validator.isDigit("A"));
+	REQUIRE(!validator.isDigit(""));
+}
+
+TEST_CASE("Test isNzDigit method", "[isNzDigit]") {
+	REQUIRE(validator.isNzDigit("1"));
+	REQUIRE(validator.isNzDigit("2"));
+	REQUIRE(validator.isNzDigit("9"));
+	REQUIRE(!validator.isNzDigit("0"));
+	REQUIRE(!validator.isNzDigit("10"));
+	REQUIRE(!validator.isNzDigit("A"));
+	REQUIRE(!validator.isNzDigit(""));
+}
+
+// Definition of integer: 0 | NZDIGIT ( DIGIT )* - no leading zero
+TEST_CASE("Test isInteger method", "[isInteger]") {
+	REQUIRE(validator.isInteger("0"));
+	REQUIRE(validator.isInteger("1"));
+	REQUIRE(validator.isInteger("9"));
+	REQUIRE(validator.isInteger("10"));
+	REQUIRE(validator.isInteger("123"));
+	REQUIRE(!validator.isInteger("01"));
+	REQUIRE(!validator.isInteger("A"));
+    REQUIRE(!validator.isInteger("Long_Invalid_Chars"));
+    REQUIRE(!validator.isInteger("12Mix0fCh@rs"));
+	REQUIRE(!validator.isInteger(""));
+}
+
+// Definition of identifier (IDENT): LETTER ( LETTER | DIGIT )*
+TEST_CASE("Test isIdent method", "[isIdent]") {
+	REQUIRE(validator.isIdent("variable"));
+	REQUIRE(validator.isIdent("Variable1"));
+	REQUIRE(!validator.isIdent("123variable"));
+	REQUIRE(!validator.isIdent("_variable"));
+	REQUIRE(!validator.isIdent("123"));
+	REQUIRE(!validator.isIdent(""));
+}
+
+// Definition of synonym: IDENT
+TEST_CASE("Test isSynonym method", "[isSynonym]") {
+	REQUIRE(validator.isSynonym("stmt"));
+	REQUIRE(validator.isSynonym("variable"));
+	REQUIRE(validator.isSynonym("read"));
+	REQUIRE(validator.isSynonym("xyz"));
+	REQUIRE(!validator.isSynonym(""));
+}
+
+// Definition of stmtRef: synonym | '_' | INTEGER
+TEST_CASE("Test isStmtRef method", "[isStmtRef]") {
+	REQUIRE(validator.isStmtRef("stmt"));
+	REQUIRE(validator.isStmtRef("_"));
+	REQUIRE(validator.isStmtRef("10"));
+	REQUIRE(validator.isStmtRef("xyz"));
+	REQUIRE(!validator.isStmtRef(""));
+}
+
+TEST_CASE("Test isEntRef method", "[isEntRef]") {
+	REQUIRE(validator.isEntRef("stmt"));
+	REQUIRE(validator.isEntRef("_"));
+	REQUIRE(validator.isEntRef("\"variable\""));
+	REQUIRE(!validator.isEntRef("\"_\""));
+	REQUIRE(!validator.isEntRef("\"123\""));
+	REQUIRE(validator.isEntRef("xyz"));
+	REQUIRE(!validator.isEntRef(""));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-03
+File: Team03/Code03/src/unit_testing/src/QPS/clause/TestAssignPatternPredicate.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://chat.openai.com/share/5347909f-8b91-4451-8f33-ebc41eb4576f
+ChatId: 5347909f-8b91-4451-8f33-ebc41eb4576f
+Code:
+TEST_CASE("AssignPatternPredicate Constructor - Valid Inputs") {
+    SECTION("Valid assignSyn, lhs as synonym, and exact match rhs") {
+        Synonym assignSyn(EntityType::Assign, "a");
+        Synonym lhsSyn(EntityType::Variable, "v");
+        std::string rhs = "x+1";
+
+        REQUIRE_NOTHROW(AssignPatternPredicate(assignSyn, lhsSyn, rhs));
+    }
+
+    SECTION("Valid assignSyn, lhs as wildcard, and wildcard rhs") {
+        Synonym assignSyn(EntityType::Assign, "a");
+        EntityRef lhs = "_";
+        std::string rhs = "_";
+
+        REQUIRE_NOTHROW(AssignPatternPredicate(assignSyn, lhs, rhs));
+    }
+
+    SECTION("Valid assignSyn, lhs as string, and partial match rhs") {
+        Synonym assignSyn(EntityType::Assign, "a");
+        EntityRef lhs = "x";
+        std::string rhs = "_\"x*y\"_";
+
+        REQUIRE_NOTHROW(AssignPatternPredicate(assignSyn, lhs, rhs));
+    }
+}
+
+TEST_CASE("AssignPatternPredicate Constructor - Invalid Inputs") {
+    SECTION("Invalid assignSyn type") {
+        Synonym assignSyn(EntityType::Variable, "a"); // Incorrect type
+        Synonym lhsSyn(EntityType::Variable, "v");
+        std::string rhs = "x+1";
+
+        REQUIRE_THROWS_AS(AssignPatternPredicate(assignSyn, lhsSyn, rhs), SyntaxErrorException);
+    }
+
+    SECTION("Invalid lhs as non-variable synonym") {
+        Synonym assignSyn(EntityType::Assign, "a");
+        Synonym lhsSyn(EntityType::Procedure, "p"); // Incorrect type for lhs
+        std::string rhs = "x+1";
+
+        REQUIRE_THROWS_AS(AssignPatternPredicate(assignSyn, lhsSyn, rhs), SyntaxErrorException);
+    }
+
+
+//    SECTION("Invalid rhs - contains underscores without quotes") {
+//        Synonym assignSyn(EntityType::Assign, "a");
+//        EntityRef lhs = "x";
+//        std::string rhs = "xy_"; // Underscores without surrounding quotes are invalid
+//
+//        REQUIRE_THROWS_AS(AssignPatternPredicate(assignSyn, lhs, rhs), SyntaxErrorException);
+//    }
+}
+--------------------
 Directory:../sample/repo/23s2-cp-spa-team-03
-Total Snippets: 15
-Total lines: 585
+Total Snippets: 45
+Total lines: 2581
 SP Snippets: 0
 SP lines: 0
-PKB Snippets: 0
-PKB lines: 0
-QPS Snippets: 14
-QPS lines: 574
+PKB Snippets: 1
+PKB lines: 80
+QPS Snippets: 43
+QPS lines: 2485

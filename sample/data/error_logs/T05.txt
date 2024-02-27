@@ -1,5 +1,2 @@
-23s2-cp-spa-team-05: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/spa/src/utilSpa/TwoSideFwdVecMap.cpp
-23s2-cp-spa-team-05: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/spa/src/utilSpa/DoubleMap.cpp
-23s2-cp-spa-team-05: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/unit_testing/src/unit/TestSP.cpp
-23s2-cp-spa-team-05: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp
-23s2-cp-spa-team-05: Chat id error, chat id is not found in the prompt URL: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/unit_testing/src/ConstraintArgumentTestAI.cpp
+23s2-cp-spa-team-05: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/unit_testing/src/unit/qps/query_evaluator/IntResultTestAI.cpp
+23s2-cp-spa-team-05: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-05/Team05/Code05/src/unit_testing/src/unit/sp/helper/AstFactory.cpp

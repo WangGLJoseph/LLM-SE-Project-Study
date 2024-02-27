@@ -1,50 +1,80 @@
-SimpleParser::SimpleParser() {
-	
-}
-
-SimpleParser::SimpleParser(std::string filename) {
-	this->tokenStream = SPTokenizer::tokenize(SPTokenizer::readFileToString(filename));
+/**
+ * @brief Constructs a new Simple Parser object
+ *
+ * Reads the given file, tokenizes it and prepares for parsing.
+ *
+ * @param filename The name of the file to parse.
+ */
+SimpleParser::SimpleParser(std::vector<LexicalToken> tokenStream) {
+	this->tokenStream = tokenStream;
 	this->tokenIndex = 0;
 }
 
+/**
+ * @brief Parses the entire program and returns a tree representing it.
+ *
+ * @return std::shared_ptr<ASTNode> A pointer to the root of the parse tree.
+ */
 std::shared_ptr<ASTNode> SimpleParser::parseProgram() {
 	std::vector<std::shared_ptr<ASTNode>> procedures;
+	const int START_OF_PROGRAM = 1;
 
 	while (this->hasTokensLeft()) {
-		if (this->peekToken().getTokenType() == LexicalTokenType::WHITESPACE) {
-			this->getToken();
-			continue;
-		}
-
 		procedures.push_back(this->parseProcedure());
 	}
 
-	// Depending on how important the the number of lines is to the code, find out whether to further go ahead
-	// with finding the number of lines.
-	Program program = Program(-1, procedures);
+	std::shared_ptr<ASTNode> root = std::make_shared<ASTNode>(
+		ASTNodeType::PROGRAMS, START_OF_PROGRAM, ASTUtility::getASTNodeType(ASTNodeType::PROGRAMS)
+	);
 
-	return program.buildTree();
+	root->lineNumber = PROGRAM_LINE_NUMBER;
+	int maxLineNumber = 0;
+	for (auto& procedure : procedures) {
+		int temp = ASTTraverser::setLineNumbers(procedure, maxLineNumber);
+		root->addChild(procedure);
+		maxLineNumber = temp;
+	}
+
+	return root;
 }
 
+/**
+ * @brief Assert Token to check if the token's type matches the expected one.
+ *
+ * @param token A lexical token in the stream.
+ * @param type A expected lexical token type.
+ * @throws Retrieves a runtime_error if the token's type doesn't match the expected type.
+ */
+void SimpleParser::assertToken(LexicalToken token, LexicalTokenType type) const {
+	if (!token.isType(type)) {
+		throw std::runtime_error("Error: Expected " + LexicalTokenTypeMapper::printType(type) + " but got " + LexicalTokenTypeMapper::printType(token.getTokenType()) +
+			" At Line " + std::to_string(token.getLine()) + " Position " + std::to_string(token.getLinePosition()));
+	}
+}
+
+/**
+ * @brief Check if there are more tokens to parse.
+ *
+ * @return bool Returns true if there are more tokens in the token stream otherwise false.
+ */
 bool SimpleParser::hasTokensLeft() const {
 	return this->tokenIndex < this->tokenStream.size();
 }
 
-// Gets token, without advancing the index.
-LexicalToken SimpleParser::peekToken() const {
-	if (this->hasTokensLeft()) {
-		return this->tokenStream[this->tokenIndex];
-	}
-	else {
-		return LexicalToken(LexicalTokenType::NULL_TOKEN);
-	}
-}
-
-// Gets token, and advance the index to look for the next token.
-LexicalToken SimpleParser::getToken() {
+/**
+ * @brief Gets the token from the stream without advancing the index.
+ *
+ * @return LexicalToken The next token in the stream without advancing the index.
+ */
+LexicalToken SimpleParser::peekNextToken() {
 	if (this->hasTokensLeft()) {
 		LexicalToken token = this->tokenStream[this->tokenIndex];
-		this->tokenIndex++;
+
+		if (token.isType(LexicalTokenType::WHITESPACE)) {
+			this->tokenIndex++;
+			return peekNextToken();
+		}
+
 		return token;
 	}
 	else {
@@ -52,169 +82,23 @@ LexicalToken SimpleParser::getToken() {
 	}
 }
 
-void SimpleParser::assertToken(LexicalToken token, LexicalTokenType type) const {
-	if (token.getTokenType() != type) {
-		throw std::runtime_error("Error: Invalid SIMPLE syntax.");
-	}
-}
+/**
+ * @brief Gets the token from the stream and advances the index by 1.
+ *
+ * @return LexicalToken The next token in the stream.
+ */
+LexicalToken SimpleParser::getNextToken() {
+	if (this->hasTokensLeft()) {
+		LexicalToken token = this->tokenStream[this->tokenIndex];
+		this->tokenIndex++;
 
-std::shared_ptr<ASTNode> SimpleParser::parseProcedure() {
-	if (!this->hasTokensLeft()) {
-		throw std::runtime_error("Error: SimpleParser::parseProcedure encounter empty statement.");
-	}
-
-	LexicalToken procedureKeyword = this->getToken();
-	this->assertToken(procedureKeyword, LexicalTokenType::KEYWORD_PROCEDURE);
-
-	LexicalToken procedureName = this->getToken();
-	this->assertToken(procedureName, LexicalTokenType::NAME);
-	this->assertToken(this->getToken(), LexicalTokenType::SYMBOL_OPEN_BRACE);
-
-	// Parse Statement Lists;
-	std::shared_ptr<ASTNode> statementList = this->parseStmtLst();
-
-	LexicalToken closeBrace = this->getToken();
-	this->assertToken(closeBrace, LexicalTokenType::SYMBOL_CLOSE_BRACE);
-
-	Procedure procedure = Procedure(procedureKeyword.getLine(), closeBrace.getLine(), statementList);
-	return procedure.buildTree();
-}
-
-std::shared_ptr<ASTNode> SimpleParser::parseStmtLst() {
-	// Parse every statement until we see a closing bracket.
-	std::vector<std::shared_ptr<ASTNode>> statements;
-	int firstLine = this->peekToken().getLine();
-	while (this->peekToken().getTokenType() != LexicalTokenType::SYMBOL_CLOSE_BRACE) {
-		if (this->peekToken().getTokenType() == LexicalTokenType::WHITESPACE) {
-			this->getToken();
-			continue;
+		if (token.isType(LexicalTokenType::WHITESPACE)) {
+			return getNextToken();
 		}
-		statements.push_back(this->parseStmt());
+
+		return token;
 	}
-
-	int lastLine = this->peekToken().getLine();
-
-	StmtList stmtList = StmtList(firstLine, lastLine, statements);
-
-	return stmtList.buildTree();
-}
-
-std::shared_ptr<ASTNode> SimpleParser::parseStmt() {
-	// Add parsing logic for statement
-	// If next token is '=', we are assigning. Call assign.
-	// Then, Check keywords read/print/call.
-	// Then, check keywords while/if.
-	// If dont have keyword, this is an invalid statement.
-	if (!this->hasTokensLeft()) {
-		throw std::runtime_error("Error: SimpleParser::parseStmt encounter empty statement.");
+	else {
+		return LexicalToken(LexicalTokenType::NULL_TOKEN);
 	}
-
-	LexicalToken firstToken = this->peekToken();
-	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_CALL) {
-		return this->parseCall();
-	}
-
-	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_PRINT) {
-		return this->parsePrint();
-	}
-
-	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_READ) {
-		return this->parseRead();
-	}
-
-	throw std::runtime_error("Error: SimpleParser only accepts READ,CALL,PRINT statements now.");
-}
-
-std::shared_ptr<ASTNode> SimpleParser::parseRead() {
-	LexicalToken keyword = this->getToken();
-	this->assertToken(keyword, LexicalTokenType::KEYWORD_READ);
-
-	LexicalToken variable = this->getToken();
-	this->assertToken(variable, LexicalTokenType::NAME);
-
-	LexicalToken semicolon = this->getToken();
-	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
-
-	ReadStmt readStmt = ReadStmt(variable, keyword.getLine(), semicolon.getLine());
-
-	return readStmt.buildTree();
-}
-
-std::shared_ptr<ASTNode> SimpleParser::parsePrint() {
-	LexicalToken keyword = this->getToken();
-	this->assertToken(keyword, LexicalTokenType::KEYWORD_PRINT);
-
-	LexicalToken variable = this->getToken();
-	this->assertToken(variable, LexicalTokenType::NAME);
-
-	LexicalToken semicolon = this->getToken();
-	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
-
-	PrintStmt printStmt = PrintStmt(variable, keyword.getLine(), semicolon.getLine());
-
-	return printStmt.buildTree();
-}
-
-// To change to void later when building trees.
-std::shared_ptr<ASTNode> SimpleParser::parseCall() {
-	LexicalToken keyword = this->getToken();
-	this->assertToken(keyword, LexicalTokenType::KEYWORD_CALL);
-
-	LexicalToken variable = this->getToken();
-	this->assertToken(variable, LexicalTokenType::NAME);
-
-	LexicalToken semicolon = this->getToken();
-	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
-
-	CallStmt callStmt = CallStmt(variable, keyword.getLine(), semicolon.getLine());
-
-	return callStmt.buildTree();
-}
-
-void SimpleParser::parseWhile() {
-	// Add parsing logic for while
-}
-
-void SimpleParser::parseIf() {
-	// Add parsing logic for if statement
-}
-
-void SimpleParser::parseAssign() {
-	// Add parsing logic for assignment
-}
-
-void SimpleParser::parseCondExpr() {
-	// Add parsing logic for condition expression
-}
-
-void SimpleParser::parseRelExpr() {
-	// Add parsing logic for relational expression
-}
-
-void SimpleParser::parseRelFactor() {
-	// Add parsing logic for relational factor (variable name or constant value or expression)
-}
-
-void SimpleParser::parseExpr() {
-	// Add parsing logic for expression (term or expression "+" term or expression "-" term)
-}
-
-void SimpleParser::parseTerm() {
-	// Add parsing logic for term (factor or term "*" factor or term "/" factor or term "%" factor)
-}
-
-void SimpleParser::parseFactor() {
-	// Add parsing logic for factor (variable name or constant value or "(" expr ")")
-}
-
-void SimpleParser::parseVarName() {
-	// Add parsing logic for variable name
-}
-
-void SimpleParser::parseProcName() {
-	// Add parsing logic for procedure name
-}
-
-void SimpleParser::parseConstValue() {
-	// Add parsing logic for constant value parsing
 }

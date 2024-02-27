@@ -1,0 +1,24 @@
+/**
+ * @brief Gets the token after the next token in the stream.
+ *
+ * First retrieves the next token, incrementing the token index, then retrieves the subsequent token without incrementing the token index.
+ * The token index is reset back 1 step after completing these actions.
+ *
+ * @return LexicalToken The token that is 2 steps ahead in the stream.
+ */
+LexicalToken SimpleParser::peekNextNextToken() {
+	// Store the current index
+	int originalIndex = this->tokenIndex;
+
+	// Skip potential whitespace and get the token
+	this->getNextToken();
+
+	// Check the token after the one just returned by getNextToken()
+	LexicalToken nextToken = this->peekNextToken();
+
+	// Reset the token index to its original value
+	this->tokenIndex = originalIndex;
+
+	// Return the peeked token
+	return nextToken;
+}

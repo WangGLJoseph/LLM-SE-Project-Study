@@ -8,3 +8,4 @@ private:
 
  public:
   static PKB& getPKB();
+  void clear();

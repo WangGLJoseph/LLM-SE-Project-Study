@@ -1,0 +1,217 @@
+#pragma once
+
+#include <PKB.h>
+#include <ReadFacade.h>
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+class ReadFacadeStub : public ReadFacade {
+ private:
+  [[maybe_unused]] PKB* pkb = nullptr;
+
+ public:
+  // Entity Manager methods
+  std::unordered_set<std::string> getAllVariables() override {
+    return {"a", "b", "c"};
+  };
+
+  std::unordered_set<std::string> getAllConstants() override {
+    return {"0", "7", "8", "9", "20", "1", "2"};
+  };
+
+  std::unordered_set<std::string> getAllProcedures() override {
+    return {"main", "call"};
+  };
+
+  std::unordered_set<int> getStatements() override {
+    return {1, 2, 3, 4, 5, 6};
+  };
+
+  std::unordered_set<int> getAssigns() override {
+    return {1, 2, 5, 6, 7, 9, 10, 13};
+  };
+
+  std::unordered_set<int> getReads() override { return {14, 16, 17}; };
+
+  std::unordered_set<int> getPrints() override { return {1, 2, 12, 15}; };
+
+  std::unordered_set<int> getCalls() override { return {7, 8, 9}; };
+
+  std::unordered_set<int> getWhiles() override { return {3, 10, 11}; };
+
+  std::unordered_set<int> getIfs() override { return {4, 8}; };
+
+  // Pattern Manager Methods
+  std::vector<std::pair<std::string, std::string>>
+  getAssignExpPairsSynonymPartialMatch(
+      [[maybe_unused]] const std::vector<std::string>& infixTokens) override {
+    return {{"2", "b"}, {"5", "c"}, {"6", "c"}};
+  };
+
+  std::vector<std::pair<std::string, std::string>>
+  getAssignExpPairsPartialMatch(
+      [[maybe_unused]] const std::string& var,
+      [[maybe_unused]] const std::vector<std::string>& infixTokens) override {
+    return {{"1", "a"}, {"2", "b"}};
+  };
+
+  std::vector<std::pair<std::string, std::string>> getAllAssignExpPairs()
+      override {
+    return {{"1", "a"}, {"2", "b"}, {"5", "c"}, {"6", "c"}};
+  };
+
+  // Relationship Manager Methods
+  // parent
+  std::vector<int> getChildren([[maybe_unused]] int parentStmtNo) override {
+    return {4, 5, 6, 7};
+  };
+
+  int getParent([[maybe_unused]] int childStmtNo) override { return 2; };
+
+  std::vector<int> getChildrenStar([[maybe_unused]] int parentStmtNo) override {
+    return {4, 5, 6, 7};
+  };
+
+  std::vector<int> getParentStar([[maybe_unused]] int childStmtNo) override {
+    return {1, 2, 3};
+  };
+
+  std::vector<std::pair<int, int>> getAllParentPairs() override {
+    return {{1, 2}, {3, 4}, {5, 6}};
+  };
+
+  std::vector<std::pair<int, int>> getAllParentStarPairs() override {
+    return {{1, 2}, {1, 3}, {2, 3}};
+  }
+
+  std::unordered_set<int> getAllChildren() override { return {2, 3, 4, 5, 6}; };
+
+  std::unordered_set<int> getAllParents() override { return {1, 2, 3}; };
+
+  // follows
+  int getStmtThatFollowsAfter([[maybe_unused]] int stmtNo) override {
+    return 4;
+  };
+
+  int getStmtThatFollowsBefore([[maybe_unused]] int stmtNo) override {
+    return 3;
+  };
+
+  std::vector<int> getAllStmtsThatFollowAfter(
+      [[maybe_unused]] int stmtNo) override {
+    return {10, 11, 12, 13};
+  };
+
+  std::vector<int> getAllStmtsThatFollowBefore(
+      [[maybe_unused]] int stmtNo) override {
+    return {4, 5, 6};
+  };
+
+  std::vector<std::pair<int, int>> getAllFollowPairs() override {
+    return {{1, 2}, {3, 4}, {5, 6}};
+  };
+
+  std::vector<std::pair<int, int>> getAllFollowStarPairs() override {
+    return {{1, 2}, {1, 3}, {2, 3}};
+  }
+
+  std::unordered_set<int> getAllStmtsThatFollowAfterOtherStmts() override {
+    return {4, 5, 6, 7};
+  }
+
+  std::unordered_set<int> getAllStmtsThatFollowBeforeOtherStmts() override {
+    return {1, 2, 3};
+  }
+
+  // modifies
+  std::vector<std::string> getVarsModifiedByStmt(
+      [[maybe_unused]] int stmtNo) override {
+    return {"a", "b"};
+  };
+
+  std::vector<int> getStmtsThatModifyVar(
+      [[maybe_unused]] std::string str) override {
+    return {1, 2, 3, 9};
+  };
+
+  std::vector<std::pair<int, std::string>> getAllVarModifiedByStmtPairs()
+      override {
+    return {{1, "a"}, {2, "b"}, {3, "c"}};
+  };
+
+  std::vector<std::string> getVarsModifiedByProcedure(
+      [[maybe_unused]] std::string& str) override {
+    return {"a", "b", "c", "d"};
+  };
+
+  std::vector<std::string> getProceduresThatModifyVar(
+      [[maybe_unused]] std::string& str) override {
+    return {"main", "call"};
+  };
+
+  std::vector<std::pair<std::string, std::string>>
+  getAllVarModifiedByProcedurePairs() override {
+    return {{"main", "a"}, {"main", "c"}, {"call", "d"}};
+  };
+
+  std::unordered_set<int> getAllStmtsThatModifyVars() override {
+    return {1, 2, 3};
+  }
+
+  std::unordered_set<std::string> getAllVarsModifiedByStmts() override {
+    return {"a", "b"};
+  }
+
+  std::unordered_set<std::string> getAllProceduresThatModifyVars() override {
+    return {"main", "call", "fun"};
+  }
+
+  std::unordered_set<std::string> getAllVarsModifiedByProcedures() override {
+    return {"a", "b", "c"};
+  }
+
+  // uses
+  std::vector<std::string> getVarsUsedByStmt(
+      [[maybe_unused]] int stmtNo) override {
+    return {"a", "b"};
+  };
+
+  std::vector<int> getStmtsThatUseVar(
+      [[maybe_unused]] std::string str) override {
+    return {1, 2, 3};
+  };
+
+  std::vector<std::pair<int, std::string>> getAllVarUsedByStmtPairs() override {
+    return {{1, "a"}, {2, "a"}, {3, "b"}};
+  };
+
+  std::vector<std::string> getVarsUsedByProcedure(
+      [[maybe_unused]] std::string str) override {
+    return {"a", "b"};
+  };
+
+  std::vector<std::string> getProceduresThatUseVar(
+      [[maybe_unused]] std::string str) override {
+    return {"main", "call"};
+  };
+
+  std::vector<std::pair<std::string, std::string>>
+  getAllVarUsedByProcedurePairs() override {
+    return {{"main", "d"}, {"call", "a"}, {"main", "ef"}};
+  };
+
+  std::unordered_set<int> getAllStmtsThatUseVars() override {
+    return {1, 2, 3};
+  }
+  std::unordered_set<std::string> getAllVarsUsedByStmts() override {
+    return {"a", "b", "c"};
+  }
+  std::unordered_set<std::string> getAllProceduresThatUseVars() override {
+    return {"main", "call"};
+  }
+  std::unordered_set<std::string> getAllVarsUsedByProcedures() override {
+    return {"a", "b", "c", "d"};
+  }
+};

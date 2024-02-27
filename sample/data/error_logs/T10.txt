@@ -1,2 +1,6 @@
-23s2-cp-spa-team-10: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp
-23s2-cp-spa-team-10: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp
+23s2-cp-spa-team-10: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/QPS/src/query/Query.cpp
+23s2-cp-spa-team-10: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/QPS/src/query/Query.cpp
+23s2-cp-spa-team-10: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/QPS/src/query/Query.cpp
+23s2-cp-spa-team-10: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/QPS/src/query/Query.cpp
+23s2-cp-spa-team-10: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp
+23s2-cp-spa-team-10: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-10/Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp

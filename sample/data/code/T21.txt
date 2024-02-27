@@ -1,26 +1,794 @@
 RepoName: 23s2-cp-spa-team-21
-File: Team21/Code21/src/unit_testing/src/sp/utils/StubPKBWriter.cpp
+File: Team21/Code21/src/integration_testing/src/PKBToQPS/PKBToQPSModifiesTest.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/0fefef07-7381-4f58-bd3d-bc4e573d7d22
+ChatId: 0fefef07-7381-4f58-bd3d-bc4e573d7d22
+Code:
+TEST_CASE("PKB Modifies Integration with QPS - Positive Test Cases") {
+  std::shared_ptr<PKB> pkb = std::make_shared<PKB>();
+  std::shared_ptr<PKBWriter> writer = std::make_shared<PKBWriter>(pkb);
+  PKBReader *reader = new PKBReader(pkb);
+  QPS qps(reader);
+
+  StatementType ASSIGN_TYPE = StatementType::ASSIGN;
+  StatementType IF_TYPE = StatementType::IF;
+  StatementType WHILE_TYPE = StatementType::WHILE;
+  StatementType PRINT_TYPE = StatementType::PRINT;
+  StatementType READ_TYPE = StatementType::READ;
+  StatementType INVALID_TYPE = StatementType::INVALID;
+
+  SECTION("Modifies(STMT_ENTITY, VARIABLE) evaluates to true") {
+
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    writer->write(v1);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "cenX")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select s1 such that Modifies(s1, v)");
+    std::list<std::string> expectedResult = {"1"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY, VARIABLE) evaluates to false") {
+
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select s1 such that Modifies(s1, v)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY, WILDCARD) gets all modified variables for a statement") {
+
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "cenX")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "cenY")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "cenX")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(4, "cenY")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; Select s1 such that Modifies(s1, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3", "4"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY, WILDCARD) gets no modified variables for a statement") {
+
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; Select s1 such that Modifies(s1, _)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY - IF, VARIABLE) evaluates to true") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("a1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("b1"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "a1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "b1")));
+
+    std::list<std::string> results = qps.runQuery("if if1; variable v; Select if1 such that Modifies(if1, v)");
+    std::list<std::string> expectedResult = {"1", "2"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY - WHILE, VARIABLE) evaluates to false") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("x"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("y"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "x")));
+
+    std::list<std::string> results = qps.runQuery("while w1; variable y; Select w1 such that Modifies(w1, y)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(ASSIGN_TYPE, WILDCARD) gets all modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; assign p2; Select p1 such that Modifies(p1, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  
+  SECTION("Modifies(INTEGER, WILDCARD) gets all modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; Select p1 such that Modifies(3, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  
+  SECTION("Modifies(INTEGER, WILDCARD) gets no modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; Select p1 such that Modifies(3, _)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(INTEGER, VARIABLE) gets all modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("variable v1; Select v1 such that Modifies(3, v1)");
+    std::list<std::string> expectedResult = {"p1"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(INTEGER, VARIABLE) gets no modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+
+    std::list<std::string> results = qps.runQuery("variable v1; Select v1 such that Modifies(3, v1)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(INTEGER, IDENTIFIER) gets all variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select v such that Modifies(3, \"p1\")");
+    std::list<std::string> expectedResult = {"p1", "p2"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+}
+
+TEST_CASE("PKB Modifies Integration with QPS - Negative Test Cases") {
+  std::shared_ptr<PKB> pkb = std::make_shared<PKB>();
+  std::shared_ptr<PKBWriter> writer = std::make_shared<PKBWriter>(pkb);
+  PKBReader *reader = new PKBReader(pkb);
+  QPS qps(reader);
+
+  StatementType ASSIGN_TYPE = StatementType::ASSIGN;
+  StatementType IF_TYPE = StatementType::IF;
+  StatementType WHILE_TYPE = StatementType::WHILE;
+  StatementType PRINT_TYPE = StatementType::PRINT;
+  StatementType READ_TYPE = StatementType::READ;
+
+  SECTION("Wildcard for the first variable") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("a1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("b1"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "a1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "b1")));
+
+    REQUIRE_THROWS_AS(qps.runQuery("stmt s1; Select s1 such that Modifies(_, \"a1\")"), SemanticError);
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/integration_testing/src/PKBToQPS/PKBToQPSUsesTest.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/0fefef07-7381-4f58-bd3d-bc4e573d7d22
+ChatId: 0fefef07-7381-4f58-bd3d-bc4e573d7d22
+Code:
+TEST_CASE("PKB Uses Integration with QPS - Positive Test Cases") {
+  std::shared_ptr<PKB> pkb = std::make_shared<PKB>();
+  std::shared_ptr<PKBWriter> writer = std::make_shared<PKBWriter>(pkb);
+  PKBReader *reader = new PKBReader(pkb);
+  QPS qps(reader);
+
+  StatementType ASSIGN_TYPE = StatementType::ASSIGN;
+  StatementType IF_TYPE = StatementType::IF;
+  StatementType WHILE_TYPE = StatementType::WHILE;
+  StatementType PRINT_TYPE = StatementType::PRINT;
+  StatementType READ_TYPE = StatementType::READ;
+  StatementType INVALID_TYPE = StatementType::INVALID;
+
+  SECTION("Uses(STMT_ENTITY, VARIABLE) evaluates to true") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    writer->write(v1);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "cenX")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select s1 such that Uses(s1, v)");
+    std::list<std::string> expectedResult = {"1"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Uses(STMT_ENTITY, VARIABLE) evaluates to false") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select s1 such that Uses(s1, v)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Uses(STMT_ENTITY, WILDCARD) gets all used variables for a statement") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "cenX")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(2, "cenY")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(3, "cenX")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(4, "cenY")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; Select s1 such that Uses(s1, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3", "4"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Uses(STMT_ENTITY, WILDCARD) gets no used variables for a statement") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; Select s1 such that Uses(s1, _)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Uses(STMT_ENTITY - IF, VARIABLE) evaluates to true") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("a1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("b1"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "a1")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(2, "b1")));
+
+    std::list<std::string> results = qps.runQuery("if if1; variable v; Select if1 such that Uses(if1, v)");
+    std::list<std::string> expectedResult = {"1", "2"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Uses(STMT_ENTITY - WHILE, VARIABLE) evaluates to false") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("x"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("y"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "x")));
+
+    std::list<std::string> results = qps.runQuery("while w1; variable y; Select w1 such that Uses(w1, y)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+
+  SECTION("Uses(ASSIGN_TYPE, WILDCARD) gets all used variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "p1")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(2, "p2")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; assign p2; Select p1 such that Uses(p1, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+
+  SECTION("Uses(INTEGER, WILDCARD) gets all used variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "p1")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(2, "p2")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; Select p1 such that Uses(3, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Uses(INTEGER, WILDCARD) gets no used variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "p1")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(2, "p2")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; Select p1 such that Uses(3, _)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+
+  SECTION("Uses(INTEGER, VARIABLE) gets all used variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "p1")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(2, "p2")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("variable v1; Select v1 such that Uses(3, v1)");
+    std::list<std::string> expectedResult = {"p1"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+
+  SECTION("Uses(INTEGER, VARIABLE) gets no used variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "p1")));
+
+    std::list<std::string> results = qps.runQuery("variable v1; Select v1 such that Uses(3, v1)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+
+  SECTION("Uses(INTEGER, IDENTIFIER) gets all variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(1, "p1")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(2, "p2")));
+    writer->write(std::make_shared<UsesEntry>(UsesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select v such that Uses(3, \"p1\")");
+    std::list<std::string> expectedResult = {"p1", "p2"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+}
+
+TEST_CASE("PKB Uses Integration with QPS - Negative Test Cases") {
+  std::shared_ptr<PKB> pkb = std::make_shared<PKB>();
+  std::shared_ptr<PKBWriter> writer = std::make_shared<PKBWriter>(pkb);
+  PKBReader *reader = new PKBReader(pkb);
+  QPS qps(reader);
+
+  StatementType ASSIGN_TYPE = StatementType::ASSIGN;
+  StatementType IF_TYPE = StatementType::IF;
+  StatementType WHILE_TYPE = StatementType::WHILE;
+  StatementType PRINT_TYPE = StatementType::PRINT;
+  StatementType READ_TYPE = StatementType::READ;
+
+  SECTION("Wildcard for the first variable") {
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/spa/src/sp/ASTNode/ExpressionNode.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/piHh6JQOEfqCmocyXXpiVtRR?model=gpt-4&mode=chat
+ChatId: piHh6JQOEfqCmocyXXpiVtRR
+Code:
+std::vector<std::shared_ptr<SPToken>> ExpressionNode::getAllVariableTokens() {
+  std::vector<std::shared_ptr<SPToken>> tokens;
+
+  // Add the symbol token of this node
+  if (symbol->getType() == SPTokenType::IDENTIFIER) {
+    tokens.push_back(symbol);
+  }
+
+  // Recursively process the left child, if it exists
+  if (left != nullptr) {
+    std::vector<std::shared_ptr<SPToken>> leftTokens = left->getAllVariableTokens();
+    tokens.insert(tokens.end(), leftTokens.begin(), leftTokens.end());
+  }
+
+  // Recursively process the right child, if it exists
+  if (right != nullptr) {
+    std::vector<std::shared_ptr<SPToken>> rightTokens = right->getAllVariableTokens();
+    tokens.insert(tokens.end(), rightTokens.begin(), rightTokens.end());
+  }
+
+  return tokens;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/spa/src/sp/ASTNode/ExpressionNode.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/gf0PJabuEMVePzIa9vFWW8kz?model=gpt-4&mode=chat
+ChatId: gf0PJabuEMVePzIa9vFWW8kz
+Code:
+bool ExpressionNode::isSubTree(const std::shared_ptr<ExpressionNode> &other) const {
+  // Empty tree is subtree of every tree
+  if (!other)
+    return true;
+
+  // Non-empty tree can't be a subtree of an empty tree
+  if (!this->symbol)
+    return false;
+
+  // Check if the data of both roots is same and data of left and right
+  // subtrees are also same
+  if (this->areIdentical(other))
+    return true;
+
+  // If the tree with root as current node doesn't match, then try left
+  // and right subtrees one by one
+  return (this->left && this->left->isSubTree(other)) || (this->right && this->right->isSubTree(other));
+}
+
+bool ExpressionNode::areIdentical(const std::shared_ptr<ExpressionNode> &otherTree) const {
+  if (!this->symbol && !otherTree)
+    return true;
+
+  if (!this->symbol || !otherTree)
+    return false;
+
+  return ((*this->symbol == *otherTree->symbol) && ((this->left ? this->left->areIdentical(otherTree->left) : !otherTree->left)) &&
+          ((this->right ? this->right->areIdentical(otherTree->right) : !otherTree->right)));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/spa/src/sp/DesignExtractor/ConcreteExtractor/UseExtractor.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// https://platform.openai.com/playground/p/0daYNrNnpn3OJsHstB18m4q5?model=gpt-4&mode=chat
+
+UseExtractor::UseExtractor(std::shared_ptr<PKBWriter> &pkbWriter)
+        : pkbWriter(pkbWriter) {}
+
+void UseExtractor::VisitAssignNode(std::shared_ptr<const AssignNode> assignNode) {
+    int lineNum = assignNode->GetLineNum();
+    // Get the variables used in the right hand side of the assignment
+    std::shared_ptr<ExpressionNode> exprNode = assignNode->getExpression();
+    std::vector<std::shared_ptr<SPToken>> varTokens = exprNode->getAllVariableTokens();
+
+    for (const std::shared_ptr<SPToken>& token : varTokens) {
+        ProcessAddUsesEntry(lineNum, token->getTokenValue());
+    }
+}
+
+void UseExtractor::VisitPrintNode(std::shared_ptr<const PrintNode> printNode) {
+    // Get the variable used in the print statement
+    std::string usedVar = printNode->getPrintVar();
+    ProcessAddUsesEntry(printNode->GetLineNum(), usedVar);
+}
+
+void UseExtractor::VisitIfNode(std::shared_ptr<const IfNode> ifNode) {
+    // Process the condition of the if statement
+    int lineNum = ifNode->GetLineNum();
+    std::shared_ptr<ExpressionNode> exprNode = ifNode->getCondition();
+    std::vector<std::shared_ptr<SPToken>> varTokens = exprNode->getAllVariableTokens();
+
+    for (const std::shared_ptr<SPToken>& token : varTokens) {
+        ProcessAddUsesEntry(lineNum, token->getTokenValue());
+    }
+
+    // Push parentLineNumList
+    parentLineNumList.push_back(lineNum);
+    parentLineNumList.push_back(lineNum);
+}
+
+void UseExtractor::VisitWhileNode(std::shared_ptr<const WhileNode> whileNode) {
+    int lineNum = whileNode->GetLineNum();
+    // Process the condition of the while statement
+    std::shared_ptr<ExpressionNode> exprNode = whileNode->getCondition();
+    std::vector<std::shared_ptr<SPToken>> varTokens = exprNode->getAllVariableTokens();
+    for (const std::shared_ptr<SPToken>& token : varTokens) {
+        ProcessAddUsesEntry(lineNum, token->getTokenValue());
+    }
+
+    // Push parentLineNumList
+    parentLineNumList.push_back(lineNum);
+}
+
+void UseExtractor::VisitProcedureNode(std::shared_ptr<const ProcedureNode> procedureNode) {
+    curProcedureName = procedureNode->getProcedureName();
+}
+
+void UseExtractor::EndVisitProcedureNode(std::shared_ptr<const ProcedureNode> procedureNode) {
+    curProcedureName = "";
+}
+
+void UseExtractor::EndVisitStatementListNode(std::shared_ptr<const StatementListNode> statementListNode) {
+    if (!parentLineNumList.empty()) {
+      parentLineNumList.pop_back();
+    }
+}
+
+void UseExtractor::ProcessAddUsesEntry(int lineNum, const std::string& varName) {
+    if (!curProcedureName.empty()) {
+        AddProcedureUsesEntry(curProcedureName, varName);
+    }
+
+    // Get Callers
+    auto callers = callPathManager->getAllCallersFor(curProcedureName);
+    if (!callers.empty()) {
+        for (const std::string& caller : callers) {
+            AddProcedureUsesEntry(caller, varName);
+        }
+    }
+
+    // Get Caller line numbers
+    auto callerLineNum = callPathManager->getAllCallerLineNumFor(curProcedureName);
+    if (!callerLineNum.empty()) {
+        for (int i : callerLineNum) {
+            AddStmtUsesEntry(i, varName);
+        }
+    }
+
+    AddStmtUsesEntry(lineNum, varName);
+    if (!parentLineNumList.empty()) {
+        std::unordered_set<int> parentLineSet(parentLineNumList.begin(), parentLineNumList.end());
+        for (int i : parentLineSet) {
+            AddStmtUsesEntry(i, varName);
+        }
+    }
+}
+
+void UseExtractor::AddProcedureUsesEntry(const std::string& procName, const std::string& varName) {
+    pkbWriter->writeProcedureUses(procName, varName);
+}
+
+void UseExtractor::AddStmtUsesEntry(int lineNum, const std::string& varName) {
+    pkbWriter->write(std::make_shared<UsesEntry>(UsesEntry(lineNum, varName)));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/spa/src/sp/DesignExtractor/ConcreteExtractor/UseExtractor.h
 Generator: gpt
 Intervention: 1
 Language: e
 Prompt: 
 ChatId: 
 Code:
-// https://platform.openai.com/playground/p/RD0h76mGKpDUhlh5MSEccMd7?model=gpt-4&mode=chat
-StubPKBWriter::StubPKBWriter(PKB *pkb) : PKBWriter(pkb) {}
+// https://platform.openai.com/playground/p/0daYNrNnpn3OJsHstB18m4q5?model=gpt-4&mode=chat
 
-void StubPKBWriter::writeFollows(int stmt1, int stmt2) {
-  if (followsRecord.find(stmt1) == followsRecord.end()) {
-    followsRecord[stmt1] = std::vector<int>();
+class UseExtractor : public ConcreteDesignExtractor {
+public:
+    explicit UseExtractor(std::shared_ptr<PKBWriter> &pkbWriter);
+
+    void VisitAssignNode(std::shared_ptr<const AssignNode> assignNode) override;
+    void VisitPrintNode(std::shared_ptr<const PrintNode> printNode) override;
+    void VisitIfNode(std::shared_ptr<const IfNode> ifNode) override;
+    void VisitWhileNode(std::shared_ptr<const WhileNode> whileNode) override;
+    //void VisitCallNode(std::shared_ptr<const CallNode> callNode) override;
+    void VisitProcedureNode(std::shared_ptr<const ProcedureNode> procedureNode) override;
+    void EndVisitProcedureNode(std::shared_ptr<const ProcedureNode> procedureNode) override;
+    void EndVisitStatementListNode(std::shared_ptr<const StatementListNode> statementListNode) override;
+
+private:
+    std::shared_ptr<PKBWriter> pkbWriter;
+    std::string curProcedureName;
+    std::vector<int> parentLineNumList;
+    std::shared_ptr<CallPathManager> callPathManager = CallPathManager::getCallPathManager();
+    void ProcessAddUsesEntry(int lineNum, const std::string& varName);
+    void AddProcedureUsesEntry(const std::string& procName, const std::string& varName);
+    void AddStmtUsesEntry(int lineNum, const std::string& varName);
+};
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/unit_testing/src/sp/utils/StubPKBWriter.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/RD0h76mGKpDUhlh5MSEccMd7?model=gpt-4&mode=chat
+ChatId: RD0h76mGKpDUhlh5MSEccMd7
+Code:
+StubPKBWriter::StubPKBWriter(std::shared_ptr<PKB> pkb) : PKBWriter(pkb) {}
+
+void StubPKBWriter::write(FollowsEntry entry) {
+  int stmt1 = std::stoi(entry.getLeft());
+  if (entry.isIndirect()) {
+    if (indirectFollowsRecord.find(stmt1) == indirectFollowsRecord.end()) {
+      indirectFollowsRecord[stmt1] = std::vector<int>();
+    }
+    indirectFollowsRecord[stmt1].push_back(std::stoi(entry.getRight()));
+  } else {
+    if (followsRecord.find(stmt1) == followsRecord.end()) {
+      followsRecord[stmt1] = std::vector<int>();
+    }
+    followsRecord[stmt1].push_back(std::stoi(entry.getRight()));
   }
-  followsRecord[stmt1].push_back(stmt2);
 }
 
-bool StubPKBWriter::isFollows(int stmt1, int stmt2) {
-  if (followsRecord.find(stmt1) == followsRecord.end()) {
+// void StubPKBWriter::writeIndirect(FollowsEntry entry) {
+//   int stmt1 = entry.getLeft();
+//   if (indirectFollowsRecord.find(stmt1) == indirectFollowsRecord.end()) {
+//     indirectFollowsRecord[stmt1] = std::vector<int>();
+//   }
+//   indirectFollowsRecord[stmt1].push_back(entry.getRight());
+// }
+
+bool StubPKBWriter::isFollows(int stmt1, int stmt2, bool isDirect) {
+  auto recordToUse = isDirect ? followsRecord : indirectFollowsRecord;
+
+  if (recordToUse.find(stmt1) == recordToUse.end()) {
     return false;
   }
-  for (int i : followsRecord[stmt1]) {
+  for (int i : recordToUse[stmt1]) {
     if (i == stmt2) {
       return true;
     }
@@ -28,8 +796,399 @@ bool StubPKBWriter::isFollows(int stmt1, int stmt2) {
   return false;
 }
 
-std::unordered_map<int, std::vector<int>> StubPKBWriter::getAllFollowsRecord() {
-  return followsRecord;
+std::unordered_map<int, std::vector<int>> StubPKBWriter::getAllFollowsRecord() { return followsRecord; }
+
+std::unordered_map<int, std::vector<int>> StubPKBWriter::getAllIndirectFollowsRecord() { return indirectFollowsRecord; }
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/unit_testing/src/sp/ParsingStrategy/CallParsingStrategyTest.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/Qj3JSOfPfI4CtSxXlNgWjSNk?model=gpt-4&mode=chat
+ChatId: Qj3JSOfPfI4CtSxXlNgWjSNk
+Code:
+#include "sp/ParsingStrategy/CallParsingStrategy.h"
+
+#include "catch.hpp"
+#include "common/exception/ErrorConstants.h"
+#include "sp/ASTNode/ASTNode.h"
+#include "sp/SPTokenizer/SPToken.h"
+#include "unit_testing//src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+
+TEST_CASE("Test CallParsingStrategy::parse function", "[CallParsingStrategy]") {
+  CallParsingStrategy cps;
+  int stmtNo = 0;
+
+  SECTION("Test case when the first token value is not 'CALL'") {
+    std::vector<SPToken> tokens = {*CommonTokens::PRINT_TOKEN, *CommonTokens::P_PROC_TOKEN, *CommonTokens::SEMICOLON_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_CALL_KEYWORD);
+  }
+
+  SECTION("Test case when the procedure name is missing") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::SEMICOLON_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_IDENTIFIER);
+  }
+
+  SECTION("Test case when the function name token is not an identifier nor a keyword") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::ONE_TOKEN, *CommonTokens::SEMICOLON_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_IDENTIFIER);
+  }
+
+  SECTION("Test case when the trailing semicolon is missing") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::P_PROC_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::MISSING_TRAILING_SEMICOLON);
+  }
+
+  SECTION("Test case when the trailing semicolon is incorrect") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::P_PROC_TOKEN, *CommonTokens::DIVIDE_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_TRAILING_SEMICOLON);
+  }
+
+  SECTION("Successful parsing into CallNode") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::P_PROC_TOKEN, *CommonTokens::SEMICOLON_TOKEN};
+    size_t current = 0;
+    auto result = cps.parse(tokens, current, stmtNo);
+    auto callNode = dynamic_cast<CallNode *>(result.get());
+    auto expectedCallNode = std::make_shared<CallNode>(0, CommonTokens::P_PROC_TOKEN);
+    REQUIRE(callNode != nullptr);
+    REQUIRE(*callNode == *expectedCallNode);
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/unit_testing/src/sp/ParsingStrategy/ConditionalExpressionParsingStrategy.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/d1i8aXgGBViR2A68mJvvm29h?model=gpt-4&mode=chat
+ChatId: d1i8aXgGBViR2A68mJvvm29h
+Code:
+#include "sp/ParsingStrategy/ConditionalExpressionParsingStrategy.h"
+
+#include "catch.hpp"
+#include "common/exception/ErrorConstants.h"
+#include "sp/ASTNode/ASTNode.h"
+#include "sp/SPTokenizer/SPToken.h"
+#include "unit_testing//src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+
+TEST_CASE("Testing ConditionalExpression parse()", "[ConditionalExpressionParsingStrategy]") {
+  ConditionalExpressionParsingStrategy strategy;
+
+  SECTION("Positive test case: Normal expression") {
+    // (a + x * y + z / b)
+    std::vector<SPToken> tokens = {*CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::A_TOKEN,
+                                   *CommonTokens::PLUS_TOKEN,
+                                   *CommonTokens::X_TOKEN,
+                                   *CommonTokens::MULTIPLY_TOKEN,
+                                   *CommonTokens::Y_TOKEN,
+                                   *CommonTokens::PLUS_TOKEN,
+                                   *CommonTokens::Z_TOKEN,
+                                   *CommonTokens::DIVIDE_TOKEN,
+                                   *CommonTokens::B_TOKEN,
+                                   *CommonTokens::CLOSE_PARENTHESES_TOKEN};
+    size_t current = 0;
+    int stmtNo = 0;
+
+    auto node = strategy.parse(tokens, current, stmtNo);
+    auto exprNode = std::dynamic_pointer_cast<ExpressionNode>(node);
+
+    // build expected expr node
+    auto multNode1 = ASTBuilder::buildSimpleExpressionNode(1, "*", CommonTokens::X_TOKEN, CommonTokens::Y_TOKEN);
+    auto aNode = std::make_shared<ExpressionNode>(1, CommonTokens::A_TOKEN);
+    auto plusNode1 = std::make_shared<ExpressionNode>(1, CommonTokens::PLUS_TOKEN, aNode, multNode1);
+    auto divideNode = ASTBuilder::buildSimpleExpressionNode(1, "/", CommonTokens::Z_TOKEN, CommonTokens::B_TOKEN);
+    auto expectedExprNode = std::make_shared<ExpressionNode>(1, CommonTokens::PLUS_TOKEN, plusNode1, divideNode);
+
+    REQUIRE(exprNode != nullptr);
+    REQUIRE(*exprNode == *exprNode);
+  }
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/unit_testing/src/sp/ParsingStrategy/IfParsingStrategyTest.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/ZUA31IPGZQDF2cxfjaNjbV9v?model=gpt-4&mode=chat
+ChatId: ZUA31IPGZQDF2cxfjaNjbV9v
+Code:
+#include "sp/ParsingStrategy/IfParsingStrategy.h"
+
+#include "catch.hpp"
+#include "common/exception/ErrorConstants.h"
+#include "sp/ASTNode/ASTNode.h"
+#include "sp/SPTokenizer/SPToken.h"
+#include "unit_testing//src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+
+TEST_CASE("IfParsingStrategy parse", "[parse]") {
+  SECTION("Parse correct IF statement") {
+    IfParsingStrategy ifParser;
+
+    // if (x == 1) then {print x;} else {call p;}
+    std::vector<SPToken> tokens = {// Add your appropriate tokens here, which represents a correct IF statement
+                                   *CommonTokens::IF_TOKEN,        *CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::X_TOKEN,         *CommonTokens::EQUAL_EQUAL_TOKEN,
+                                   *CommonTokens::ONE_TOKEN,       *CommonTokens::CLOSE_PARENTHESES_TOKEN,
+                                   *CommonTokens::THEN_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::PRINT_TOKEN,     *CommonTokens::X_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN,
+                                   *CommonTokens::ELSE_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::CALL_TOKEN,      *CommonTokens::P_PROC_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN};
+
+    // Build expected IfNode
+    auto conditionExprNode = ASTBuilder::buildSimpleExpressionNode(1, "==", CommonTokens::X_TOKEN, CommonTokens::ONE_TOKEN);
+    auto printNode = ASTBuilder::buildPrintNode(2, "x");
+    auto callNode = ASTBuilder::buildCallNode(3, "p");
+    auto thenStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{printNode});
+    auto elseStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{callNode});
+    auto expectedIfNode = std::make_shared<IfNode>(1, conditionExprNode, thenStmtList, elseStmtList);
+
+    size_t current = 0;
+    int stmtNo = 1;
+
+    auto astNode = ifParser.parse(tokens, current, stmtNo);
+
+    // dynamic cast to IfNode
+    auto ifNode = std::dynamic_pointer_cast<IfNode>(astNode);
+    REQUIRE(ifNode); // checks if the dynamic cast is successful
+    REQUIRE(*ifNode == *expectedIfNode);
+  }
+
+  SECTION("Parse incorrect IF statement") {
+    IfParsingStrategy ifParser;
+
+    // call (x == 1) then {print x;} else {call p;}
+    std::vector<SPToken> tokens = {// Add your appropriate tokens here, which represents a correct IF statement
+                                   *CommonTokens::CALL_TOKEN,      *CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::X_TOKEN,         *CommonTokens::EQUAL_EQUAL_TOKEN,
+                                   *CommonTokens::ONE_TOKEN,       *CommonTokens::CLOSE_PARENTHESES_TOKEN,
+                                   *CommonTokens::THEN_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::PRINT_TOKEN,     *CommonTokens::X_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN,
+                                   *CommonTokens::ELSE_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::CALL_TOKEN,      *CommonTokens::P_PROC_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN};
+
+    size_t current = 0;
+    int stmtNo = 1;
+
+    REQUIRE_THROWS_WITH(ifParser.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_IF_KEYWORD);
+  }
+
+  SECTION("Parse with incorrect condition expression") {
+    IfParsingStrategy ifParser;
+
+    // if (x = 1) then {print x;} else {call p;}
+    std::vector<SPToken> tokens = {// Add your appropriate tokens here, which represents a correct IF statement
+                                   *CommonTokens::IF_TOKEN,        *CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::X_TOKEN,         *CommonTokens::EQUAL_TOKEN,
+                                   *CommonTokens::ONE_TOKEN,       *CommonTokens::CLOSE_PARENTHESES_TOKEN,
+                                   *CommonTokens::THEN_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::PRINT_TOKEN,     *CommonTokens::X_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN,
+                                   *CommonTokens::ELSE_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::CALL_TOKEN,      *CommonTokens::P_PROC_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN};
+
+    size_t current = 0;
+    int stmtNo = 1;
+
+    REQUIRE_THROWS_AS(ifParser.parse(tokens, current, stmtNo), SyntaxError);
+  }
+
+  SECTION("Parse with missing then keyword") {
+    IfParsingStrategy ifParser;
+
+    // if (x = 1) {print x;} else {call p;}
+    std::vector<SPToken> tokens = {// Add your appropriate tokens here, which represents a correct IF statement
+                                   *CommonTokens::IF_TOKEN,
+                                   *CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::X_TOKEN,
+                                   *CommonTokens::EQUAL_EQUAL_TOKEN,
+                                   *CommonTokens::ONE_TOKEN,
+                                   *CommonTokens::CLOSE_PARENTHESES_TOKEN,
+                                   *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::PRINT_TOKEN,
+                                   *CommonTokens::X_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN,
+                                   *CommonTokens::CLOSE_BRACKET_TOKEN,
+                                   *CommonTokens::ELSE_TOKEN,
+                                   *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::CALL_TOKEN,
+                                   *CommonTokens::P_PROC_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN,
+                                   *CommonTokens::CLOSE_BRACKET_TOKEN};
+
+    size_t current = 0;
+    int stmtNo = 1;
+
+    REQUIRE_THROWS_WITH(ifParser.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_THEN_KEYWORD);
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-21
+File: Team21/Code21/src/unit_testing/src/sp/ParsingStrategy/AssignParsingStrategyTest.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/3sNsWIiWbU0xxKYkQd0cVQof?model=gpt-4&mode=chat
+ChatId: 3sNsWIiWbU0xxKYkQd0cVQof
+Code:
+#include "sp/ParsingStrategy/AssignParsingStrategy.h"
+
+#include "catch.hpp"
+#include "common/exception/ErrorConstants.h"
+#include "sp/ASTNode/ASTNode.h"
+#include "sp/SPTokenizer/SPToken.h"
+#include "unit_testing//src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+
+TEST_CASE("AssignParsingStrategy parse function", "[AssignParsingStrategy]") {
+
+  SECTION("Valid input: assign single variable") {
+    // x = y;
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 1;
+
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+    tokens.push_back(*CommonTokens::Y_TOKEN);
+    tokens.push_back(*CommonTokens::SEMICOLON_TOKEN);
+
+    auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+    auto assignNode = std::dynamic_pointer_cast<AssignNode>(node);
+
+    auto expectedExprNode = std::make_shared<ExpressionNode>(1, CommonTokens::Y_TOKEN);
+
+    REQUIRE(assignNode != nullptr);
+    REQUIRE(assignNode->GetLineNum() == 1);
+    REQUIRE(assignNode->getVariable()->getTokenValue() == "x");
+    REQUIRE(*assignNode->getExpression() == *expectedExprNode);
+  }
+
+  SECTION("Testing with valid inputs (expression assignment)") {
+    // x =  3 + x * 1 + 0 / y;
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 1;
+
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+    tokens.push_back(*CommonTokens::THREE_TOKEN);
+    tokens.push_back(*CommonTokens::PLUS_TOKEN);
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::MULTIPLY_TOKEN);
+    tokens.push_back(*CommonTokens::ONE_TOKEN);
+    tokens.push_back(*CommonTokens::PLUS_TOKEN);
+    tokens.push_back(*CommonTokens::ZERO_TOKEN);
+    tokens.push_back(*CommonTokens::DIVIDE_TOKEN);
+    tokens.push_back(*CommonTokens::Y_TOKEN);
+    tokens.push_back(*CommonTokens::SEMICOLON_TOKEN);
+
+    auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+    auto assignNode = std::dynamic_pointer_cast<AssignNode>(node);
+
+    // Build expected ExpressionNode
+    // 3 + x * 1 + 0 / y;
+    auto multNode1 = ASTBuilder::buildSimpleExpressionNode(1, "*", CommonTokens::X_TOKEN, CommonTokens::ONE_TOKEN);
+    auto threeNode = std::make_shared<ExpressionNode>(1, CommonTokens::THREE_TOKEN);
+    auto plusNode1 = std::make_shared<ExpressionNode>(1, CommonTokens::PLUS_TOKEN, threeNode, multNode1);
+    auto multNode2 = ASTBuilder::buildSimpleExpressionNode(1, "/", CommonTokens::ZERO_TOKEN, CommonTokens::Y_TOKEN);
+    auto expectedExprNode = std::make_shared<ExpressionNode>(1, CommonTokens::PLUS_TOKEN, plusNode1, multNode2);
+
+    REQUIRE(assignNode != nullptr);
+    REQUIRE(assignNode->GetLineNum() == 1);
+    REQUIRE(assignNode->getVariable()->getTokenValue() == "x");
+    REQUIRE(*assignNode->getExpression() == *expectedExprNode);
+  }
+
+  SECTION("Testing with invalid inputs: Incomplete assignment") {
+    // x =   //(incomplete)
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 0;
+
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+
+    try {
+      auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+      FAIL();
+    } catch (const SyntaxError &ex) {
+      REQUIRE(ex.what() == "Syntax Error: " + ErrorConstants::INCOMPLETE_ASSIGNMENT);
+    }
+  }
+
+  SECTION("Testing with invalid inputs: Does not start with identifier") {
+    // 1 = 1;  //(incomplete)
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 0;
+
+    tokens.emplace_back("1", SPTokenType::INTEGER); // Error
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+    tokens.push_back(*CommonTokens::ONE_TOKEN);
+    tokens.push_back(*CommonTokens::SEMICOLON_TOKEN);
+
+    try {
+      auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+      FAIL();
+    } catch (const SyntaxError &ex) {
+      REQUIRE(ex.what() == "Syntax Error: " + ErrorConstants::EXPECTED_IDENTIFIER);
+    }
+  }
+
+  SECTION("Testing with invalid inputs: Invalid expression") {
+    // x = 1 +/ x;  //(invalid)
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 0;
+
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+    tokens.push_back(*CommonTokens::ONE_TOKEN);
+    tokens.push_back(*CommonTokens::PLUS_TOKEN);
+    tokens.push_back(*CommonTokens::DIVIDE_TOKEN);
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::SEMICOLON_TOKEN);
+
+    try {
+      auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+      FAIL();
+    } catch (const SyntaxError &ex) {
+      REQUIRE(ex.what() == "Syntax Error: " + ErrorConstants::UNEXPECTED_TOKEN_EXPRESSION);
+    }
+  }
+
+  SECTION("Missing semi colon") {
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens = {
+        *CommonTokens::X_TOKEN, *CommonTokens::EQUAL_TOKEN,    *CommonTokens::A_TOKEN, *CommonTokens::PLUS_TOKEN,
+        *CommonTokens::X_TOKEN, *CommonTokens::MULTIPLY_TOKEN, *CommonTokens::Y_TOKEN, *CommonTokens::PLUS_TOKEN,
+        *CommonTokens::Z_TOKEN, *CommonTokens::DIVIDE_TOKEN,   *CommonTokens::B_TOKEN,
+    };
+    size_t current = 0;
+    int stmtNo = 0;
+
+    REQUIRE_THROWS_WITH(assignParsingStrategy.parse(tokens, current, stmtNo),
+                        "Syntax Error: " + ErrorConstants::MISSING_TRAILING_SEMICOLON);
+  }
 }
 --------------------
 RepoName: 23s2-cp-spa-team-21
@@ -37,60 +1196,100 @@ File: Team21/Code21/src/unit_testing/src/sp/DesignExtractor/ConcreteExtractor/Fo
 Generator: gpt
 Intervention: 1
 Language: e
-Prompt: 
-ChatId: 
+Prompt: https://platform.openai.com/playground/p/RD0h76mGKpDUhlh5MSEccMd7?model=gpt-4&mode=chat
+ChatId: RD0h76mGKpDUhlh5MSEccMd7
 Code:
-// https://platform.openai.com/playground/p/RD0h76mGKpDUhlh5MSEccMd7?model=gpt-4&mode=chat
-
 #include "sp/DesignExtractor/ConcreteExtractor/FollowsExtractor.h"
 
 #include "catch.hpp"
 #include "pkb/storage/PKB.h"
 #include "sp/ASTNode/StatementListNode.h"
+#include "sp/ASTNode/WhileNode.h"
 #include "unit_testing/src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
 #include "unit_testing/src/sp/utils/StubPKBWriter.h"
 
 #include <memory>
 
-TEST_CASE("FollowsExtractor correctly extracts relationships",
-          "[FollowsExtractor]") {
-  PKB pkb;
-  auto stubPKBWriter = std::make_shared<StubPKBWriter>(&pkb);
+TEST_CASE("FollowsExtractor correctly extracts relationships", "[FollowsExtractor]") {
+  std::shared_ptr<PKB> pkb;
+  auto stubPKBWriter = std::make_shared<StubPKBWriter>(pkb);
   FollowsExtractor extractor((std::shared_ptr<PKBWriter> &)stubPKBWriter);
 
   SECTION("Single statement list node") {
     auto callNode = ASTBuilder::buildCallNode(1, "a");
-    auto stmtListNode = std::make_shared<StatementListNode>(
-        std::vector<std::shared_ptr<StatementNode>>{callNode});
+    auto stmtListNode = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{callNode});
     extractor.VisitStatementListNode(stmtListNode);
 
     // Make assertions for a single statement node. No Follows relation should
     // exist
     REQUIRE(stubPKBWriter->getAllFollowsRecord().empty());
+    REQUIRE(stubPKBWriter->getAllIndirectFollowsRecord().empty());
   }
 
   SECTION("Multiple statements list node") {
     auto callNode = ASTBuilder::buildCallNode(1, "a");
     auto readNode1 = ASTBuilder::buildReadNode(2, "a");
     auto readNode2 = ASTBuilder::buildReadNode(3, "a");
-    auto stmtListNode = std::make_shared<StatementListNode>(
-        std::vector<std::shared_ptr<StatementNode>>{callNode, readNode1,
-                                                    readNode2});
+    auto stmtListNode = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{callNode, readNode1, readNode2});
 
     extractor.VisitStatementListNode(stmtListNode);
 
     // Make assertions for Follows relation. This should exist.
-    REQUIRE(stubPKBWriter->isFollows(1, 2));
-    REQUIRE(stubPKBWriter->isFollows(2, 3));
-    REQUIRE_FALSE(stubPKBWriter->isFollows(1, 3));
+    REQUIRE(stubPKBWriter->getAllFollowsRecord().size() == 2);
+    REQUIRE(stubPKBWriter->isFollows(1, 2, true));
+    REQUIRE(stubPKBWriter->isFollows(2, 3, true));
+
+    REQUIRE(stubPKBWriter->getAllIndirectFollowsRecord().size() == 1);
+    REQUIRE(stubPKBWriter->isFollows(1, 3, false));
+  }
+
+  SECTION("statement list with if block") {
+    // Source Code:
+    // 1           print x;
+    // 2           if (x==1) then {
+    // 3               read a;
+    // 4               print b;
+    // 5               call p; }
+    //             else {
+    // 6               call q; }
+
+    auto readNode = std::make_shared<ReadNode>(3, CommonTokens::A_TOKEN);
+    auto callNode_p = std::make_shared<CallNode>(5, CommonTokens::P_PROC_TOKEN);
+    auto callNode_q = std::make_shared<CallNode>(6, CommonTokens::Q_PROC_TOKEN);
+    auto printNode_b = std::make_shared<PrintNode>(4, CommonTokens::B_TOKEN);
+    auto thenStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{readNode, printNode_b, callNode_p});
+    auto elseStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{callNode_q});
+
+    auto expressionLeft = std::make_shared<ExpressionNode>(2, CommonTokens::X_TOKEN);
+    auto expressionRight = std::make_shared<ExpressionNode>(2, CommonTokens::ONE_TOKEN);
+
+    auto expressionNode = std::make_shared<ExpressionNode>(1, CommonTokens::EQUAL_EQUAL_TOKEN, expressionLeft, expressionRight);
+
+    auto ifNode = std::make_shared<IfNode>(2, expressionNode, thenStmtList, elseStmtList);
+    auto printNode_x = std::make_shared<PrintNode>(1, CommonTokens::X_TOKEN);
+    auto stmtListNode = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{printNode_x, ifNode});
+
+    extractor.VisitStatementListNode(stmtListNode);
+    extractor.VisitStatementListNode(thenStmtList);
+    extractor.VisitStatementListNode(elseStmtList);
+
+    // Make assertions for Follows relation. This should exist.
+    REQUIRE(stubPKBWriter->getAllFollowsRecord().size() == 3);
+    REQUIRE(stubPKBWriter->isFollows(1, 2, true));
+    REQUIRE(stubPKBWriter->isFollows(3, 4, true));
+    REQUIRE(stubPKBWriter->isFollows(4, 5, true));
+
+    REQUIRE(stubPKBWriter->getAllIndirectFollowsRecord().size() == 1);
+    REQUIRE(stubPKBWriter->isFollows(3, 5, false));
   }
 }
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-21
-Total Snippets: 2
-Total lines: 72
-SP Snippets: 2
-SP lines: 72
+Total Snippets: 12
+Total lines: 1197
+SP Snippets: 10
+SP lines: 674
 PKB Snippets: 0
 PKB lines: 0
 QPS Snippets: 0

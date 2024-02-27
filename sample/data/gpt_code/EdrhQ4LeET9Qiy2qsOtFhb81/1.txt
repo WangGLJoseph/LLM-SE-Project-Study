@@ -1,7 +1,57 @@
-class FollowsTable : public RelationshipTable<std::string, std::string> {
+class FollowsTable : public RelationshipTable<int, int> {
 public:
-    bool doesFollow(const std::string& followee, const std::string& follower) {
-        return RelationshipTable::hasRelationship(followee, follower);
+    /**
+     * Add a follows relationship between two statement numbers
+     *
+     * @param followeeStatementNum - The statement number being followed
+     * @param followerStatementNum - The statement number following the other statement
+     */
+    void addFollowsRelationship(int followeeStatementNum, int followerStatementNum) {
+        RelationshipTable::addRelationship(followeeStatementNum, followerStatementNum);
+    }
+
+    /**
+     * Returns whether the second statement number follows the first
+     * @param followeeStatementNum - The statement number being followed
+     * @param followerStatementNum - The statement number following the other statement
+     * @return True if the second statement number follows the first, false otherwise
+     */
+    bool doesFollow(int followeeStatementNum, int followerStatementNum) {
+        return RelationshipTable::hasRelationship(followeeStatementNum, followerStatementNum);
+    }
+
+    /**
+     * Get all statement numbers that follow the given statement number.
+     * @param statementNum - The statement number being followed
+     * @return A set of statement numbers that follows the given statement number
+     */
+    std::unordered_set<int> getFollowers(int statementNum) {
+        return RelationshipTable::getRelatedValues(statementNum);
+    }
+
+    /**
+     * Get all statement numbers that follows any statement number.
+     * @return  A set of statement numbers that follows another statement number
+     */
+    std::unordered_set<int> getAllFollowers() {
+        return RelationshipTable::getAllRelatedValues();
+    }
+
+    /**
+     * Get all statement numbers that are followed by the given statement number
+     * @param statementNum - The statement number following another statement number
+     * @return A set of statement numbers that are followed by the given statement number
+     */
+    std::unordered_set<int> getFollowees(int statementNum) {
+        return RelationshipTable::getRelatedKeys(statementNum);
+    }
+
+    /**
+     * Get all statement numbers that are followed by any statement number
+     * @return A set of statement numbers that are followed by another statement number
+     */
+    std::unordered_set<int> getAllFollowees() {
+        return RelationshipTable::getAllKeys();
     }
 };
 

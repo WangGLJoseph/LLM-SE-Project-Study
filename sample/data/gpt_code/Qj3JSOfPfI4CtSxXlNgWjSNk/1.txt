@@ -1,0 +1,53 @@
+#include "sp/ParsingStrategy/CallParsingStrategy.h"
+
+#include "catch.hpp"
+#include "common/exception/ErrorConstants.h"
+#include "sp/ASTNode/ASTNode.h"
+#include "sp/SPTokenizer/SPToken.h"
+#include "unit_testing//src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+
+TEST_CASE("Test CallParsingStrategy::parse function", "[CallParsingStrategy]") {
+  CallParsingStrategy cps;
+  int stmtNo = 0;
+
+  SECTION("Test case when the first token value is not 'CALL'") {
+    std::vector<SPToken> tokens = {*CommonTokens::PRINT_TOKEN, *CommonTokens::P_PROC_TOKEN, *CommonTokens::SEMICOLON_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_CALL_KEYWORD);
+  }
+
+  SECTION("Test case when the procedure name is missing") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::SEMICOLON_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_IDENTIFIER);
+  }
+
+  SECTION("Test case when the function name token is not an identifier nor a keyword") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::ONE_TOKEN, *CommonTokens::SEMICOLON_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_IDENTIFIER);
+  }
+
+  SECTION("Test case when the trailing semicolon is missing") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::P_PROC_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::MISSING_TRAILING_SEMICOLON);
+  }
+
+  SECTION("Test case when the trailing semicolon is incorrect") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::P_PROC_TOKEN, *CommonTokens::DIVIDE_TOKEN};
+    size_t current = 0;
+    REQUIRE_THROWS_WITH(cps.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_TRAILING_SEMICOLON);
+  }
+
+  SECTION("Successful parsing into CallNode") {
+    std::vector<SPToken> tokens = {*CommonTokens::CALL_TOKEN, *CommonTokens::P_PROC_TOKEN, *CommonTokens::SEMICOLON_TOKEN};
+    size_t current = 0;
+    auto result = cps.parse(tokens, current, stmtNo);
+    auto callNode = dynamic_cast<CallNode *>(result.get());
+    auto expectedCallNode = std::make_shared<CallNode>(0, CommonTokens::P_PROC_TOKEN);
+    REQUIRE(callNode != nullptr);
+    REQUIRE(*callNode == *expectedCallNode);
+  }
+}

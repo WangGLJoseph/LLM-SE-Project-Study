@@ -1,423 +1,505 @@
 RepoName: 23s2-cp-spa-team-02
-File: Team02/Code02/src/unit_testing/src/SP/Tokenizer/TestTokenizer.cpp
+File: Team02/Code02/src/spa/src/Util/ShuntingYard.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/KQnaxhKZUvQVCtWNCU9FGQlF?model=gpt-4&mode=chat
+ChatId: KQnaxhKZUvQVCtWNCU9FGQlF
+Code:
+enum State {
+  ExpectOperand, ExpectOperator
+};
+
+enum TokenTypeSY {
+  Constant,
+  Variable,
+  BinaryOperator,
+  LeftParenthesis,
+  RightParenthesis
+};
+
+struct TokenSY {
+  TokenTypeSY type;
+  std::string value;
+};
+
+int getPrecedence(TokenSY op) {
+  switch (op.value[0]) {
+    case '+':
+    case '-':
+      return 1;
+    case '*':
+    case '/':
+    case '%':
+      return 2;
+    default:
+      return -1; // value for non-operators
+  }
+}
+
+std::vector<TokenSY> shuntingYardAlgorithm(const std::vector<TokenSY> &tokens) {
+  State state = ExpectOperand;
+  std::stack<TokenSY> operatorStack;
+  std::vector<TokenSY> outputQueue;
+
+  if (tokens.empty()) {
+    throw SyntaxErrorException("token vector cannot be empty");
+  }
+  if (tokens[tokens.size() - 1].type == BinaryOperator) {
+    throw SyntaxErrorException("trailing binary operator");
+  }
+
+  for (const auto &token: tokens) {
+    switch (token.type) {
+      case Constant:
+      case Variable:
+        if (state != ExpectOperand) {
+          throw SyntaxErrorException("expected operator but got operand");
+        }
+        outputQueue.push_back(token);
+        state = ExpectOperator;
+        break;
+      case BinaryOperator:
+        if (state != ExpectOperator) {
+          throw SyntaxErrorException("expected operand but got operator");
+        }
+        while (!operatorStack.empty() &&
+               operatorStack.top().type == BinaryOperator &&
+               getPrecedence(token) <= getPrecedence(operatorStack.top())) {
+          outputQueue.push_back(operatorStack.top());
+          operatorStack.pop();
+        }
+        operatorStack.push(token);
+        state = ExpectOperand;
+        break;
+      case LeftParenthesis:
+        if (state != ExpectOperand) {
+          throw SyntaxErrorException("expected operator but got operand");
+        }
+        operatorStack.push(token);
+        break;
+      case RightParenthesis:
+        while (true) {
+          if (operatorStack.empty()) {
+            throw SyntaxErrorException("tried to pop from an empty operator stack");
+          }
+          if (operatorStack.top().type == LeftParenthesis) {
+            break;
+          }
+          outputQueue.push_back(operatorStack.top());
+          operatorStack.pop();
+        }
+        operatorStack.pop(); // Pop LeftParenthesis
+        state = ExpectOperator;
+    }
+  }
+
+  while (!operatorStack.empty()) {
+    if (operatorStack.top().type == LeftParenthesis ||
+        operatorStack.top().type == RightParenthesis) {
+      throw SyntaxErrorException("mismatched parenthesis");
+    }
+    outputQueue.push_back(operatorStack.top());
+    operatorStack.pop();
+  }
+
+  // Here, outputQueue will have the postfix expression.
+  return outputQueue;
+}
+
+// parses a whitespace seperated token string
+std::vector<TokenSY> parseTokens(std::string &inputString) {
+  std::vector<TokenSY> tokens;
+  std::string token;
+  std::stringstream input(inputString);
+
+  while (input >> token) {
+    if (StringUtils::isInteger(token)) {
+      tokens.push_back({Constant, token});
+      continue;
+    }
+
+    if (StringUtils::isAlphanumericNoLeadingNumber(token)) {
+      tokens.push_back({Variable, token});
+      continue;
+    }
+
+    if (token.size() == 1) {
+      if (token[0] == '+' || token[0] == '-' || token[0] == '*' ||
+          token[0] == '/' || token[0] == '%') {
+        tokens.push_back({BinaryOperator, token});
+        continue;
+      } else if (token[0] == '(') {
+        tokens.push_back({LeftParenthesis, token});
+        continue;
+      } else if (token[0] == ')') {
+        // handle edge case: empty parentheses
+        if (tokens.at(tokens.size() - 1).type == LeftParenthesis) {
+          throw SyntaxErrorException("parentheses cannot be empty");
+        }
+        tokens.push_back({RightParenthesis, token});
+        continue;
+      }
+    }
+
+    throw SyntaxErrorException("invalid token: " + token);
+  }
+  return tokens;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-02
+File: Team02/Code02/src/unit_testing/src/SP/Parser/TestConditionalExpression.cpp
+Generator: gpt4
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/r1NhQwJ3iHLrLSF1PeOCSULk?model=gpt-4&mode=chat
+ChatId: r1NhQwJ3iHLrLSF1PeOCSULk
+Code:
+TEST_CASE("validate more than relational expression") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::GREATER_THAN, ">"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                         });
+  mustPass(tokens);
+
+  Tokens tokens2 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::NAME, "z"),
+                              TokenFactory::createToken(TokenTypeSP::LESS_THAN_OR_EQUALS, "<="),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "1000"),
+                          });
+  mustPass(tokens2);
+}
+
+TEST_CASE("validate conditional expression with logical operators") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::AND, "&&"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NOT, "!"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "y"),
+                             TokenFactory::createToken(TokenTypeSP::GREATER_THAN, ">"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "5"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                         });
+  mustPass(tokens);
+
+  Tokens tokens2 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                              TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                              TokenFactory::createToken(TokenTypeSP::LESS_THAN, "<"),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "0"),
+                              TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                              TokenFactory::createToken(TokenTypeSP::OR, "||"),
+                              TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                              TokenFactory::createToken(TokenTypeSP::NAME, "z"),
+                              TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "5"),
+                              TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                          });
+  mustPass(tokens2);
+}
+
+TEST_CASE("validate expression with arithmetic operators") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::PLUS, "+"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                         });
+  mustFail(tokens);
+
+  Tokens tokens2 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::NAME, "z"),
+                              TokenFactory::createToken(TokenTypeSP::TIMES, "*"),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "1000"),
+                          });
+  mustFail(tokens2);
+
+  Tokens tokens3 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::NAME, "y"),
+                              TokenFactory::createToken(TokenTypeSP::MINUS, "-"),
+                              TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                          });
+  mustFail(tokens3);
+
+  Tokens tokens4 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "10"),
+                              TokenFactory::createToken(TokenTypeSP::DIVIDE, "/"),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "2"),
+                          });
+  mustFail(tokens4);
+
+  Tokens tokens5 = Tokens({
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "100"),
+                              TokenFactory::createToken(TokenTypeSP::MODULO, "%"),
+                              TokenFactory::createToken(TokenTypeSP::INTEGER, "3"),
+                          });
+  mustFail(tokens5);
+}
+
+TEST_CASE("validate conditional expression with nested brackets") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::AND, "&&"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "y"),
+                             TokenFactory::createToken(TokenTypeSP::GREATER_THAN, ">"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "2"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::OR, "||"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "z"),
+                             TokenFactory::createToken(TokenTypeSP::LESS_THAN, "<"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "3"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                         });
+  mustPass(tokens);
+}
+
+TEST_CASE("parenthesized expressions with missing closing parenthesis") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::AND, "&&"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "y"),
+                             TokenFactory::createToken(TokenTypeSP::GREATER_THAN, ">"),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "5"),
+                         });
+  mustFail(tokens);
+}
+
+TEST_CASE("Invalid token in the condition") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::NAME, "x"),
+                             TokenFactory::createToken(TokenTypeSP::DOUBLE_EQUALS, "=="),
+                             TokenFactory::createToken(TokenTypeSP::INTEGER, "1"),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                             TokenFactory::createToken(TokenTypeSP::PRINT, "print"),
+                         });
+  mustFail(tokens);
+}
+
+TEST_CASE("Incomplete condition - missing relational expression") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::NOT, "!"),
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             // Missing Relational Expression here
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                         });
+  mustFail(tokens);
+}
+
+TEST_CASE("just parantheses") {
+  Tokens tokens = Tokens({
+                             TokenFactory::createToken(TokenTypeSP::LEFT_PARENTHESIS, "("),
+                             TokenFactory::createToken(TokenTypeSP::RIGHT_PARENTHESIS, ")"),
+                         });
+  mustFail(tokens);
+}
+
+TEST_CASE("conditional operator without brackets") {
+  std::string input = "this && that";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  Tokens tokens = tokenizer.tokenize();
+  mustFail(tokens);
+}
+
+TEST_CASE("conditional with relational expr") {
+
+  std::string input = "(!((a != b) || (d + 3 >= e))) && (((c % 4 / e)) <= (((d))) * 5)";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  Tokens tokens = tokenizer.tokenize();
+  mustPass(tokens);
+}
+
+TEST_CASE("conditional with invalid relational expr") {
+
+  std::string input = "(!((a != b) || (d + 3 = e))) && (((c % 4 / e)) <= (((d))) * 5)";
+  std::istringstream iss(input);
+  Tokenizer tokenizer(iss);
+  Tokens tokens = tokenizer.tokenize();
+  mustFail(tokens);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-02
+File: Team02/Code02/src/unit_testing/src/Util/TestShuntingYard.cpp
 Generator: gpt
 Intervention: 1
 Language: e
 Prompt: 
 ChatId: 
 Code:
-// https://platform.openai.com/playground?assistant=asst_bB5WL2lLMsCHPP9OedD9H5kM&thread=thread_GWNyhjQk9MCMNoiUH2R6yz0B
-// test && and ||
-TEST_CASE("Tokenize logical operators") {
-  std::string input = "&& ||";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-  auto tokens = tokenizer.tokenize();
+// promt:https://platform.openai.com/playground/p/uqctOKxREV3cbXzMdHT7caVK?model=gpt-4&mode=chat
 
-  REQUIRE(tokens.getLength() == 2);
-
-  REQUIRE(tokens.at(0).getType() == AND);
-  REQUIRE(tokens.at(0).getValue() == "&&");
-
-  REQUIRE(tokens.at(1).getType() == OR);
-  REQUIRE(tokens.at(1).getValue() == "||");
+TEST_CASE("Basic operation") {
+  std::string infix = "a + b";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a b +";
+  REQUIRE(actual == expected);
 }
 
-TEST_CASE("Tokenize complex arithmetic expression") {
-  std::string input = "(a + b) * (c - d) / (e % f)";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-  auto tokens = tokenizer.tokenize();
-
-  REQUIRE(tokens.getLength() == 17);
-
-  REQUIRE(tokens.at(0).getType() == LEFT_PARENTHESIS);
-  REQUIRE(tokens.at(0).getValue() == "(");
-
-  REQUIRE(tokens.at(1).getType() == NAME);
-  REQUIRE(tokens.at(1).getValue() == "a");
-
-  REQUIRE(tokens.at(2).getType() == PLUS);
-  REQUIRE(tokens.at(2).getValue() == "+");
-
-  REQUIRE(tokens.at(3).getType() == NAME);
-  REQUIRE(tokens.at(3).getValue() == "b");
-
-  REQUIRE(tokens.at(4).getType() == RIGHT_PARENTHESIS);
-  REQUIRE(tokens.at(4).getValue() == ")");
-
-  REQUIRE(tokens.at(5).getType() == TIMES);
-  REQUIRE(tokens.at(5).getValue() == "*");
-
-  REQUIRE(tokens.at(6).getType() == LEFT_PARENTHESIS);
-  REQUIRE(tokens.at(6).getValue() == "(");
-
-  REQUIRE(tokens.at(7).getType() == NAME);
-  REQUIRE(tokens.at(7).getValue() == "c");
-
-  REQUIRE(tokens.at(8).getType() == MINUS);
-  REQUIRE(tokens.at(8).getValue() == "-");
-
-  REQUIRE(tokens.at(9).getType() == NAME);
-  REQUIRE(tokens.at(9).getValue() == "d");
-
-  REQUIRE(tokens.at(10).getType() == RIGHT_PARENTHESIS);
-  REQUIRE(tokens.at(10).getValue() == ")");
-
-  REQUIRE(tokens.at(11).getType() == DIVIDE);
-  REQUIRE(tokens.at(11).getValue() == "/");
-
-  REQUIRE(tokens.at(12).getType() == LEFT_PARENTHESIS);
-  REQUIRE(tokens.at(12).getValue() == "(");
-
-  REQUIRE(tokens.at(13).getType() == NAME);
-  REQUIRE(tokens.at(13).getValue() == "e");
-
-  REQUIRE(tokens.at(14).getType() == MODULO);
-  REQUIRE(tokens.at(14).getValue() == "%");
-
-  REQUIRE(tokens.at(15).getType() == NAME);
-  REQUIRE(tokens.at(15).getValue() == "f");
-
-  REQUIRE(tokens.at(16).getType() == RIGHT_PARENTHESIS);
-  REQUIRE(tokens.at(16).getValue() == ")");
+TEST_CASE("Operation priority") {
+  std::string infix = "a + b * c";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a b c * +";
+  REQUIRE(actual == expected);
 }
 
-TEST_CASE("Tokenize program with multiple procedures") {
-  std::string input = R"(
-        procedure Proc1 {
-            x = 10 + y;
-        }
-
-        procedure Proc2 {
-            if (z > 0) {
-                print z;
-            }
-        }
-    )";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-  auto tokens = tokenizer.tokenize();
-  REQUIRE(tokens.getLength() == 25);
-
-  REQUIRE(tokens.getLength() == 25);
-
-  REQUIRE(tokens.at(0).getType() == PROCEDURE);
-  REQUIRE(tokens.at(0).getValue() == "procedure");
-
-  REQUIRE(tokens.at(1).getType() == NAME);
-  REQUIRE(tokens.at(1).getValue() == "Proc1");
-
-  REQUIRE(tokens.at(2).getType() == LEFT_CURLY_BRACKET);
-  REQUIRE(tokens.at(2).getValue() == "{");
-
-  REQUIRE(tokens.at(3).getType() == NAME);
-  REQUIRE(tokens.at(3).getValue() == "x");
-
-  REQUIRE(tokens.at(4).getType() == ASSIGN);
-  REQUIRE(tokens.at(4).getValue() == "=");
-
-  REQUIRE(tokens.at(5).getType() == INTEGER);
-  REQUIRE(tokens.at(5).getValue() == "10");
-
-  REQUIRE(tokens.at(6).getType() == PLUS);
-  REQUIRE(tokens.at(6).getValue() == "+");
-
-  REQUIRE(tokens.at(7).getType() == NAME);
-  REQUIRE(tokens.at(7).getValue() == "y");
-
-  REQUIRE(tokens.at(8).getType() == SEMICOLON);
-  REQUIRE(tokens.at(8).getValue() == ";");
-
-  REQUIRE(tokens.at(9).getType() == RIGHT_CURLY_BRACKET);
-  REQUIRE(tokens.at(9).getValue() == "}");
-
-  REQUIRE(tokens.at(10).getType() == PROCEDURE);
-  REQUIRE(tokens.at(10).getValue() == "procedure");
-
-  REQUIRE(tokens.at(11).getType() == NAME);
-  REQUIRE(tokens.at(11).getValue() == "Proc2");
-
-  REQUIRE(tokens.at(12).getType() == LEFT_CURLY_BRACKET);
-  REQUIRE(tokens.at(12).getValue() == "{");
-
-  REQUIRE(tokens.at(13).getType() == IF);
-  REQUIRE(tokens.at(13).getValue() == "if");
-
-  REQUIRE(tokens.at(14).getType() == LEFT_PARENTHESIS);
-  REQUIRE(tokens.at(14).getValue() == "(");
-
-  REQUIRE(tokens.at(15).getType() == NAME);
-  REQUIRE(tokens.at(15).getValue() == "z");
-
-  REQUIRE(tokens.at(16).getType() == GREATER_THAN);
-  REQUIRE(tokens.at(16).getValue() == ">");
-
-  REQUIRE(tokens.at(17).getType() == INTEGER);
-  REQUIRE(tokens.at(17).getValue() == "0");
-
-  REQUIRE(tokens.at(18).getType() == RIGHT_PARENTHESIS);
-  REQUIRE(tokens.at(18).getValue() == ")");
-
-  REQUIRE(tokens.at(19).getType() == LEFT_CURLY_BRACKET);
-  REQUIRE(tokens.at(19).getValue() == "{");
-
-  REQUIRE(tokens.at(20).getType() == PRINT);
-  REQUIRE(tokens.at(20).getValue() == "print");
-
-  REQUIRE(tokens.at(21).getType() == NAME);
-  REQUIRE(tokens.at(21).getValue() == "z");
-
-  REQUIRE(tokens.at(22).getType() == SEMICOLON);
-  REQUIRE(tokens.at(22).getValue() == ";");
-
-  REQUIRE(tokens.at(23).getType() == RIGHT_CURLY_BRACKET);
-  REQUIRE(tokens.at(23).getValue() == "}");
-
-  REQUIRE(tokens.at(24).getType() == RIGHT_CURLY_BRACKET);
-  REQUIRE(tokens.at(24).getValue() == "}");
+TEST_CASE("Operation with parentheses") {
+  std::string infix = "( a + b ) * c";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a b + c *";
+  REQUIRE(actual == expected);
 }
 
-TEST_CASE("Tokenize program with invalid character") {
-  std::string input = "procedure Invalid { $ = x + y; }";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-
-  REQUIRE_THROWS_AS(tokenizer.tokenize(), SyntaxErrorException);
+TEST_CASE("Mixed and nested parentheses") {
+  std::string infix = "a * ( b + c * ( d + e ) )";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a b c d e + * + *";
+  REQUIRE(actual == expected);
 }
 
-TEST_CASE("Tokenize program with invalid keyword") {
-  std::string input = "procedure Invalid { if (x &&& y) { print z; } }";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-
-  REQUIRE_THROWS_AS(tokenizer.tokenize(), SyntaxErrorException);
+TEST_CASE("Complex operations with parentheses") {
+  std::string infix = "a + b * ( c - d ) * ( e + f * g ) - h";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a b c d - * e f g * + * + h -";
+  REQUIRE(actual == expected);
 }
 
-TEST_CASE("Tokenize program with invalid number format") {
-  std::string input = "procedure Invalid { num = 123.45; }";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-
-  REQUIRE_THROWS_AS(tokenizer.tokenize(), SyntaxErrorException);
+TEST_CASE("Expression with percentages") {
+  std::string infix = "a + b % c";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a b c % +";
+  REQUIRE(actual == expected);
 }
 
-// Testing if-else condition
-TEST_CASE("Tokenize if-else statements") {
-  std::string input = "if (a == b) { call x; } else { call y; }";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-  auto tokens = tokenizer.tokenize();
-  REQUIRE(tokens.getLength() == 17);
-
-  REQUIRE(tokens.at(0).getType() == IF);
-  REQUIRE(tokens.at(0).getValue() == "if");
-
-  REQUIRE(tokens.at(1).getType() == LEFT_PARENTHESIS);
-  REQUIRE(tokens.at(1).getValue() == "(");
-
-  REQUIRE(tokens.at(2).getType() == NAME);
-  REQUIRE(tokens.at(2).getValue() == "a");
-
-  REQUIRE(tokens.at(3).getType() == DOUBLE_EQUALS);
-  REQUIRE(tokens.at(3).getValue() == "==");
-
-  REQUIRE(tokens.at(4).getType() == NAME);
-  REQUIRE(tokens.at(4).getValue() == "b");
-
-  REQUIRE(tokens.at(5).getType() == RIGHT_PARENTHESIS);
-  REQUIRE(tokens.at(5).getValue() == ")");
-
-  REQUIRE(tokens.at(6).getType() == LEFT_CURLY_BRACKET);
-  REQUIRE(tokens.at(6).getValue() == "{");
-
-  REQUIRE(tokens.at(7).getType() == CALL);
-  REQUIRE(tokens.at(7).getValue() == "call");
-
-  REQUIRE(tokens.at(8).getType() == NAME);
-  REQUIRE(tokens.at(8).getValue() == "x");
-
-  REQUIRE(tokens.at(9).getType() == SEMICOLON);
-  REQUIRE(tokens.at(9).getValue() == ";");
-
-  REQUIRE(tokens.at(10).getType() == RIGHT_CURLY_BRACKET);
-  REQUIRE(tokens.at(10).getValue() == "}");
-
-  REQUIRE(tokens.at(11).getType() == ELSE);
-  REQUIRE(tokens.at(11).getValue() == "else");
-
-  REQUIRE(tokens.at(12).getType() == LEFT_CURLY_BRACKET);
-  REQUIRE(tokens.at(12).getValue() == "{");
-
-  REQUIRE(tokens.at(13).getType() == CALL);
-  REQUIRE(tokens.at(13).getValue() == "call");
-
-  REQUIRE(tokens.at(14).getType() == NAME);
-  REQUIRE(tokens.at(14).getValue() == "y");
-
-  REQUIRE(tokens.at(15).getType() == SEMICOLON);
-  REQUIRE(tokens.at(15).getValue() == ";");
-
-  REQUIRE(tokens.at(16).getType() == RIGHT_CURLY_BRACKET);
-  REQUIRE(tokens.at(16).getValue() == "}");
+TEST_CASE("Single operand") {
+  std::string infix = "a";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a";
+  REQUIRE(actual == expected);
 }
 
-TEST_CASE("Tokenize maths expressions with whitespace") {
-  std::string input = "a =   1+ 2   - 3    *4;";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-  auto tokens = tokenizer.tokenize();
-
-  REQUIRE(tokens.getLength() == 10);
-
-  REQUIRE(tokens.at(0).getType() == NAME);
-  REQUIRE(tokens.at(0).getValue() == "a");
-
-  REQUIRE(tokens.at(1).getType() == ASSIGN);
-  REQUIRE(tokens.at(1).getValue() == "=");
-
-  REQUIRE(tokens.at(2).getType() == INTEGER);
-  REQUIRE(tokens.at(2).getValue() == "1");
-
-  REQUIRE(tokens.at(3).getType() == PLUS);
-  REQUIRE(tokens.at(3).getValue() == "+");
-
-  REQUIRE(tokens.at(4).getType() == INTEGER);
-  REQUIRE(tokens.at(4).getValue() == "2");
-
-  REQUIRE(tokens.at(5).getType() == MINUS);
-  REQUIRE(tokens.at(5).getValue() == "-");
-
-  REQUIRE(tokens.at(6).getType() == INTEGER);
-  REQUIRE(tokens.at(6).getValue() == "3");
-
-  REQUIRE(tokens.at(7).getType() == TIMES);
-  REQUIRE(tokens.at(7).getValue() == "*");
-
-  REQUIRE(tokens.at(8).getType() == INTEGER);
-  REQUIRE(tokens.at(8).getValue() == "4");
-
-  REQUIRE(tokens.at(9).getType() == SEMICOLON);
-  REQUIRE(tokens.at(9).getValue() == ";");
+TEST_CASE("Single operation without spaces") {
+  std::string infix = "a+b";
+  REQUIRE_THROWS_AS(ShuntingYard::infixToPostfix(infix), SyntaxErrorException);
 }
 
-TEST_CASE("Tokenize function call with whitespace") {
-  std::string input = "call   functionName   ;";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-  auto tokens = tokenizer.tokenize();
-
-  REQUIRE(tokens.getLength() == 3);
-
-  REQUIRE(tokens.at(0).getType() == CALL);
-  REQUIRE(tokens.at(0).getValue() == "call");
-
-  REQUIRE(tokens.at(1).getType() == NAME);
-  REQUIRE(tokens.at(1).getValue() == "functionName");
-
-  REQUIRE(tokens.at(2).getType() == SEMICOLON);
-  REQUIRE(tokens.at(2).getValue() == ";");
+TEST_CASE("Parentheses without inner operator") {
+  std::string infix = "( a + b )";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a b +";
+  REQUIRE(actual == expected);
 }
 
-TEST_CASE("Tokenize if-else statements with whitespace") {
-  std::string input =
-      "if    ( a  == b     )   { call   x ;  }   else   { call y   ; }";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-  auto tokens = tokenizer.tokenize();
-
-  REQUIRE(tokens.getLength() == 17);
-
-  REQUIRE(tokens.at(0).getType() == IF);
-  REQUIRE(tokens.at(0).getValue() == "if");
-
-  REQUIRE(tokens.at(1).getType() == LEFT_PARENTHESIS);
-  REQUIRE(tokens.at(1).getValue() == "(");
-
-  REQUIRE(tokens.at(2).getType() == NAME);
-  REQUIRE(tokens.at(2).getValue() == "a");
-
-  REQUIRE(tokens.at(3).getType() == DOUBLE_EQUALS);
-  REQUIRE(tokens.at(3).getValue() == "==");
-
-  REQUIRE(tokens.at(4).getType() == NAME);
-  REQUIRE(tokens.at(4).getValue() == "b");
-
-  REQUIRE(tokens.at(5).getType() == RIGHT_PARENTHESIS);
-  REQUIRE(tokens.at(5).getValue() == ")");
-
-  REQUIRE(tokens.at(6).getType() == LEFT_CURLY_BRACKET);
-  REQUIRE(tokens.at(6).getValue() == "{");
-
-  REQUIRE(tokens.at(7).getType() == CALL);
-  REQUIRE(tokens.at(7).getValue() == "call");
-
-  REQUIRE(tokens.at(8).getType() == NAME);
-  REQUIRE(tokens.at(8).getValue() == "x");
-
-  REQUIRE(tokens.at(9).getType() == SEMICOLON);
-  REQUIRE(tokens.at(9).getValue() == ";");
-
-  REQUIRE(tokens.at(10).getType() == RIGHT_CURLY_BRACKET);
-  REQUIRE(tokens.at(10).getValue() == "}");
-
-  REQUIRE(tokens.at(11).getType() == ELSE);
-  REQUIRE(tokens.at(11).getValue() == "else");
-
-  REQUIRE(tokens.at(12).getType() == LEFT_CURLY_BRACKET);
-  REQUIRE(tokens.at(12).getValue() == "{");
-
-  REQUIRE(tokens.at(13).getType() == CALL);
-  REQUIRE(tokens.at(13).getValue() == "call");
-
-  REQUIRE(tokens.at(14).getType() == NAME);
-  REQUIRE(tokens.at(14).getValue() == "y");
-
-  REQUIRE(tokens.at(15).getType() == SEMICOLON);
-  REQUIRE(tokens.at(15).getValue() == ";");
-
-  REQUIRE(tokens.at(16).getType() == RIGHT_CURLY_BRACKET);
-  REQUIRE(tokens.at(16).getValue() == "}");
+TEST_CASE("Multi-digit integers") {
+  std::string infix = "123 + 456";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "123 456 +";
+  REQUIRE(actual == expected);
 }
 
-TEST_CASE("Tokenize procedures with whitespace") {
-  std::string input = "procedure   procName  { a  =    1 ;    }";
-  std::istringstream iss(input);
-  Tokenizer tokenizer(iss);
-  auto tokens = tokenizer.tokenize();
+TEST_CASE("Variable and multi-digit integer") {
+  std::string infix = "a * 123";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a 123 *";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.getLength() == 8);
+TEST_CASE("Variables and multi-digit integers mixed") {
+  std::string infix = "a + 123 * b - 456";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a 123 b * + 456 -";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.at(0).getType() == PROCEDURE);
-  REQUIRE(tokens.at(0).getValue() == "procedure");
+TEST_CASE("Long expression with variables and multi-digit integers") {
+  std::string infix = "( a + 123 ) * ( 456 - b ) / 789 + c";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a 123 + 456 b - * 789 / c +";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.at(1).getType() == NAME);
-  REQUIRE(tokens.at(1).getValue() == "procName");
+TEST_CASE("Variable and multi-digit integer multiplication with parentheses") {
+  std::string infix = "a * ( 123 + b )";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a 123 b + *";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.at(2).getType() == LEFT_CURLY_BRACKET);
-  REQUIRE(tokens.at(2).getValue() == "{");
+TEST_CASE("Complex expression with variables and multi-digit integers") {
+  std::string infix = "a + b / ( c - 123 ) * d % 456";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "a b c 123 - / d * 456 % +";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.at(3).getType() == NAME);
-  REQUIRE(tokens.at(3).getValue() == "a");
+TEST_CASE("Expression mixing variables, multi-digit integers, and various operators") {
+  std::string infix = "123 - a * b + 456 / c - d";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "123 a b * - 456 c / + d -";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.at(4).getType() == ASSIGN);
-  REQUIRE(tokens.at(4).getValue() == "=");
+TEST_CASE("Multiple character variable mixed with single character") {
+  std::string infix = "variable1 + a";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "variable1 a +";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.at(5).getType() == INTEGER);
-  REQUIRE(tokens.at(5).getValue() == "1");
+TEST_CASE("Two multiple character variables") {
+  std::string infix = "variable1 * variable2";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "variable1 variable2 *";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.at(6).getType() == SEMICOLON);
-  REQUIRE(tokens.at(6).getValue() == ";");
+TEST_CASE("Complex expression with multi-character variable and integer") {
+  std::string infix = "( var1 + 123 ) * var2";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "var1 123 + var2 *";
+  REQUIRE(actual == expected);
+}
 
-  REQUIRE(tokens.at(7).getType() == RIGHT_CURLY_BRACKET);
-  REQUIRE(tokens.at(7).getValue() == "}");
+TEST_CASE("Using multi-character variable with multi-digit integers") {
+  std::string infix = "var123 + 456 * var789";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "var123 456 var789 * +";
+  REQUIRE(actual == expected);
+}
+
+TEST_CASE("single number expression") {
+  std::string infix = "42";
+  std::string actual = ShuntingYard::infixToPostfix(infix);
+  std::string expected = "42";
+  REQUIRE(actual == expected);
 }
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-02
-Total Snippets: 1
-Total lines: 406
+Total Snippets: 3
+Total lines: 472
 SP Snippets: 1
-SP lines: 406
+SP lines: 185
 PKB Snippets: 0
 PKB lines: 0
 QPS Snippets: 0

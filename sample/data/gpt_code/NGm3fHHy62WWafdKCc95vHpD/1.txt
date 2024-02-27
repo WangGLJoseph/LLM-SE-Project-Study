@@ -1,0 +1,76 @@
+/**
+ * @brief Parse a expression in the program.
+ *
+ * @return std::shared_ptr<ASTNode> A smart pointer pointing to the root of the parsed expression node tree.
+ */
+std::shared_ptr<ASTNode> SimpleParser::parseExpr() {
+	std::shared_ptr<ASTNode> left = parseTerm();
+
+	LexicalToken operation = peekNextToken();
+
+	while (operation.isType(LexicalTokenType::OPERATOR_EXPR)) {
+		this->getNextToken(); //consume operation token		
+
+		std::shared_ptr<ASTNode> operationNode;
+		if (operation.isType(LexicalTokenType::OPERATOR_PLUS)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::ADD, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::ADD));
+		}
+		else if (operation.isType(LexicalTokenType::OPERATOR_MINUS)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::SUBTRACT, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::SUBTRACT));
+		}
+
+		std::shared_ptr<ASTNode> right = parseTerm();
+
+		// Create a new AST node to combine the expr and term and add it under current operation
+		operationNode->addChild(left);
+		operationNode->addChild(right);
+
+		// Swap left operand and operation for next iteration
+		left = operationNode;
+		operation = peekNextToken();
+	}
+
+	return left;
+}
+
+/**
+ * @brief Parse a term in the program.
+ *
+ * @return std::shared_ptr<ASTNode> A smart pointer pointing to the root of the parsed term node tree.
+ */
+std::shared_ptr<ASTNode> SimpleParser::parseTerm() {
+	std::shared_ptr<ASTNode> left = parseFactor();
+
+	LexicalToken operation = peekNextToken();
+
+	while (operation.isType(LexicalTokenType::OPERATOR_TERM)) {
+		this->getNextToken(); //consume operation token
+
+		//		return std::make_shared<ASTNode>(ASTNodeType::CONSTANT, operation.getLine(), Utility::getASTNodeType(ASTNodeType::CONSTANT));
+		std::shared_ptr<ASTNode> operationNode;
+		if (operation.isType(LexicalTokenType::OPERATOR_MULTIPLY)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::MULTIPLY, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::MULTIPLY));
+		}
+		else if (operation.isType(LexicalTokenType::OPERATOR_DIVIDE)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::DIVIDE, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::DIVIDE));
+		}
+		else if (operation.isType(LexicalTokenType::OPERATOR_MODULO)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::MODULO, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::MODULO));
+		}
+		else {
+			throw std::runtime_error("Parsing Term but operator is not of the following: *, /, %");
+		}
+
+		std::shared_ptr<ASTNode> right = parseFactor();
+
+		// Create a new AST node to combine the factor and term and add it under current operation
+		operationNode->addChild(left);
+		operationNode->addChild(right);
+
+		// Swap left operand and operation for next iteration
+		left = operationNode;
+		operation = peekNextToken();
+	}
+
+	return left;
+}

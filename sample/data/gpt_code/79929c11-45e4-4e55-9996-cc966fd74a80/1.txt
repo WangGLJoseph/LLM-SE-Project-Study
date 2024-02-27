@@ -4,8 +4,13 @@ void EntitySetStore<T>::insert(const T& element) {
 }
 
 template <typename T>
-std::unordered_set<T>& EntitySetStore<T>::getAll() {
+std::unordered_set<T> EntitySetStore<T>::getAll() {
   return set;
+}
+
+template <typename T>
+void EntitySetStore<T>::clear() {
+  set.clear();
 }
 
 template class EntitySetStore<int>;

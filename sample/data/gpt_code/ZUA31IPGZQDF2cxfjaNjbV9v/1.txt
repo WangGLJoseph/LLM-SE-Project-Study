@@ -1,0 +1,115 @@
+#include "sp/ParsingStrategy/IfParsingStrategy.h"
+
+#include "catch.hpp"
+#include "common/exception/ErrorConstants.h"
+#include "sp/ASTNode/ASTNode.h"
+#include "sp/SPTokenizer/SPToken.h"
+#include "unit_testing//src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+
+TEST_CASE("IfParsingStrategy parse", "[parse]") {
+  SECTION("Parse correct IF statement") {
+    IfParsingStrategy ifParser;
+
+    // if (x == 1) then {print x;} else {call p;}
+    std::vector<SPToken> tokens = {// Add your appropriate tokens here, which represents a correct IF statement
+                                   *CommonTokens::IF_TOKEN,        *CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::X_TOKEN,         *CommonTokens::EQUAL_EQUAL_TOKEN,
+                                   *CommonTokens::ONE_TOKEN,       *CommonTokens::CLOSE_PARENTHESES_TOKEN,
+                                   *CommonTokens::THEN_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::PRINT_TOKEN,     *CommonTokens::X_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN,
+                                   *CommonTokens::ELSE_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::CALL_TOKEN,      *CommonTokens::P_PROC_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN};
+
+    // Build expected IfNode
+    auto conditionExprNode = ASTBuilder::buildSimpleExpressionNode(1, "==", CommonTokens::X_TOKEN, CommonTokens::ONE_TOKEN);
+    auto printNode = ASTBuilder::buildPrintNode(2, "x");
+    auto callNode = ASTBuilder::buildCallNode(3, "p");
+    auto thenStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{printNode});
+    auto elseStmtList = std::make_shared<StatementListNode>(std::vector<std::shared_ptr<StatementNode>>{callNode});
+    auto expectedIfNode = std::make_shared<IfNode>(1, conditionExprNode, thenStmtList, elseStmtList);
+
+    size_t current = 0;
+    int stmtNo = 1;
+
+    auto astNode = ifParser.parse(tokens, current, stmtNo);
+
+    // dynamic cast to IfNode
+    auto ifNode = std::dynamic_pointer_cast<IfNode>(astNode);
+    REQUIRE(ifNode); // checks if the dynamic cast is successful
+    REQUIRE(*ifNode == *expectedIfNode);
+  }
+
+  SECTION("Parse incorrect IF statement") {
+    IfParsingStrategy ifParser;
+
+    // call (x == 1) then {print x;} else {call p;}
+    std::vector<SPToken> tokens = {// Add your appropriate tokens here, which represents a correct IF statement
+                                   *CommonTokens::CALL_TOKEN,      *CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::X_TOKEN,         *CommonTokens::EQUAL_EQUAL_TOKEN,
+                                   *CommonTokens::ONE_TOKEN,       *CommonTokens::CLOSE_PARENTHESES_TOKEN,
+                                   *CommonTokens::THEN_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::PRINT_TOKEN,     *CommonTokens::X_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN,
+                                   *CommonTokens::ELSE_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::CALL_TOKEN,      *CommonTokens::P_PROC_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN};
+
+    size_t current = 0;
+    int stmtNo = 1;
+
+    REQUIRE_THROWS_WITH(ifParser.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_IF_KEYWORD);
+  }
+
+  SECTION("Parse with incorrect condition expression") {
+    IfParsingStrategy ifParser;
+
+    // if (x = 1) then {print x;} else {call p;}
+    std::vector<SPToken> tokens = {// Add your appropriate tokens here, which represents a correct IF statement
+                                   *CommonTokens::IF_TOKEN,        *CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::X_TOKEN,         *CommonTokens::EQUAL_TOKEN,
+                                   *CommonTokens::ONE_TOKEN,       *CommonTokens::CLOSE_PARENTHESES_TOKEN,
+                                   *CommonTokens::THEN_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::PRINT_TOKEN,     *CommonTokens::X_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN,
+                                   *CommonTokens::ELSE_TOKEN,      *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::CALL_TOKEN,      *CommonTokens::P_PROC_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN, *CommonTokens::CLOSE_BRACKET_TOKEN};
+
+    size_t current = 0;
+    int stmtNo = 1;
+
+    REQUIRE_THROWS_AS(ifParser.parse(tokens, current, stmtNo), SyntaxError);
+  }
+
+  SECTION("Parse with missing then keyword") {
+    IfParsingStrategy ifParser;
+
+    // if (x = 1) {print x;} else {call p;}
+    std::vector<SPToken> tokens = {// Add your appropriate tokens here, which represents a correct IF statement
+                                   *CommonTokens::IF_TOKEN,
+                                   *CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::X_TOKEN,
+                                   *CommonTokens::EQUAL_EQUAL_TOKEN,
+                                   *CommonTokens::ONE_TOKEN,
+                                   *CommonTokens::CLOSE_PARENTHESES_TOKEN,
+                                   *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::PRINT_TOKEN,
+                                   *CommonTokens::X_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN,
+                                   *CommonTokens::CLOSE_BRACKET_TOKEN,
+                                   *CommonTokens::ELSE_TOKEN,
+                                   *CommonTokens::OPEN_BRACKET_TOKEN,
+                                   *CommonTokens::CALL_TOKEN,
+                                   *CommonTokens::P_PROC_TOKEN,
+                                   *CommonTokens::SEMICOLON_TOKEN,
+                                   *CommonTokens::CLOSE_BRACKET_TOKEN};
+
+    size_t current = 0;
+    int stmtNo = 1;
+
+    REQUIRE_THROWS_WITH(ifParser.parse(tokens, current, stmtNo), "Syntax Error: " + ErrorConstants::EXPECTED_THEN_KEYWORD);
+  }
+}

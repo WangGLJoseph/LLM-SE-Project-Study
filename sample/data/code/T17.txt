@@ -1,40 +1,9 @@
 RepoName: 23s2-cp-spa-team-17
-File: Team17/Code17/src/spa/src/QPS/QueryEvaluator/EResult.h
-Generator: copilot
-Intervention: 0
-Language: e
-Prompt: used copilot
-ChatId: 
-Code:
-public:
-    std::vector<std::string> results{};
-
-    EResult();
-
-    std::vector<std::string>& getResults();
-
-    void addResult(const std::string& result);
-
-    void addResults(const std::vector<std::string>& results);
-
-    bool empty() const;
-
-    void clear();
-
-    size_t size() const;
-
-    std::string at(size_t index);
-
-    std::string operator[](size_t index);
-
-    void removeDuplicates();
---------------------
-RepoName: 23s2-cp-spa-team-17
 File: Team17/Code17/src/spa/src/SP/DesignExtractor/EntityExtractor.cpp
 Generator: copilot
 Intervention: 0
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
 std::vector<std::string> expression = {assignStmt->expressionPtr->representation};
@@ -47,10 +16,60 @@ Language: e
 Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
 ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
 Code:
-class FollowsTable : public RelationshipTable<std::string, std::string> {
+class FollowsTable : public RelationshipTable<int, int> {
 public:
-    bool doesFollow(const std::string& followee, const std::string& follower) {
-        return RelationshipTable::hasRelationship(followee, follower);
+    /**
+     * Add a follows relationship between two statement numbers
+     *
+     * @param followeeStatementNum - The statement number being followed
+     * @param followerStatementNum - The statement number following the other statement
+     */
+    void addFollowsRelationship(int followeeStatementNum, int followerStatementNum) {
+        RelationshipTable::addRelationship(followeeStatementNum, followerStatementNum);
+    }
+
+    /**
+     * Returns whether the second statement number follows the first
+     * @param followeeStatementNum - The statement number being followed
+     * @param followerStatementNum - The statement number following the other statement
+     * @return True if the second statement number follows the first, false otherwise
+     */
+    bool doesFollow(int followeeStatementNum, int followerStatementNum) {
+        return RelationshipTable::hasRelationship(followeeStatementNum, followerStatementNum);
+    }
+
+    /**
+     * Get all statement numbers that follow the given statement number.
+     * @param statementNum - The statement number being followed
+     * @return A set of statement numbers that follows the given statement number
+     */
+    std::unordered_set<int> getFollowers(int statementNum) {
+        return RelationshipTable::getRelatedValues(statementNum);
+    }
+
+    /**
+     * Get all statement numbers that follows any statement number.
+     * @return  A set of statement numbers that follows another statement number
+     */
+    std::unordered_set<int> getAllFollowers() {
+        return RelationshipTable::getAllRelatedValues();
+    }
+
+    /**
+     * Get all statement numbers that are followed by the given statement number
+     * @param statementNum - The statement number following another statement number
+     * @return A set of statement numbers that are followed by the given statement number
+     */
+    std::unordered_set<int> getFollowees(int statementNum) {
+        return RelationshipTable::getRelatedKeys(statementNum);
+    }
+
+    /**
+     * Get all statement numbers that are followed by any statement number
+     * @return A set of statement numbers that are followed by another statement number
+     */
+    std::unordered_set<int> getAllFollowees() {
+        return RelationshipTable::getAllKeys();
     }
 };
 
@@ -77,6 +96,64 @@ bool VariableTable::variableExists(const std::string& variable) const {
 std::unordered_set<std::string> VariableTable::getAllVariables() const {
     return symbols;
 }
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Tables/Statements/AssignmentTable.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <utility> // Needed for std::pair
+
+class AssignmentTable {
+private:
+    std::unordered_map<std::string, std::vector<std::pair<int, std::vector<std::string>>>> assignments;
+
+public:
+    // Adds a new assignment to the vector of pairs associated with the variable
+    void addAssignment(const std::string& variable, int statementNum, const std::vector<std::string>& valueList = std::vector<std::string>()) {
+        assignments[variable].emplace_back(statementNum, valueList);
+    }
+
+    // Retrieves the list of assignments (pairs of int and vector of strings) for a variable
+    std::vector<std::pair<int, std::vector<std::string>>> getAssignments(const std::string& variable) const {
+        auto it = assignments.find(variable);
+        if (it != assignments.end()) {
+            return it->second;
+        }
+        return {}; // Return empty if not found
+    }
+
+    // Retrieves all assignments
+    std::unordered_map<std::string, std::vector<std::pair<int, std::vector<std::string>>>> getAllAssignments() const {
+        return assignments;
+    }
+
+    // Checks if a variable has any assignment
+    bool hasAssignment(const std::string& variable) const {
+        return assignments.find(variable) != assignments.end();
+    }
+
+    // Removes all assignments for a variable
+    bool removeAssignments(const std::string& variable) {
+        auto it = assignments.find(variable);
+        if (it != assignments.end()) {
+            assignments.erase(it);
+            return true;
+        }
+        return false;
+    }
+
+    // Clears all assignments
+    void clear() {
+        assignments.clear();
+    }
+};
 --------------------
 RepoName: 23s2-cp-spa-team-17
 File: Team17/Code17/src/spa/src/PKB/Tables/Templates/SymbolTable.h
@@ -117,7 +194,7 @@ protected:
 RepoName: 23s2-cp-spa-team-17
 File: Team17/Code17/src/spa/src/PKB/Tables/Templates/RelationshipTable.h
 Generator: gpt
-Intervention: 0
+Intervention: 1
 Language: e
 Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
 ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
@@ -131,14 +208,23 @@ private:
     std::unordered_map<Type1, std::unordered_set<Type2>> relationships;
 
 public:
-    // Add a relationship between the first and second parameter
+    /**
+     * Add a relationship between the first and second parameter.
+     * @param first - The first parameter
+     * @param second - The second parameter
+     */
     void addRelationship(const Type1& first, const Type2& second) {
         // If 'first' is not already a key in relationships, it initializes
         // a new unordered_set automatically and inserts 'second'.
         relationships[first].insert(second);
     }
 
-    // Check if a specific relationship exists
+    /**
+     * Check if the second parameter is related to the first parameter.
+     * @param first - The first parameter
+     * @param second - The second parameter
+     * @return true if the second parameter is related to the first parameter
+     */
     bool hasRelationship(const Type1& first, const Type2& second) const {
         auto iter = relationships.find(first);
         if (iter == relationships.end()) {
@@ -148,9 +234,59 @@ public:
         // Check if 'second' is in the unordered_set associated with 'first'
         return iter->second.find(second) != iter->second.end();
     }
-
-    // Gets all second parameters associated with a given first parameter
-    std::unordered_set<Type2> getRelated(const Type1& first) const {
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Tables/Templates/RelationshipTable.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+     * Check if there is a relationship by following a path of entries.
+     * @param first - The first parameter
+     * @param second - The second parameter
+     * @return true if the second parameter is directly or indirectly related to the first parameter
+     */
+    bool hasRelationshipStar(const Type1& first, const Type2& second) const {
+        std::unordered_set<Type1> visited;
+        std::unordered_set<Type1> toVisit;
+        toVisit.insert(first);
+        while (!toVisit.empty()) {
+            Type1 current = *toVisit.begin();
+            toVisit.erase(toVisit.begin());
+            if (visited.find(current) != visited.end()) {
+                continue;
+            }
+            visited.insert(current);
+            auto iter = relationships.find(current);
+            if (iter != relationships.end()) {
+                if (iter->second.find(second) != iter->second.end()) {
+                    return true;
+                }
+                for (const auto& next : iter->second) {
+                    toVisit.insert(next);
+                }
+            }
+        }
+        return false;
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Tables/Templates/RelationshipTable.h
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
+ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
+Code:
+/**
+     * Get related second parameters for a given first parameter.
+     * @param first - The first parameter
+     * @return A set of second parameters
+     */
+    std::unordered_set<Type2> getRelatedValues(const Type1& first) const {
         auto iter = relationships.find(first);
         if (iter != relationships.end()) {
             return iter->second;
@@ -159,8 +295,11 @@ public:
         return {};
     }
 
-    // Gets all second parameters associated with any parameter
-    std::unordered_set<Type2> getAllRelated() const {
+    /**
+     * Gets all related second parameters.
+     * @return A set of all second parameters
+     */
+    std::unordered_set<Type2> getAllRelatedValues() const {
         std::unordered_set<Type2> allRelated;
         for (const auto& pair : relationships) {
             allRelated.insert(pair.second.begin(), pair.second.end());
@@ -168,12 +307,41 @@ public:
         return allRelated;
     }
 
-    // Returns all relationships
-    std::unordered_map<Type1, std::unordered_set<Type2>> getAllRelationships() const {
-        return relationships;
+    /**
+     * Get related first parameters for a given second parameter.
+     * @param value - The value stored in the unordered_set
+     * @return A set of first parameters
+     */
+    std::unordered_set<Type1> getRelatedKeys(const Type2& value) const {
+        std::unordered_set<Type1> keys;
+        for (const auto& pair : relationships) {
+            if (pair.second.find(value) != pair.second.end()) {
+                keys.insert(pair.first);
+            }
+        }
+        return keys;
     }
 
-    std::unordered_set<Type1> getKeys() const {
+    /**
+     * Get first/only related first parameter for a given second parameter.
+     * @param value - The value stored in the unordered_set
+     * @return The first parameter
+     */
+    Type1 getRelatedKey(const Type2& value) const {
+        for (const auto& pair : relationships) {
+            if (pair.second.find(value) != pair.second.end()) {
+                return pair.first;
+            }
+        }
+        // Return default value if 'value' not found
+        return {};
+    }
+
+    /**
+     * Get all keys in the unordered_map.
+     * @return A set of all first parameters
+     */
+    std::unordered_set<Type1> getAllKeys() const {
         std::unordered_set<Type1> keys;
         for (const auto& pair : relationships) {
             keys.insert(pair.first);
@@ -181,92 +349,77 @@ public:
         return keys;
     }
 
+    /**
+     * Get the relationships unordered_map.
+     * @return A map of all stored relationships
+     */
+    std::unordered_map<Type1, std::unordered_set<Type2>> getAllRelationships() const {
+        return relationships;
+    }
+
     // Optional: Clear all stored relationships
     void clear() {
         relationships.clear();
     }
-
-    // Optional: Remove specific relationship
-    bool removeRelationship(const Type1& first, const Type2& second) {
-        auto iter = relationships.find(first);
-        if (iter != relationships.end()) {
-            auto& values = iter->second;
-            auto pos = values.find(second);
-            if (pos != values.end()) {
-                values.erase(pos);
-                // Optional: Erase the key if no more related items
-                if (values.empty()) {
-                    relationships.erase(iter);
-                }
-                return true; // Successfully removed
-            }
-        }
-        return false; // Relationship not found
-    }
 };
 --------------------
 RepoName: 23s2-cp-spa-team-17
-File: Team17/Code17/src/spa/src/PKB/Tables/AssignmentTable.h
-Generator: copilot
-Intervention: 0
+File: Team17/Code17/src/spa/src/PKB/Generators/ParentStarGenerator.cpp
+Generator: gpt
+Intervention: 1
 Language: e
-Prompt: 
-ChatId: 
+Prompt: https://platform.openai.com/playground/p/ObWILjlLklBsGIwA4IUS36k5?mode=chat
+ChatId: ObWILjlLklBsGIwA4IUS36k5
 Code:
-#include <string>
-#include <unordered_map>
-#include <vector>
-#include <utility> // Needed for std::pair
+for(auto& entry : parentStarTable){
+        unordered_set<int> visited;
+        DFS(entry.first, parentStarTable, visited);
 
-class AssignmentTable {
-private:
-    std::unordered_map<std::string, std::vector<std::pair<int, std::vector<std::string>>>> assignments;
+        // Erase source node from set, so it's not included in it's own set
+        visited.erase(entry.first);
 
-public:
-    // Adds a new assignment to the vector of pairs associated with the variable
-    void addAssignment(const std::string& variable, int statementNum, const std::vector<std::string>& valueList) {
-        assignments[variable].emplace_back(statementNum, valueList);
+        for(auto& child : visited)
+            writeFacade.AddParentStarRelationship(entry.first, child);
     }
-
-    // Retrieves the list of assignments (pairs of int and vector of strings) for a variable
-    std::vector<std::pair<int, std::vector<std::string>>> getAssignments(const std::string& variable) const {
-        auto it = assignments.find(variable);
-        if (it != assignments.end()) {
-            return it->second;
-        }
-        return {}; // Return empty if not found
-    }
-
-    // Retrieves all assignments
-    std::unordered_map<std::string, std::vector<std::pair<int, std::vector<std::string>>>> getAllAssignments() const {
-        return assignments;
-    }
-
-    // Checks if a variable has any assignment
-    bool hasAssignment(const std::string& variable) const {
-        return assignments.find(variable) != assignments.end();
-    }
-
-    // Removes all assignments for a variable
-    bool removeAssignments(const std::string& variable) {
-        auto it = assignments.find(variable);
-        if (it != assignments.end()) {
-            assignments.erase(it);
-            return true;
-        }
-        return false;
-    }
-
-    // Clears all assignments
-    void clear() {
-        assignments.clear();
-    }
-};
 --------------------
 RepoName: 23s2-cp-spa-team-17
-File: Team17/Code17/src/unit_testing/src/PKB/TestFollowsTable.cpp
+File: Team17/Code17/src/spa/src/PKB/Generators/FollowStarGenerator.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/ObWILjlLklBsGIwA4IUS36k5?mode=chat
+ChatId: ObWILjlLklBsGIwA4IUS36k5
+Code:
+for(auto& entry : followStarTable){
+        unordered_set<int> visited;
+        DFS(entry.first, followStarTable, visited);
+
+        // Erase source node from set, so it's not included in it's own set
+        visited.erase(entry.first);
+
+        for(auto& follower : visited)
+            writeFacade.AddFollowsStarRelationship(entry.first, follower);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/spa/src/PKB/Generators/DFSUtility.cpp
 Generator: gpt
 Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/ObWILjlLklBsGIwA4IUS36k5?mode=chat
+ChatId: ObWILjlLklBsGIwA4IUS36k5
+Code:
+void DFS(int node, unordered_map<int, unordered_set<int>>& adjList, unordered_set<int>& visited){
+    visited.insert(node);
+    for (auto& child : adjList[node])
+        if (visited.find(child) == visited.end())
+            DFS(child, adjList, visited);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/unit_testing/src/PKB/Tables/TestFollowsTable.cpp
+Generator: gpt
+Intervention: 2
 Language: e
 Prompt: https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview
 ChatId: EdrhQ4LeET9Qiy2qsOtFhb81
@@ -275,28 +428,126 @@ TEST_CASE("FollowsTable basic functionality", "[FollowsTable]") {
     FollowsTable followTable;
 
     SECTION("Adding and checking simple relationships") {
-        // Assumption: "B" follows "A", and "C" doesFollow "B"
-        followTable.addRelationship("A", "B");
-        followTable.addRelationship("B", "C");
+        followTable.addFollowsRelationship(1, 2);
+        followTable.addFollowsRelationship(2, 3);
 
-        REQUIRE(followTable.doesFollow("A", "B") == true );
-        REQUIRE(followTable.doesFollow("B", "C") == true );
-        REQUIRE(followTable.doesFollow("A", "C") == false ); // "C" does not directly follow "A"
+        REQUIRE(followTable.doesFollow(1, 2) == true );
+        REQUIRE(followTable.doesFollow(2, 3) == true );
+        REQUIRE(followTable.doesFollow(1, 3) == false );    // "C" does not directly follow "A"
     }
 
     SECTION("Retrieving related elements") {
-        followTable.addRelationship("X", "Y");
-        followTable.addRelationship("X", "Z");  // "X" has multiple followers: "Y" and "Z"
+        // Statement 1 has multiple followers: 2 and 3
+        followTable.addFollowsRelationship(1, 2);
+        followTable.addFollowsRelationship(1, 3);
 
-        auto related = followTable.getRelated("X");
-        REQUIRE( std::find(related.begin(), related.end(), "Y") != related.end() );
-        REQUIRE( std::find(related.begin(), related.end(), "Z") != related.end() );
-        REQUIRE( related.size() == 2 );  // Only "Y" and "Z" are related to "X"
+        auto related = followTable.getFollowers(1);
+        REQUIRE(related.size() == 2);
+        REQUIRE(related.count(2) == 1);
+        REQUIRE(related.count(3) == 1);
     }
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/unit_testing/src/PKB/Tables/TestStatementTable.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+StatementTable statementTable;
+    STATEMENT_TYPE statementType1 = STATEMENT_TYPE::ASSIGN;
+    STATEMENT_TYPE statementType2 = STATEMENT_TYPE::WHILE;
+    int statementNumber1 = 1;
+    int statementNumber2 = 2;
+
+    statementTable.addStatement(statementType1, statementNumber1);
+    statementTable.addStatement(statementType2, statementNumber2);
+
+    SECTION("addStatement adds statements correctly") {
+        REQUIRE(statementTable.isStatementOfType(statementNumber1, statementType1));
+    }
+
+    SECTION("isStatementOfType returns true for existing statements") {
+        REQUIRE(statementTable.isStatementOfType(statementNumber1, statementType1));
+    }
+
+    SECTION("getStatementsOfType returns all statements of a type") {
+        std::unordered_set<int> expected = {statementNumber1};
+        std::unordered_set<int> actual = statementTable.getStatementsOfType(statementType1);
+        REQUIRE(actual == expected);
+    }
+
+    SECTION("getAllStatements returns all statements") {
+        std::unordered_set<int> expected = {statementNumber1, statementNumber2};
+        std::unordered_set<int> actual = statementTable.getAllStatements();
+        REQUIRE(actual == expected);
+    }
+
+    SECTION("getStatementType returns the correct statement type") {
+        STATEMENT_TYPE actualType = statementTable.getStatementType(statementNumber1);
+        REQUIRE(actualType == statementType1);
+    }
+
+    SECTION("getAllStatementTypes returns all statement types") {
+        std::unordered_set<STATEMENT_TYPE> expected = {statementType1, statementType2};
+        std::unordered_set<STATEMENT_TYPE> actual = statementTable.getAllStatementTypes();
+        REQUIRE(actual == expected);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/unit_testing/src/PKB/Tables/TestParentTable.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+SECTION("Is parent star") {
+        parentTable.addParentRelationship(1, 2);
+        parentTable.addParentRelationship(2, 3);
+        parentTable.addParentRelationship(3, 4);
+        parentTable.addParentRelationship(4, 5);
+        parentTable.addParentRelationship(5, 6);
+        parentTable.addParentRelationship(6, 7);
+        parentTable.addParentRelationship(7, 8);
+        parentTable.addParentRelationship(8, 9);
+        parentTable.addParentRelationship(9, 10);
+
+        REQUIRE(parentTable.isParentStar(1, 10) == true);
+        REQUIRE(parentTable.isParentStar(1, 2) == true);
+        REQUIRE(parentTable.isParentStar(1, 3) == true);
+        REQUIRE(parentTable.isParentStar(1, 4) == true);
+        REQUIRE(parentTable.isParentStar(1, 5) == true);
+        REQUIRE(parentTable.isParentStar(1, 6) == true);
+        REQUIRE(parentTable.isParentStar(1, 7) == true);
+        REQUIRE(parentTable.isParentStar(1, 8) == true);
+        REQUIRE(parentTable.isParentStar(1, 9) == true);
+        REQUIRE(parentTable.isParentStar(1, 10) == true);
+    }
+--------------------
+RepoName: 23s2-cp-spa-team-17
+File: Team17/Code17/src/unit_testing/src/PKB/Tables/TestSymbolTable.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+TEST_CASE("getAllSymbols returns all symbols") {
+    SymbolTable symbolTable;
+    symbolTable.addSymbol("x");
+    symbolTable.addSymbol("y");
+
+    auto symbols = symbolTable.getAllSymbols();
+    REQUIRE(symbols.size() == 2);
+    REQUIRE(symbols.find("x") != symbols.end());
+    REQUIRE(symbols.find("y") != symbols.end());
+    REQUIRE(symbols.find("a") == symbols.end());
 }
 --------------------
 RepoName: 23s2-cp-spa-team-17
-File: Team17/Code17/src/unit_testing/src/PKB/TestPKB.cpp
+File: Team17/Code17/src/unit_testing/src/PKB/TestPKBAdd.cpp
 Generator: gpt
 Intervention: 2
 Language: e
@@ -315,11 +566,11 @@ TEST_CASE("PkbWriteFacade::AddVariable adds a variable successfully", "[PkbWrite
 }
 --------------------
 RepoName: 23s2-cp-spa-team-17
-File: Team17/Code17/src/unit_testing/src/PKB/TestPKB.cpp
+File: Team17/Code17/src/unit_testing/src/PKB/TestPKBAdd.cpp
 Generator: copilot
 Intervention: 0
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
 TEST_CASE("PkbWriteFacade::AddReadStatement adds multiple read statements of the same variable successfully", "[PkbWriteFacade]") {
@@ -338,11 +589,11 @@ TEST_CASE("PkbWriteFacade::AddReadStatement adds multiple read statements of the
 }
 --------------------
 RepoName: 23s2-cp-spa-team-17
-File: Team17/Code17/src/unit_testing/src/PKB/TestGetAllPKB.cpp
+File: Team17/Code17/src/unit_testing/src/PKB/TestPKBGetAll.cpp
 Generator: copilot
 Intervention: 0
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
 TEST_CASE("PkbReadFacade::GetAllProcedures returns all procedures", "[PkbReadFacade]") {
@@ -386,6 +637,63 @@ TEST_CASE("PkbReadFacade::GetAllVariables returns all variables", "[PkbReadFacad
     REQUIRE(allVariables.find("x") != allVariables.end());
     REQUIRE(allVariables.find("y") != allVariables.end());
 }
+
+TEST_CASE("PkbReadFacade::GetAllFollowers returns all followers", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddFollowsRelationship(1, 2);
+    writeFacade.AddFollowsRelationship(3, 4);
+
+    auto allFollowers = readFacade.GetAllFollowers();
+    REQUIRE(allFollowers.size() == 2);
+}
+
+TEST_CASE("PkbReadFacade::GetAllChildren returns all print variables", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddParentRelationship(1, 2);
+    writeFacade.AddParentRelationship(1, 3);
+
+    auto allChildren = readFacade.GetAllChildren();
+    REQUIRE(allChildren.size() == 2);
+}
+
+TEST_CASE("PkbReadFacade::GetAllModifiesStatementNums returns all modifies statement numbers", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddModifiesRelationship(1, "x");
+    writeFacade.AddModifiesRelationship(2, "y");
+    writeFacade.AddModifiesRelationship(3, "z");
+
+    auto allModifiedVariables = readFacade.GetAllModifiedVariables();
+    REQUIRE(allModifiedVariables.size() == 3);
+    REQUIRE(allModifiedVariables.find("x") != allModifiedVariables.end());
+    REQUIRE(allModifiedVariables.find("y") != allModifiedVariables.end());
+    REQUIRE(allModifiedVariables.find("z") != allModifiedVariables.end());
+}
+
+TEST_CASE("PkbReadFacade::GetAllUsesStatementNums returns all uses statement numbers", "[PkbReadFacade]") {
+    PKB pkb;
+    PkbWriteFacade writeFacade(pkb);
+    PkbReadFacade readFacade(pkb);
+
+    writeFacade.AddUsesRelationship(1, "x");
+    writeFacade.AddUsesRelationship(2, "y");
+    writeFacade.AddUsesRelationship(3, "z");
+
+    auto allUsedVariables = readFacade.GetAllUsedVariables();
+    REQUIRE(allUsedVariables.size() == 3);
+    REQUIRE(allUsedVariables.find("x") != allUsedVariables.end());
+    REQUIRE(allUsedVariables.find("y") != allUsedVariables.end());
+    REQUIRE(allUsedVariables.find("z") != allUsedVariables.end());
+}
+
 
 TEST_CASE("PkbReadFacade::GetAllReadStatementNums returns all read statement numbers", "[PkbReadFacade]") {
     PKB pkb;
@@ -444,11 +752,11 @@ TEST_CASE("PkbReadFacade::GetAllPrintVariables returns all print variables", "[P
 }
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-17
-Total Snippets: 11
-Total lines: 346
+Total Snippets: 18
+Total lines: 591
 SP Snippets: 1
 SP lines: 1
-PKB Snippets: 9
-PKB lines: 323
-QPS Snippets: 1
-QPS lines: 22
+PKB Snippets: 17
+PKB lines: 590
+QPS Snippets: 0
+QPS lines: 0

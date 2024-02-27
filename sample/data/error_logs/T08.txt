@@ -1,5 +1,1 @@
-23s2-cp-spa-team-08: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-08/Team00/Code00/src/spa/src/sp/tnode/ProcedureNode.h
-23s2-cp-spa-team-08: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-08/Team00/Code00/src/spa/src/sp/Tokenizer.cpp
-23s2-cp-spa-team-08: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-08/Team00/Code00/src/spa/src/sp/Tokenizer.cpp
-23s2-cp-spa-team-08: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-08/Team00/Code00/src/spa/src/sp/Tokenizer.cpp
-23s2-cp-spa-team-08: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-08/Team00/Code00/src/spa/src/sp/Tokenizer.cpp
+23s2-cp-spa-team-08: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-08/Team08/Code08/src/spa/src/sp/parser/Parser.cpp

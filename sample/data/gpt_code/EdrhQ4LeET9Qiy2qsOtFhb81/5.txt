@@ -1,23 +1,81 @@
-TEST_CASE("FollowsTable basic functionality", "[FollowsTable]") {
-    FollowsTable followTable;
-
-    SECTION("Adding and checking simple relationships") {
-        // Assumption: "B" follows "A", and "C" doesFollow "B"
-        followTable.addRelationship("A", "B");
-        followTable.addRelationship("B", "C");
-
-        REQUIRE(followTable.doesFollow("A", "B") == true );
-        REQUIRE(followTable.doesFollow("B", "C") == true );
-        REQUIRE(followTable.doesFollow("A", "C") == false ); // "C" does not directly follow "A"
+/**
+     * Get related second parameters for a given first parameter.
+     * @param first - The first parameter
+     * @return A set of second parameters
+     */
+    std::unordered_set<Type2> getRelatedValues(const Type1& first) const {
+        auto iter = relationships.find(first);
+        if (iter != relationships.end()) {
+            return iter->second;
+        }
+        // Return empty unordered_set if 'first' not found
+        return {};
     }
 
-    SECTION("Retrieving related elements") {
-        followTable.addRelationship("X", "Y");
-        followTable.addRelationship("X", "Z");  // "X" has multiple followers: "Y" and "Z"
-
-        auto related = followTable.getRelated("X");
-        REQUIRE( std::find(related.begin(), related.end(), "Y") != related.end() );
-        REQUIRE( std::find(related.begin(), related.end(), "Z") != related.end() );
-        REQUIRE( related.size() == 2 );  // Only "Y" and "Z" are related to "X"
+    /**
+     * Gets all related second parameters.
+     * @return A set of all second parameters
+     */
+    std::unordered_set<Type2> getAllRelatedValues() const {
+        std::unordered_set<Type2> allRelated;
+        for (const auto& pair : relationships) {
+            allRelated.insert(pair.second.begin(), pair.second.end());
+        }
+        return allRelated;
     }
-}
+
+    /**
+     * Get related first parameters for a given second parameter.
+     * @param value - The value stored in the unordered_set
+     * @return A set of first parameters
+     */
+    std::unordered_set<Type1> getRelatedKeys(const Type2& value) const {
+        std::unordered_set<Type1> keys;
+        for (const auto& pair : relationships) {
+            if (pair.second.find(value) != pair.second.end()) {
+                keys.insert(pair.first);
+            }
+        }
+        return keys;
+    }
+
+    /**
+     * Get first/only related first parameter for a given second parameter.
+     * @param value - The value stored in the unordered_set
+     * @return The first parameter
+     */
+    Type1 getRelatedKey(const Type2& value) const {
+        for (const auto& pair : relationships) {
+            if (pair.second.find(value) != pair.second.end()) {
+                return pair.first;
+            }
+        }
+        // Return default value if 'value' not found
+        return {};
+    }
+
+    /**
+     * Get all keys in the unordered_map.
+     * @return A set of all first parameters
+     */
+    std::unordered_set<Type1> getAllKeys() const {
+        std::unordered_set<Type1> keys;
+        for (const auto& pair : relationships) {
+            keys.insert(pair.first);
+        }
+        return keys;
+    }
+
+    /**
+     * Get the relationships unordered_map.
+     * @return A map of all stored relationships
+     */
+    std::unordered_map<Type1, std::unordered_set<Type2>> getAllRelationships() const {
+        return relationships;
+    }
+
+    // Optional: Clear all stored relationships
+    void clear() {
+        relationships.clear();
+    }
+};

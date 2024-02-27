@@ -1,0 +1,14 @@
+class EntityTypeConverter {
+
+public:
+    static EntityType getEnumFromString(const std::string &s);
+
+    static std::string getStringFromEnum(EntityType e);
+
+    static bool initialize();
+
+private:
+    static std::unordered_map<std::string, EntityType> stringToEntityTypeMap;
+    static std::unordered_map<EntityType, std::string> entityTypeToStringMap;
+    [[maybe_unused]] static bool initialized;
+};

@@ -12,197 +12,355 @@ RepoName, Component, FilePath, Generator, Intervention, Language, Prompt, ChatId
 23s2-cp-spa-team-00,,Team00/Code00/src/spa/src/utils/Errors.h,gpt,0,e,https://platform.openai.com/playground/p/NOluedVgW5yWh05DioM75jSz?model=gpt-4&mode=chat,NOluedVgW5yWh05DioM75jSz
 23s2-cp-spa-team-00,,Team00/Code00/src/spa/src/utils/Errors.h,copilot,1,c,used copilot,
 23s2-cp-spa-team-00,,Team00/Code00/src/spa/src/utils/Errors.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-02,SP,Team02/Code02/src/unit_testing/src/SP/Tokenizer/TestTokenizer.cpp,gpt,1,e,,
+23s2-cp-spa-team-02,,Team02/Code02/src/spa/src/Util/ShuntingYard.cpp,gpt,2,e,https://platform.openai.com/playground/p/KQnaxhKZUvQVCtWNCU9FGQlF?model=gpt-4&mode=chat,KQnaxhKZUvQVCtWNCU9FGQlF
+23s2-cp-spa-team-02,SP,Team02/Code02/src/unit_testing/src/SP/Parser/TestConditionalExpression.cpp,gpt4,0,e,https://platform.openai.com/playground/p/r1NhQwJ3iHLrLSF1PeOCSULk?model=gpt-4&mode=chat,r1NhQwJ3iHLrLSF1PeOCSULk
+23s2-cp-spa-team-02,,Team02/Code02/src/unit_testing/src/Util/TestShuntingYard.cpp,gpt,1,e,,
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/util/EntityTypeConverter.h,gpt,1,e,https://chat.openai.com/share/c3d59194-4f71-41b5-b045-642450edca7a,c3d59194-4f71-41b5-b045-642450edca7a
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/util/EntityTypeConverter.cpp,gpt,2,e,https://chat.openai.com/share/c3d59194-4f71-41b5-b045-642450edca7a,c3d59194-4f71-41b5-b045-642450edca7a
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/parser/DeclarationsParser.cpp,gpt,1,e,,
 23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/QueryEvaluationContext.cpp,gpt,1,e,https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0,8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.h,gpt,1,e,https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0,8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.cpp,gpt,1,e,https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0,8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymValues.cpp,gpt,0,e,https://chat.openai.com/share/dc4fa5ec-550d-4bf8-b28d-2d6a9d8bf4a2,dc4fa5ec-550d-4bf8-b28d-2d6a9d8bf4a2
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/QueryEvaluationContext.cpp,gpt,0,e,https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192,7c590366-8e0e-40e2-863f-2862fa1ae192
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymGraph.cpp,gpt,1,e,https://chat.openai.com/share/7b6dae68-063a-4ce8-9fd0-bd2ac43f9fe4,7b6dae68-063a-4ce8-9fd0-bd2ac43f9fe4
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/HeaderTable.h,gpt,0,e,https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a,69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/HeaderTable.cpp,gpt,0,e,https://chat.openai.com/share/eadbc02c-9e25-4f11-b2bb-c215c525d944,eadbc02c-9e25-4f11-b2bb-c215c525d944
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/TableRow.h,gpt,0,e,https://chat.openai.com/share/eadbc02c-9e25-4f11-b2bb-c215c525d944,eadbc02c-9e25-4f11-b2bb-c215c525d944
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/TableRow.cpp,gpt,0,e,https://chat.openai.com/share/eadbc02c-9e25-4f11-b2bb-c215c525d944,eadbc02c-9e25-4f11-b2bb-c215c525d944
 23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/QueryEvaluationContext.h,gpt,1,e,https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0,8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/strategy/ProjectionStrategy.cpp,gpt,0,e,https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758,b4e5ee0e-2ffc-4b9b-810c-871f71f82758
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/evaluation/SynonymGraph.h,gpt,1,e,https://chat.openai.com/share/7b6dae68-063a-4ce8-9fd0-bd2ac43f9fe4,7b6dae68-063a-4ce8-9fd0-bd2ac43f9fe4
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/query/Synonym.h,gpt,1,e,https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a,69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/FollowsPredicate.h,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/ParentPredicate.h,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/ParentTPredicate.h,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/ParentTPredicate.cpp,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/FollowsTPredicate.h,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/ParentPredicate.cpp,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/FollowsTPredicate.cpp,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/FollowsPredicate.cpp,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/ModifiesPredicate.cpp,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/UsesPredicate.cpp,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/ModifiesPredicate.h,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/Predicate.h,gpt,1,e,https://chat.openai.com/share/649c7ba0-9712-44e7-aa24-ca6262c5a922,649c7ba0-9712-44e7-aa24-ca6262c5a922
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/clause/UsesPredicate.h,gpt,1,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/strategy/ProjectionStrategy.cpp,gpt,1,e,https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758,b4e5ee0e-2ffc-4b9b-810c-871f71f82758
 23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/strategy/ProjectionStrategy.h,gpt,0,e,https://chat.openai.com/share/b4e5ee0e-2ffc-4b9b-810c-871f71f82758,b4e5ee0e-2ffc-4b9b-810c-871f71f82758
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/strategy/DeclarationStrategy.cpp,gpt,1,e,,
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/QueryParser.cpp,gpt,1,e,,
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/entity/strategy/JoinWithPredicateStrategy.cpp,gpt,1,e,https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192,7c590366-8e0e-40e2-863f-2862fa1ae192
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/QueryValidator.cpp,copilot,2,e,,
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/QueryEvaluator.h,gpt,0,e,https://chat.openai.com/share/cc725a19-b2cb-4541-9910-0b2b77365e00,cc725a19-b2cb-4541-9910-0b2b77365e00
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/QueryEvaluator.cpp,gpt,0,e,https://chat.openai.com/share/cc725a19-b2cb-4541-9910-0b2b77365e00,cc725a19-b2cb-4541-9910-0b2b77365e00
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/spa/src/qps/QueryTokenizer.cpp,gpt,1,e,https://chat.openai.com/share/4ba78f27-8cc9-4e4b-887d-4f9689d236b1,4ba78f27-8cc9-4e4b-887d-4f9689d236b1
+23s2-cp-spa-team-03,PKB,Team03/Code03/src/spa/src/pkb/pattern_store/AssignPatternStore.cpp,gpt,2,e,https://platform.openai.com/playground/p/NO2qblo8fQIgUUtE5l7Cz01B?model=gpt-4&mode=chat,NO2qblo8fQIgUUtE5l7Cz01B
 23s2-cp-spa-team-03,,Team03/Code03/src/spa/src/common/EntityType.h,gpt,0,e,i can't get the link, got 'sharing conversations with images is not yet supported'.,
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/TestQueryEvaluationContext.cpp,gpt,0,e,https://chat.openai.com/share/8e7dd4d8-d866-4a69-a89a-abf14f589fa0,8e7dd4d8-d866-4a69-a89a-abf14f589fa0
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/TestQueryParser.cpp,gpt,0,e,,
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/strategy/TestProjectionStrategy.cpp,gpt,0,e,,
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/strategy/TestDeclarationStrategy.cpp,gpt,0,e,https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517,5a9de667-07bb-4d68-86ec-9b4e16053517
-23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/strategy/FakeQueryManager.cpp,gpt,0,e,https://chat.openai.com/share/5a9de667-07bb-4d68-86ec-9b4e16053517,5a9de667-07bb-4d68-86ec-9b4e16053517
-23s2-cp-spa-team-05,QPS,Team05/Code05/src/spa/src/qps/QueryEvaluator/PKBStub.h,gpt,0,e,https://platform.openai.com/playground/p/ErjJuev6dMUJWh9xtwKTTNXx?model=gpt-4&mode=chat,ErjJuev6dMUJWh9xtwKTTNXx
-23s2-cp-spa-team-05,PKB,Team05/Code05/src/spa/src/pkb/PopulatePKB.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-05,PKB,Team05/Code05/src/spa/src/pkb/PopulatePKB.h,copilot,2,e,used copilot,
-23s2-cp-spa-team-05,,Team05/Code05/src/spa/src/utilSpa/TwoSideFwdVecMap.cpp,copilot,1,e,used copilot,8ef1cf87-56eb-45bd-b91f-fbf309b86d98
-23s2-cp-spa-team-05,,Team05/Code05/src/spa/src/utilSpa/DoubleMap.cpp,gpt,0,e,,
-23s2-cp-spa-team-05,,Team05/Code05/src/spa/src/utilSpa/DoubleMap.h,gpt,0,e,https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98,8ef1cf87-56eb-45bd-b91f-fbf309b86d98
-23s2-cp-spa-team-05,,Team05/Code05/src/spa/src/utilSpa/TwoSideFwdVecMap.h,gpt,1,e,https://chat.openai.com/share/8ef1cf87-56eb-45bd-b91f-fbf309b86d98,8ef1cf87-56eb-45bd-b91f-fbf309b86d98
-23s2-cp-spa-team-05,,Team05/Code05/src/spa/src/utilSpa/TwoSideDblVecMap.cpp,copilot,1,e,copilot used,
-23s2-cp-spa-team-05,,Team05/Code05/src/spa/src/utilSpa/TwoSideDblVecMap.cpp,copilot,1,e,copilot used,
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/unit/TestPKB.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/unit/TestSP.cpp,gpt,1,e,https://chat.openai.com/share/e39e28d1-87dc-410f-918e-2fe030a34c82,e39e28d1-87dc-410f-918e-2fe030a34c82
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/unit/TestUtils.cpp,copilot,1,e,used copilot,
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/predicate/TestPredicateConstructors.cpp,gpt,0,e,https://chat.openai.com/share/4018fd98-2d4f-488f-a857-7769d6a30be0,4018fd98-2d4f-488f-a857-7769d6a30be0
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/TestDeclarationsParser.cpp,gpt,1,e,https://chat.openai.com/share/82e2cd52-da0f-49d9-8032-25cca59e34b3,82e2cd52-da0f-49d9-8032-25cca59e34b3
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/TestDeclarationsParser.cpp,gpt,0,e,https://chat.openai.com/share/d86b9515-ec39-46ef-aaae-c8e284de92a2,d86b9515-ec39-46ef-aaae-c8e284de92a2
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/fakeEntities/FakeQueryManager.cpp,gpt,0,e,https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a,69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/evaluation/TestSynonymGraph.cpp,gpt,1,e,https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192,7c590366-8e0e-40e2-863f-2862fa1ae192
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/evaluation/TestQueryEvaluationContext.cpp,gpt,1,e,https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192,7c590366-8e0e-40e2-863f-2862fa1ae192
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/evaluation/TestTable.cpp,gpt,1,e,https://chat.openai.com/share/7c590366-8e0e-40e2-863f-2862fa1ae192,7c590366-8e0e-40e2-863f-2862fa1ae192
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/evaluation/strategy/TestProjectionStrategy.cpp,gpt,1,e,https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a,69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/TestQueryValidator.cpp,gpt,2,e,https://chat.openai.com/share/c3dec1ba-84fd-4fdb-ab11-c7f34bf4ef59,c3dec1ba-84fd-4fdb-ab11-c7f34bf4ef59
+23s2-cp-spa-team-03,QPS,Team03/Code03/src/unit_testing/src/QPS/clause/TestAssignPatternPredicate.cpp,gpt,1,e,https://chat.openai.com/share/5347909f-8b91-4451-8f33-ebc41eb4576f,5347909f-8b91-4451-8f33-ebc41eb4576f
+23s2-cp-spa-team-05,QPS,Team05/Code05/src/spa/src/QPS/QueryEvaluator/PKBStub.h,gpt,0,e,https://platform.openai.com/playground/p/ErjJuev6dMUJWh9xtwKTTNXx?model=gpt-4&mode=chat,ErjJuev6dMUJWh9xtwKTTNXx
+23s2-cp-spa-team-05,QPS,Team05/Code05/src/unit_testing/src/unit/qps/query_evaluator/IntResultTestAI.cpp,gpt,0,e,https://platform.openai.com/playground/p/oplThAEITLAK0fBCIylSnHDm?model=gpt-4&mode=chat,oplThAEITLAK0fBCIylSnHDm
+23s2-cp-spa-team-05,QPS,Team05/Code05/src/unit_testing/src/unit/qps/query_elements/QueryObjectTestAI.cpp,gpt,1,e,https://chat.openai.com/share/ab543156-156c-4880-9673-2ea97ffd9182,ab543156-156c-4880-9673-2ea97ffd9182
+23s2-cp-spa-team-05,QPS,Team05/Code05/src/unit_testing/src/unit/qps/query_elements/StatementReferenceTestAI.cpp,gpt,1,e,https://platform.openai.com/playground/p/9SCJ5Iuz6Qhdknrd17M6Eh8k?model=gpt-3.5-turbo&mode=chat,9SCJ5Iuz6Qhdknrd17M6Eh8k
+23s2-cp-spa-team-05,QPS,Team05/Code05/src/unit_testing/src/unit/qps/query_elements/ConstraintArgumentTestAI.cpp,gpt,0,e,https://platform.openai.com/playground/p/iUhV1Vs18pHIoJq0lDbowAOl?model=gpt-3.5-turbo&mode=chat,iUhV1Vs18pHIoJq0lDbowAOl
+23s2-cp-spa-team-05,QPS,Team05/Code05/src/unit_testing/src/unit/qps/query_elements/ConstraintTestAI.cpp,gpt,1,e,https://platform.openai.com/playground/p/kRR1UQyUxzRLr95Mnxz0MCoG?model=gpt-3.5-turbo&mode=chat,kRR1UQyUxzRLr95Mnxz0MCoG
+23s2-cp-spa-team-05,SP,Team05/Code05/src/unit_testing/src/unit/sp/helper/AstFactory.cpp,gpt,1,e,https://chat.openai.com/share/367b948e-5198-4955-ab4d-f81ff1b1f3c8,367b948e-5198-4955-ab4d-f81ff1b1f3c8
 23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/QueryValidatorTestAI.cpp,gpt,1,e,https://chat.openai.com/share/b79012a9-d6db-4272-a8f5-d4e4e167dd91,b79012a9-d6db-4272-a8f5-d4e4e167dd91
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/QueryObjectTestAI.cpp,gpt,1,e,https://chat.openai.com/share/ab543156-156c-4880-9673-2ea97ffd9182,ab543156-156c-4880-9673-2ea97ffd9182
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp,gpt,0,e,https://chat.openai.com/share/1d6a042b-6280-4306-abaf-1ec120a9fef4,1d6a042b-6280-4306-abaf-1ec120a9fef4
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp,gpt,0,e,https://chat.openai.com/share/79d15f08-fd88-453e-943a-261fbef441a6,79d15f08-fd88-453e-943a-261fbef441a6
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp,gpt,0,e,https://chat.openai.com/share/09e67ecb-4081-4912-bb8c-023c7e117580,09e67ecb-4081-4912-bb8c-023c7e117580
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/StatementReferenceTestAI.cpp,gpt,0,e,,
 23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/SingleDeclarationRuleTestAI.cpp,gpt,1,e,https://chat.openai.com/share/dccb94c8-d4d6-4310-b2f1-2306849865cf,dccb94c8-d4d6-4310-b2f1-2306849865cf
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/TestDoubleMap.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/ConstraintArgumentTestAI.cpp,gpt,0,e,https://chat.openai.com/share/ec225b64-f0c0-4d04-a5c2-9645760d0401,ec225b64-f0c0-4d04-a5c2-9645760d0401
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/ConstraintArgumentTestAI.cpp,gpt,0,e,https://chat.openai.com/c/02a7fbcc-80e0-4cfe-be5f-2f2858ab9b47,
 23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/NoDeclarationRuleTestAI.cpp,gpt,1,e,https://chat.openai.com/share/58cc37a5-02ca-46fb-8029-ff79056aad6c,58cc37a5-02ca-46fb-8029-ff79056aad6c
-23s2-cp-spa-team-05,,Team05/Code05/src/unit_testing/src/ConstraintTestAI.cpp,gpt,1,e,https://chat.openai.com/share/f965b299-102c-4b5b-a9df-e2e1a17ded54,f965b299-102c-4b5b-a9df-e2e1a17ded54
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryTable.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryTable.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryGenerators/ClauseEvaluator.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryGenerators/VariableClauseToQuery.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryProcessors/VariableQueryProcessor.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryProcessors/QueryProcessorStrategy.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryProcessors/QueryProcessor.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryEvaluators/VariableQueryEvaluator.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,QPS,Team06/Code06/src/spa/src/QPS/QueryEvaluators/QueryEvaluator.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/Parser/ParseStrategy.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/Parser/ParseStrategy.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtCall.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtWhile.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtRead.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmt.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtPrint.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtCall.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtAssign.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Stmt/ASTNodeStmtIf.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/ASTNodeProcedure.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/ASTNodeProgram.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/ASTNodeProcedure.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/ASTNode.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprCondBinary.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExpr.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprOpr.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprCondUnary.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprOpr.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprCondRel.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/Expr/ASTNodeExprCondRel.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/ASTNodeStmtLst.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/ASTNodeProgram.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/AST/ASTNodeStmtLst.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/DesignExtractor/DesignExtractor.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/DesignExtractor/EntityDesignExtractor.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/DesignExtractor/Extractors/Relationships/FollowsExtractor.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,SP,Team06/Code06/src/spa/src/SP/DesignExtractor/Extractors/Entities/VariableExtractor.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/PatternStorage/PatternStorageBase.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/ProcedureStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/PrintStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/EntityStorageBase.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/IfStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/WhileStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/AssignStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/CallStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/ReadStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/VariableStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/ConstantStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/EntityStorageBase.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/EntityStorage/StatementStorage.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/ParentTStorage.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/AbstractionStorageBase.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/ModifiesPStorage.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/UsesSStorage.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/ParentStorage.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/AbstractionStorageBase.cpp,gpt,1,e,https://platform.openai.com/playground/p/X0MfnTPRzaKgz1JZaTAPugjk?model=gpt-4&mode=chat,X0MfnTPRzaKgz1JZaTAPugjk
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/FollowsTStorage.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/UsesPStorage.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/FollowsStorage.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,PKB,Team06/Code06/src/spa/src/PKB/AbstractionStorage/ModifiesSStorage.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-06,,Team06/Code06/src/spa/src/Common/ITokenizer/ITokenizer.h,gpt,0,e,,
-23s2-cp-spa-team-06,,Team06/Code06/src/spa/src/Common/Relationships/Relationship.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,,Team06/Code06/src/spa/src/Common/Entities/Entity.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,,Team06/Code06/src/unit_testing/src/AST/ASTTestUtils.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,,Team06/Code06/src/unit_testing/src/AST/TestASTExpr.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,,Team06/Code06/src/unit_testing/src/AST/TestASTStmt.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,,Team06/Code06/src/unit_testing/src/AST/TestASTStmt.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-06,,Team06/Code06/src/unit_testing/src/AST/TestASTStmt.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-07,SP,Team07/Code07/src/spa/src/SP/DesignExtractor/DesignExtractor.h,gpt,2,e,https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat,ZsoRSuHE0htMcUNCW0FDRVqn
-23s2-cp-spa-team-07,SP,Team07/Code07/src/spa/src/SP/DesignExtractor/ConstExtractor.cpp,gpt,2,e,https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat,ZsoRSuHE0htMcUNCW0FDRVqn
-23s2-cp-spa-team-07,SP,Team07/Code07/src/spa/src/SP/DesignExtractor/DesignExtractor.cpp,gpt,2,e,https://platform.openai.com/playground/p/ZsoRSuHE0htMcUNCW0FDRVqn?mode=chat,ZsoRSuHE0htMcUNCW0FDRVqn
-23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbWriterManager.cpp,gpt,1,e,https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat,bVeV9rb56ugv0wmNcuji4KuH
-23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestVariableManager.cpp,gpt,0,e,https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat,bVeV9rb56ugv0wmNcuji4KuH
-23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbReaderManager.cpp,gpt,1,e,https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat,bVeV9rb56ugv0wmNcuji4KuH
-23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestStatementManager.cpp,gpt,1,e,,
-23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/TestPKB.cpp,gpt,0,e,https://platform.openai.com/playground/p/bVeV9rb56ugv0wmNcuji4KuH?model=gpt-4&mode=chat,bVeV9rb56ugv0wmNcuji4KuH
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentStarRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentStarRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestUsesRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestUsesRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestVariableExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestFollowsStarRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestStatementExtractor_PKB.cpp,gpt,2,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestStatementExtractor_PKB.cpp,gpt,2,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestStatementExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestProcedureExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestFollowsRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestFollowsRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestConstantExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestModifiesRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestModifiesRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/integration_testing/src/DesignExtractor/TestParentRelationshipExtractor_PKB.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp,copilot,2,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp,copilot,0,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp,copilot,0,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp,copilot,1,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp,copilot,0,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp,copilot,0,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryEvaluator/ResultTable.cpp,copilot,1,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryParser/QuerySyntaxValidator.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,QPS,Team07/Code07/src/spa/src/QPS/QueryParser/QueryTokenizer.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,SP,Team07/Code07/src/spa/src/SP/DesignExtractor/DesignExtractor.h,gpt,2,e,,
+23s2-cp-spa-team-07,SP,Team07/Code07/src/spa/src/SP/DesignExtractor/ConstExtractor.cpp,gpt,2,e,,
+23s2-cp-spa-team-07,SP,Team07/Code07/src/spa/src/SP/DesignExtractor/DesignExtractor.cpp,gpt,2,e,,
+23s2-cp-spa-team-07,,Team07/Code07/src/spa/src/Commons/Utils.cpp,copilot,0,e,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/spa/src/PKB/PKBReader.cpp,gpt,0,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/spa/src/PKB/Managers/PkbReaderManager.h,gpt,1,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/spa/src/PKB/Managers/PkbWriterManager.cpp,gpt,2,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/spa/src/PKB/Managers/RelationshipManager.h,gpt,1,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/spa/src/PKB/Managers/PkbReaderManager.cpp,gpt,1,eng,https://platform.openai.com/playground/p/zcSfz531xVP7ZyZU3CpGxopl?model=gpt-4&mode=chat,zcSfz531xVP7ZyZU3CpGxopl
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/spa/src/PKB/Managers/RelationshipManager.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/spa/src/PKB/PKBWriter.h,gpt,2,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbWriterManager.cpp,gpt,1,e,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestConstantManager.cpp,gpt,1,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestVariableManager.cpp,gpt,0,e,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbReaderManager.cpp,gpt,1,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPkbReaderManager.cpp,gpt,0,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestStatementManager.cpp,gpt,1,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestProcedureManager.cpp,gpt,1,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestRelationshipManager.cpp,gpt,1,eng,https://platform.openai.com/playground/p/Y8Z4bGkXwvttQk3R9aaPhS5j?model=gpt-4&mode=chat,Y8Z4bGkXwvttQk3R9aaPhS5j
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/PKBManagers/TestPatternManager.cpp,gpt,1,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/TestPKB.cpp,gpt,0,e,,
 23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/TestPKBWriter.cpp,gpt,2,e,,
-23s2-cp-spa-team-08,SP,Team00/Code00/src/spa/src/sp/tnode/ProcedureNode.h,copilot,3,e,,
-23s2-cp-spa-team-08,SP,Team00/Code00/src/spa/src/sp/Tokenizer.cpp,copilot,0,e,,
-23s2-cp-spa-team-08,SP,Team00/Code00/src/spa/src/sp/Tokenizer.cpp,copilot,2,e,,
-23s2-cp-spa-team-08,SP,Team00/Code00/src/spa/src/sp/Tokenizer.cpp,copilot,3,e,,
-23s2-cp-spa-team-08,SP,Team00/Code00/src/spa/src/sp/Tokenizer.cpp,copilot,1,e,,
-23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Stores/StatementStore.cpp,gpt,1,e,https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat,JMwYQcYxmb857W2JkifHSp5w
-23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Stores/StatementStore.h,gpt,0,e,https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat,JMwYQcYxmb857W2JkifHSp5w
-23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Stores/EntityStore.h,gpt,0,e,https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat,JMwYQcYxmb857W2JkifHSp5w
-23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h,gpt,0,e,https://platform.openai.com/playground/p/JgbVHgb6Vyxb5DJwrkiMKS0k?model=gpt-4&mode=chat,JgbVHgb6Vyxb5DJwrkiMKS0k
-23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h,gpt,0,e,https://platform.openai.com/playground/p/JMwYQcYxmb857W2JkifHSp5w?model=gpt-4&mode=chat,JMwYQcYxmb857W2JkifHSp5w
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/TestPKBWriter.cpp,gpt,0,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/TestPKBReader.cpp,gpt,0,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/TestPKBReader.cpp,gpt,0,eng,,
+23s2-cp-spa-team-07,PKB,Team07/Code07/src/unit_testing/src/PKB/TestPKBReader.cpp,gpt,0,eng,,
+23s2-cp-spa-team-08,QPS,Team08/Code08/src/spa/src/QPS/evaluator/ResultTable.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-08,QPS,Team08/Code08/src/spa/src/QPS/parser/PatternType/ExpressionValidator.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-08,QPS,Team08/Code08/src/spa/src/QPS/parser/PatternType/ExpressionValidator.h,copilot,0,e,used copilot,
+23s2-cp-spa-team-08,SP,Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-08,SP,Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,SP,Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-08,SP,Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-08,SP,Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-08,SP,Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-08,SP,Team08/Code08/src/spa/src/sp/tokenizer/Tokenizer.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,SP,Team08/Code08/src/spa/src/sp/parser/Parser.cpp,gpt,2,e,https://chat.openai.com/share/c26e2cf6-5e67-43eb-85aa-64ef5d97c328,c26e2cf6-5e67-43eb-85aa-64ef5d97c328
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/PkbResult.cpp,copilot,1,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/utils/RelationshipUtils.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/EntityManager.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntIntPairEntityStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntStringEntityStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntIntEntityStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntIntPairEntityStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/StringIntPairEntityStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntEntityEntityStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntStringPairEntityStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntIntEntityStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/StringIntEntityStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntEntityEntityStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/StringIntPairEntityStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/IntStringPairEntityStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/EntityStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/entity_manager/entity_storage/StringIntEntityStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/pattern_manager/PatternManager.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/IntStringRelationshipStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/StringStringRelationshipStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/IntStringRelationshipStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/IntIntRelationshipStorage.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/relationship_manager/relationship_storage/IntIntRelationshipStorage.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-08,PKB,Team08/Code08/src/spa/src/pkb/relationship_manager/RelationshipManager.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/spa/src/qps/evaluator/Table.cpp,copilot,1,e,find the rows that have the same values for the common headers,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/spa/src/qps/evaluator/Table.cpp,copilot,0,e,create cross product of two tables,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/spa/src/qps/evaluator/Table.cpp,copilot,0,e,using copilot,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/spa/src/qps/evaluator/Table.cpp,copilot,0,e,using copilot,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/spa/src/qps/parser/PQLParser.cpp,chatgpt,2,e,https://platform.openai.com/playground/p/xBykoVKvFKrMIxAn4pwwVhlY?model=gpt-4&mode=chat,xBykoVKvFKrMIxAn4pwwVhlY
+23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Stores/StatementStore.cpp,gpt,1,e,,
+23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Stores/StatementStore.h,gpt,1,e,,
+23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Stores/EntityStore.h,gpt,0,e,,
+23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h,gpt,0,e,,
+23s2-cp-spa-team-09,PKB,Team09/Code09/src/spa/src/PKB/Utils/DataTypes.h,gpt,0,e,,
 23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp,copilot,2,e,test table class,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp,copilot,0,e,test case for empty table,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp,copilot,1,e,,
 23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp,copilot,2,e,try to extract a non-existent query entity. it should return an empty vector,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp,copilot,0,e,test case for table join,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp,copilot,1,e,test case for table join where the tables have no common headers,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestTable_AI.cpp,copilot,1,e,test joining 1 empty table with a non-empty table,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp,copilot,0,e,select s such that parent(s, 2) / should not show any results,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp,copilot,0,e,select s such that parentstar(s, 3),
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp,copilot,0,e,select s such that uses(s, 'variable_x'),
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp,copilot,0,e,select s such that uses(1, v1),
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestQuery_AI.cpp,copilot,0,e,select s such that modifies(s, 'variable_x'),
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/clauses/TestSuchThatClause_AI.cpp,copilot,0,e,test suchthatclause gettype,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/clauses/TestSuchThatClause_AI.cpp,copilot,0,e,test suchthat clause equals,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/clauses/TestSuchThatClause_AI.cpp,copilot,0,e,test suchthatclause determinerelationshiptype,
 23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestQueryEntity_AI.cpp,copilot,1,e,write test cases that creates queryentity objects for each entity type,
-23s2-cp-spa-team-09,PKB,Team09/Code09/src/unit_testing/src/PKB/Stores/TestEntityStore.cpp,gpt,1,e,https://platform.openai.com/playground/p/yzre7t43UnEzHeaMn64z5jkq?model=gpt-4&mode=chat,yzre7t43UnEzHeaMn64z5jkq
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestClauseArgument_AI.cpp,copilot,2,e,write tests for the clauseargument class that ensures that the relevant isxxx method returns the correct,
+23s2-cp-spa-team-09,QPS,Team09/Code09/src/unit_testing/src/qps/TestClauseArgument_AI.cpp,copilot,0,e,write tests for the clauseargument class that ensures that the values are retrievable,
+23s2-cp-spa-team-09,PKB,Team09/Code09/src/unit_testing/src/PKB/Stores/TestEntityStore.cpp,gpt,1,e,,
 23s2-cp-spa-team-10,QPS,Team10/Code10/src/spa/QPS/src/tokenizer/Tokenizer.cpp,gpt3.5,1,e,https://chat.openai.com/share/eee4ab57-c5f0-44ca-9fe9-885abf9a14cc,eee4ab57-c5f0-44ca-9fe9-885abf9a14cc
+23s2-cp-spa-team-10,QPS,Team10/Code10/src/spa/QPS/src/query/Query.cpp,gpt,1,e,,
+23s2-cp-spa-team-10,QPS,Team10/Code10/src/spa/QPS/src/query/Query.cpp,gpt,1,e,,
+23s2-cp-spa-team-10,QPS,Team10/Code10/src/spa/QPS/src/query/Query.cpp,gpt,1,e,https://chat.openai.com/share/9fb99c09-e82e-41b1-9917-08f511bfbf00,9fb99c09-e82e-41b1-9917-08f511bfbf00
+23s2-cp-spa-team-10,QPS,Team10/Code10/src/spa/QPS/src/query/Query.cpp,gpt,1,e,,
+23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/include/ReadFacadeStub.h,gpt,1,e,https://chat.openai.com/share/a56660b9-506a-4919-9450-f4c6e996201e,a56660b9-506a-4919-9450-f4c6e996201e
 23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/include/PKB.h,gpt,1,e,https://chat.openai.com/share/5765cbd9-43bc-41c3-ae9f-7bebba3c41a3,5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
 23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/include/pattern_manager/AssignExpPatternStore.h,gpt,0,e,https://chat.openai.com/share/feedba04-6fd0-4e9b-8b5a-c7826127fa4f,feedba04-6fd0-4e9b-8b5a-c7826127fa4f
 23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/entity_manager/EntitySetStore.cpp,gpt,1,e,https://chat.openai.com/share/79929c11-45e4-4e55-9996-cc966fd74a80,79929c11-45e4-4e55-9996-cc966fd74a80
+23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/pattern_manager/AssignExpPatternStore.cpp,gpt,0,e,https://chat.openai.com/share/aa82bf6b-8a80-4cc8-97d0-371119c5ef4d,aa82bf6b-8a80-4cc8-97d0-371119c5ef4d
 23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/PKB.cpp,gpt,1,e,https://chat.openai.com/share/5765cbd9-43bc-41c3-ae9f-7bebba3c41a3,5765cbd9-43bc-41c3-ae9f-7bebba3c41a3
+23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/relationship_manager/ParentStore.cpp,gpt,0,e,chat.openai.com/share/cc8d4070-1169-4b5e-9555-14df283c12fa,
+23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/relationship_manager/ParentStore.cpp,gpt,0,e,https://chat.openai.com/share/30d4cf60-6c09-436d-904a-b20262b98981,30d4cf60-6c09-436d-904a-b20262b98981
 23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp,gpt,0,e,,
 23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp,gpt,0,e,,
-23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp,gpt,0,e,https://chat.openai.com/share/70c84b62-2943-4870-898b-3659df332b23,70c84b62-2943-4870-898b-3659df332b23
-23s2-cp-spa-team-12,PKB,Team12/Code12/src/spa/src/pkb/entities/Statement.h,gpt-4,0,e,,
-23s2-cp-spa-team-12,PKB,Team12/Code12/src/spa/src/pkb/entities/Statement.h,gpt-4,0,e,,
-23s2-cp-spa-team-12,,Team12/Code12/src/spa/src/source_processor/design_extractor/storage_manager/EntityWriter.cpp,copilot,1,e,,
-23s2-cp-spa-team-12,,Team12/Code12/src/spa/src/source_processor/design_extractor/storage_manager/StorageManager.cpp,copilot,0,e,,
-23s2-cp-spa-team-12,,Team12/Code12/src/spa/src/source_processor/design_extractor/visitor/EntityVisitor.cpp,copilot,0,e,,
-23s2-cp-spa-team-12,,Team12/Code12/src/spa/src/utility/validator/SyntaxValidator.cpp,copilot,0,e,,
+23s2-cp-spa-team-10,PKB,Team10/Code10/src/spa/PKB/src/relationship_manager/RelationshipMapManager.cpp,gpt,1,e,https://chat.openai.com/share/70c84b62-2943-4870-898b-3659df332b23,70c84b62-2943-4870-898b-3659df332b23
+23s2-cp-spa-team-12,,Team12/Code12/src/integration_testing/src/sp-pkb/TestDesignExtractor.cpp,copilot,1,e,used copilot,
+23s2-cp-spa-team-12,QPS,Team12/Code12/src/spa/src/qps/table/TableJoiner.cpp,gpt,2,e,https://platform.openai.com/playground/p/OOWAtMyJvt0vnx2zS0GrYCeE,OOWAtMyJvt0vnx2zS0GrYCeE
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/design_extractor/storage_manager/EntityWriter.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/design_extractor/storage_manager/StorageManager.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/design_extractor/storage_manager/RelationshipWriter.cpp,copilot,1,e,used copilot,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/design_extractor/visitor/RelationshipVisitor.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/design_extractor/visitor/EntityVisitor.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/design_extractor/visitor/relationship_trackers/FollowsTracker.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/design_extractor/visitor/relationship_trackers/FollowsTracker.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/design_extractor/visitor/relationship_trackers/ParentTracker.cpp,copilot,1,e,used copilot,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/node/statement/expression/ExprNode.h,copilot,1,e,,
+23s2-cp-spa-team-12,SP,Team12/Code12/src/spa/src/sp/node/statement/expression/CondExprNode.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-12,PKB,Team12/Code12/src/spa/src/pkb/entities/Statement.h,gpt,0,e,https://platform.openai.com/playground/p/vq9W243AjR6xwog4KY3Uw2zH?mode=chat,vq9W243AjR6xwog4KY3Uw2zH
+23s2-cp-spa-team-12,PKB,Team12/Code12/src/spa/src/pkb/entities/Statement.h,gpt,0,e,https://platform.openai.com/playground/p/CAJRGV0RgoAPNYZ1pdq8yZPk?mode=chat,CAJRGV0RgoAPNYZ1pdq8yZPk
+23s2-cp-spa-team-12,,Team12/Code12/src/spa/src/common/parser/ShuntingYardParser.cpp,copilot,1,e,used copilot,
+23s2-cp-spa-team-12,,Team12/Code12/src/spa/src/common/utility/TokenUtil.cpp,copilot,1,e,used copilot,
+23s2-cp-spa-team-12,,Team12/Code12/src/spa/src/common/utility/validator/SyntaxValidator.cpp,copilot,0,e,,
+23s2-cp-spa-team-12,PKB,Team12/Code12/src/unit_testing/src/pkb/TestEntityManagerPool.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-12,PKB,Team12/Code12/src/unit_testing/src/pkb/TestPkbFacade.cpp,gpt,2,e,https://platform.openai.com/playground/p/jOn68GeDvUIerTWXXHMy9vHw?mode=chat,jOn68GeDvUIerTWXXHMy9vHw
+23s2-cp-spa-team-12,,Team12/Code12/src/unit_testing/src/utils/TestTestUtils.cpp,gpt,1,e,https://platform.openai.com/playground/p/QLFyNorlVdcxVPiiWawNBJfO?mode=chat,QLFyNorlVdcxVPiiWawNBJfO
+23s2-cp-spa-team-12,,Team12/Code12/src/unit_testing/src/utils/TestTestUtils.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-13,SP,Team13/Code13/src/spa/src/SP/Validator/SyntaxValidator.cpp,gpt,1,e,https://platform.openai.com/playground/p/8zpPT0KiO2e7WE5jSHHLxE9p?model=gpt-4&mode=chat,8zpPT0KiO2e7WE5jSHHLxE9p
 23s2-cp-spa-team-13,SP,Team13/Code13/src/spa/src/SP/Parser/Parser.cpp,gpt,1,e,https://platform.openai.com/playground/p/NUX1lMOIK7DCiEzSZgir8veZ?model=gpt-4&mode=chat,NUX1lMOIK7DCiEzSZgir8veZ
 23s2-cp-spa-team-13,PKB,Team13/Code13/src/spa/src/PKB/Facade/SPTalker.cpp,gpt,3,e,,
 23s2-cp-spa-team-13,PKB,Team13/Code13/src/spa/src/PKB/ParentRelation.cpp,gpt,3,e,write the parentrelation class; write doxygen comments for class,
 23s2-cp-spa-team-13,PKB,Team13/Code13/src/spa/src/PKB/ParentRelationStar.cpp,gpt,3,e,,
 23s2-cp-spa-team-13,PKB,Team13/Code13/src/spa/src/PKB/FollowsRelation.cpp,gpt,3,e,,
+23s2-cp-spa-team-16,QPS,Team16/Code16/src/spa/src/QPS/Evaluator/IntermediateResultsTable.cpp,coplit,1,e,used copilot,
+23s2-cp-spa-team-16,SP,Team16/Code16/src/spa/src/SP/DesignExtractor/SPFacadeStub.h,gpt,0,e,https://chat.openai.com/share/d051145c-fee1-48c0-a850-c299d536b751,d051145c-fee1-48c0-a850-c299d536b751
+23s2-cp-spa-team-16,PKB,Team16/Code16/src/spa/src/PKB/Tables/Base/IEntityTable.cpp,gpt,1,e,https://chat.openai.com/c/99e0f85a-237a-4fff-8029-9d416ad631ce,
 23s2-cp-spa-team-16,PKB,Team16/Code16/src/spa/src/PKB/Tables/Base/IEntityTable.h,gpt,1,e,https://chat.openai.com/share/4d1458e5-2925-4f5a-a6ba-a75fc192c817,4d1458e5-2925-4f5a-a6ba-a75fc192c817
-23s2-cp-spa-team-16,PKB,Team16/Code16/src/spa/src/PKB/Storage.cpp,gpt,1,e,https://chat.openai.com/c/a1320bcd-2185-46c7-b524-c1abe2460879,
+23s2-cp-spa-team-16,PKB,Team16/Code16/src/spa/src/PKB/PKBStorage.cpp,gpt,1,e,https://chat.openai.com/c/44357f66-71ca-474e-b0fe-f8ac5fc83ef4,
 23s2-cp-spa-team-16,PKB,Team16/Code16/src/spa/src/PKB/Facades/PQLFacade.h,gpt,0,e,,
-23s2-cp-spa-team-16,PKB,Team16/Code16/src/spa/src/PKB/Facades/SPFacade.cpp,gpt,2,e,https://platform.openai.com/playground/p/yqWjZ1LL5NjZitx7ga3TXrwE?model=gpt-4&mode=chat,yqWjZ1LL5NjZitx7ga3TXrwE
-23s2-cp-spa-team-16,PKB,Team16/Code16/src/spa/src/PKB/Handlers/QueryHandler.cpp,copilot,1,e,used copilot,
 23s2-cp-spa-team-16,,Team16/Code16/src/spa/src/Common/FileReader.cpp,gpt,0,e,https://chat.openai.com/share/51d22ff9-c94d-48e5-9158-4b2364c910fe,51d22ff9-c94d-48e5-9158-4b2364c910fe
 23s2-cp-spa-team-16,,Team16/Code16/src/spa/src/Common/FileReader.h,gpt,1,e,https://chat.openai.com/share/51d22ff9-c94d-48e5-9158-4b2364c910fe,51d22ff9-c94d-48e5-9158-4b2364c910fe
-23s2-cp-spa-team-16,,Team16/Code16/src/spa/src/Common/Data/SPADataType.cpp,copilot,1,e,used copilot,
-23s2-cp-spa-team-16,,Team16/Code16/src/spa/src/Common/Data/SPADataType.h,copilot,1,e,used copilot,
-23s2-cp-spa-team-17,QPS,Team17/Code17/src/spa/src/QPS/QueryEvaluator/EResult.h,copilot,0,e,used copilot,
-23s2-cp-spa-team-17,SP,Team17/Code17/src/spa/src/SP/DesignExtractor/EntityExtractor.cpp,copilot,0,e,,
+23s2-cp-spa-team-16,,Team16/Code16/src/unit_testing/src/pkb_unit_testing/TestPKBStorage.cpp,gpt,1,e,https://chat.openai.com/c/fda07a6f-9ba7-4782-9cae-f33916156c33,
+23s2-cp-spa-team-16,,Team16/Code16/src/unit_testing/src/pkb_unit_testing/Data/Entities/Expressions/TestConditionalExpressionNode.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-16,,Team16/Code16/src/unit_testing/src/pkb_unit_testing/Data/Entities/Expressions/TestConditionalExpressionNode.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-17,SP,Team17/Code17/src/spa/src/SP/DesignExtractor/EntityExtractor.cpp,copilot,0,e,used copilot,
 23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/FollowsTable.h,gpt,1,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
 23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/VariableTable.cpp,gpt,1,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/Statements/AssignmentTable.h,copilot,0,e,used copilot,
 23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/Templates/SymbolTable.h,gpt,1,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
-23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/Templates/RelationshipTable.h,gpt,0,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
-23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/AssignmentTable.h,copilot,0,e,,
-23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/TestFollowsTable.cpp,gpt,0,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
-23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/TestPKB.cpp,gpt,2,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
-23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/TestPKB.cpp,copilot,0,e,,
-23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/TestGetAllPKB.cpp,copilot,0,e,,
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/Procedure.h,gpt,2,e,https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat,3mLKCsoXcgjIM0eMlvP3rIgb
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/Program.cpp,gpt,2,e,https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat,3mLKCsoXcgjIM0eMlvP3rIgb
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/ReadStmt.h,gpt,2,e,https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat,3mLKCsoXcgjIM0eMlvP3rIgb
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/CallStmt.h,gpt,2,e,https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat,3mLKCsoXcgjIM0eMlvP3rIgb
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/Templates/RelationshipTable.h,gpt,1,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/Templates/RelationshipTable.h,copilot,0,e,used copilot,
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Tables/Templates/RelationshipTable.h,gpt,1,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Generators/ParentStarGenerator.cpp,gpt,1,e,https://platform.openai.com/playground/p/ObWILjlLklBsGIwA4IUS36k5?mode=chat,ObWILjlLklBsGIwA4IUS36k5
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Generators/FollowStarGenerator.cpp,gpt,1,e,https://platform.openai.com/playground/p/ObWILjlLklBsGIwA4IUS36k5?mode=chat,ObWILjlLklBsGIwA4IUS36k5
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/spa/src/PKB/Generators/DFSUtility.cpp,gpt,0,e,https://platform.openai.com/playground/p/ObWILjlLklBsGIwA4IUS36k5?mode=chat,ObWILjlLklBsGIwA4IUS36k5
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/Tables/TestFollowsTable.cpp,gpt,2,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/Tables/TestStatementTable.cpp,copilot,2,e,used copilot,
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/Tables/TestParentTable.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/Tables/TestSymbolTable.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/TestPKBAdd.cpp,gpt,2,e,https://platform.openai.com/playground/p/EdrhQ4LeET9Qiy2qsOtFhb81?mode=chat&model=gpt-4-turbo-preview,EdrhQ4LeET9Qiy2qsOtFhb81
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/TestPKBAdd.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-17,PKB,Team17/Code17/src/unit_testing/src/PKB/TestPKBGetAll.cpp,copilot,0,e,used copilot,
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/SimpleParserFacade.h,gpt,1,e,https://platform.openai.com/playground/p/TSrBejqZDhzJU0nYh4NsepD0,TSrBejqZDhzJU0nYh4NsepD0
 23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/SimpleParser.h,gpt,2,e,https://platform.openai.com/playground/p/cJLjmmneCEs4z6ms7ZkBSxJB?model=gpt-4&mode=chat,cJLjmmneCEs4z6ms7ZkBSxJB
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/Grammar.h,gpt,1,e,https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat,3mLKCsoXcgjIM0eMlvP3rIgb
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/PrintStmt.h,gpt,2,e,https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat,3mLKCsoXcgjIM0eMlvP3rIgb
 23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/SimpleParser.cpp,gpt,2,e,https://platform.openai.com/playground/p/cJLjmmneCEs4z6ms7ZkBSxJB?model=gpt-4&mode=chat,cJLjmmneCEs4z6ms7ZkBSxJB
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/Program.h,gpt,2,e,https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat,3mLKCsoXcgjIM0eMlvP3rIgb
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/AST/AST.cpp,gpt,2,e,https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651,a181de60-e76f-496c-9bee-7ea80f2be651
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/SimpleParser.cpp,gpt,1,e,https://platform.openai.com/playground/p/qA4gXcRsT0cbjv8cZDNsfqSW?mode=chat,qA4gXcRsT0cbjv8cZDNsfqSW
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/SimpleParser.cpp,gpt,1,e,https://platform.openai.com/playground/p/NGm3fHHy62WWafdKCc95vHpD?mode=chat,NGm3fHHy62WWafdKCc95vHpD
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Parser/SimpleParserFacade.cpp,gpt,0,e,https://platform.openai.com/playground/p/TSrBejqZDhzJU0nYh4NsepD0,TSrBejqZDhzJU0nYh4NsepD0
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/SPTokenizer/SPTokenizer.cpp,copilot,2,e,github copilot,
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/SPTokenizer/LexicalTokenType.cpp,gpt,1,e,https://platform.openai.com/playground/p/hqmTI5WojSoGp9ObQfd7Yegx?mode=chat,hqmTI5WojSoGp9ObQfd7Yegx
 23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/AST/ASTNode.h,gpt,2,e,https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651,a181de60-e76f-496c-9bee-7ea80f2be651
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/AST/ASTUtility.cpp,gpt,2,e,https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651,a181de60-e76f-496c-9bee-7ea80f2be651
 23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/AST/ASTNode.cpp,gpt,2,e,https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651,a181de60-e76f-496c-9bee-7ea80f2be651
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractor.h,gpt,0,e,,
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractor.cpp,gpt,0,e,,
-23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/Utility.cpp,gpt,2,e,https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651,a181de60-e76f-496c-9bee-7ea80f2be651
-23s2-cp-spa-team-19,SP,Team19/Code19/src/unit_testing/src/sp/ParseCallStatement_AI.cpp,gpt,2,e,https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat,BL0U9QBHRxSO8JyQGo0KpEUZ
-23s2-cp-spa-team-19,SP,Team19/Code19/src/unit_testing/src/sp/ParseCallStatement_AI.cpp,gpt,2,e,https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat,CRO1bXNAQZB3Adua8DmfPuWb
-23s2-cp-spa-team-19,SP,Team19/Code19/src/unit_testing/src/sp/ParsePrintStatement_AI.cpp,gpt,2,e,https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat,BL0U9QBHRxSO8JyQGo0KpEUZ
-23s2-cp-spa-team-19,SP,Team19/Code19/src/unit_testing/src/sp/ParsePrintStatement_AI.cpp,gpt,2,e,https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat,CRO1bXNAQZB3Adua8DmfPuWb
-23s2-cp-spa-team-19,SP,Team19/Code19/src/unit_testing/src/sp/LexicalTokenTest_AI.cpp,gpt,2,e,https://platform.openai.com/playground/p/vwMjpyCtExjgJwMs6KZaXnTE?model=gpt-4&mode=chat,vwMjpyCtExjgJwMs6KZaXnTE
-23s2-cp-spa-team-19,SP,Team19/Code19/src/unit_testing/src/sp/ParseReadStatement_AI.cpp,gpt,2,e,https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat,BL0U9QBHRxSO8JyQGo0KpEUZ
-23s2-cp-spa-team-19,SP,Team19/Code19/src/unit_testing/src/sp/ParseReadStatement_AI.cpp,gpt,2,e,https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat,CRO1bXNAQZB3Adua8DmfPuWb
-23s2-cp-spa-team-21,SP,Team21/Code21/src/unit_testing/src/sp/utils/StubPKBWriter.cpp,gpt,1,e,,
-23s2-cp-spa-team-21,SP,Team21/Code21/src/unit_testing/src/sp/DesignExtractor/ConcreteExtractor/FollowsExtractorTest.cpp,gpt,1,e,,
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/AST/ASTUtility.h,gpt,2,e,github copilot,
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractorFacade.h,copilot,2,e,github copilot,
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/DesignExtractor/Visitor/IVisitor.h,chatgpt,2,e,https://chat.openai.com/share/7d5c29d9-43f6-4c36-b04e-0fca3b0e96ff,7d5c29d9-43f6-4c36-b04e-0fca3b0e96ff
+23s2-cp-spa-team-19,SP,Team19/Code19/src/spa/src/sp/DesignExtractor/Visitor/AssignVisitor.h,gpt,2,e,https://platform.openai.com/playground/p/WEPuYktjSFWSXYtIjbHMb5KZ?model=gpt-4&mode=chat,WEPuYktjSFWSXYtIjbHMb5KZ
+23s2-cp-spa-team-19,,Team19/Code19/src/spa/src/commons/ShuntingYard.cpp,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,,Team19/Code19/src/spa/src/commons/ShuntingYard.h,copilot,0,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/patterns/IfPatternWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/patterns/WhilePatternWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/patterns/AssignPatternWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/relationships/FollowsTWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/relationships/UsesSWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/relationships/ParentWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/relationships/FollowsWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/relationships/UsesPWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/relationships/ParentTWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/relationships/ModifiesSWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/relationships/ModifiesPWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/ReadWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/StatementWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/ProcedureWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/CallWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/PrintWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/WhileWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/VariableWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/IfWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/ConstantWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/writers/entities/AssignWriter.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/PKBReaderManager.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/patterns/assign/AssignPatternStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/patterns/assign/IAssignPatternWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/patterns/assign/IAssignPatternReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/patterns/control/IControlPatternWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/patterns/control/WhilePatternStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/patterns/control/ControlPatternStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/patterns/control/IControlPatternReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/patterns/control/IfPatternStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/IRelationshipReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/types/ModifiesPStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/types/ParentTStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/types/FollowsTStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/types/FollowsStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/types/UsesPStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/types/ModifiesSStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/types/ParentStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/types/UsesSStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/RelationshipStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/relationships/IRelationshipWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/PrintStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/IfStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/WhileStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/CallStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/ReadStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/ConstantStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/ProcedureStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/VariableStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/StatementStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/types/AssignStore.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/IEntityWriter.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/IEntityReader.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/stores/entities/EntityStore.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/PKBWriterManager.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/PKB.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/templates/TemplateMapSet.h,copilot,1,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/patterns/AssignPatternReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/patterns/IfPatternReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/patterns/WhilePatternReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/relationships/ParentTReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/relationships/ParentReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/relationships/FollowsTReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/relationships/FollowsReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/CallReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/IfReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/AssignReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/ConstantReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/PrintReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/VariableReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/WhileReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/StatementReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/ReadReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/readers/entities/ProcedureReader.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,PKB,Team19/Code19/src/spa/src/pkb/PKBManager.h,copilot,2,e,used copilot,
+23s2-cp-spa-team-19,SP,Team19/Code19/src/unit_testing/src/sp/TokenizerTest/LexicalTokenTest_AI.cpp,gpt,2,e,https://platform.openai.com/playground/p/vwMjpyCtExjgJwMs6KZaXnTE?model=gpt-4&mode=chat,vwMjpyCtExjgJwMs6KZaXnTE
+23s2-cp-spa-team-21,,Team21/Code21/src/integration_testing/src/PKBToQPS/PKBToQPSModifiesTest.cpp,gpt,2,e,https://chat.openai.com/share/0fefef07-7381-4f58-bd3d-bc4e573d7d22,0fefef07-7381-4f58-bd3d-bc4e573d7d22
+23s2-cp-spa-team-21,,Team21/Code21/src/integration_testing/src/PKBToQPS/PKBToQPSUsesTest.cpp,gpt,2,e,https://chat.openai.com/share/0fefef07-7381-4f58-bd3d-bc4e573d7d22,0fefef07-7381-4f58-bd3d-bc4e573d7d22
+23s2-cp-spa-team-21,SP,Team21/Code21/src/spa/src/sp/ASTNode/ExpressionNode.cpp,gpt,1,e,https://platform.openai.com/playground/p/piHh6JQOEfqCmocyXXpiVtRR?model=gpt-4&mode=chat,piHh6JQOEfqCmocyXXpiVtRR
+23s2-cp-spa-team-21,SP,Team21/Code21/src/spa/src/sp/ASTNode/ExpressionNode.cpp,gpt,1,e,https://platform.openai.com/playground/p/gf0PJabuEMVePzIa9vFWW8kz?model=gpt-4&mode=chat,gf0PJabuEMVePzIa9vFWW8kz
+23s2-cp-spa-team-21,SP,Team21/Code21/src/spa/src/sp/DesignExtractor/ConcreteExtractor/UseExtractor.cpp,gpt,2,e,,
+23s2-cp-spa-team-21,SP,Team21/Code21/src/spa/src/sp/DesignExtractor/ConcreteExtractor/UseExtractor.h,gpt,1,e,,
+23s2-cp-spa-team-21,SP,Team21/Code21/src/unit_testing/src/sp/utils/StubPKBWriter.cpp,gpt,1,e,https://platform.openai.com/playground/p/RD0h76mGKpDUhlh5MSEccMd7?model=gpt-4&mode=chat,RD0h76mGKpDUhlh5MSEccMd7
+23s2-cp-spa-team-21,SP,Team21/Code21/src/unit_testing/src/sp/ParsingStrategy/CallParsingStrategyTest.cpp,gpt,1,e,https://platform.openai.com/playground/p/Qj3JSOfPfI4CtSxXlNgWjSNk?model=gpt-4&mode=chat,Qj3JSOfPfI4CtSxXlNgWjSNk
+23s2-cp-spa-team-21,SP,Team21/Code21/src/unit_testing/src/sp/ParsingStrategy/ConditionalExpressionParsingStrategy.cpp,gpt,2,e,https://platform.openai.com/playground/p/d1i8aXgGBViR2A68mJvvm29h?model=gpt-4&mode=chat,d1i8aXgGBViR2A68mJvvm29h
+23s2-cp-spa-team-21,SP,Team21/Code21/src/unit_testing/src/sp/ParsingStrategy/IfParsingStrategyTest.cpp,gpt,2,e,https://platform.openai.com/playground/p/ZUA31IPGZQDF2cxfjaNjbV9v?model=gpt-4&mode=chat,ZUA31IPGZQDF2cxfjaNjbV9v
+23s2-cp-spa-team-21,SP,Team21/Code21/src/unit_testing/src/sp/ParsingStrategy/AssignParsingStrategyTest.cpp,gpt,2,e,https://platform.openai.com/playground/p/3sNsWIiWbU0xxKYkQd0cVQof?model=gpt-4&mode=chat,3sNsWIiWbU0xxKYkQd0cVQof
+23s2-cp-spa-team-21,SP,Team21/Code21/src/unit_testing/src/sp/DesignExtractor/ConcreteExtractor/FollowsExtractorTest.cpp,gpt,1,e,https://platform.openai.com/playground/p/RD0h76mGKpDUhlh5MSEccMd7?model=gpt-4&mode=chat,RD0h76mGKpDUhlh5MSEccMd7

@@ -1,0 +1,22 @@
+#ifndef SPA_QUERYEVALUATOR_H
+#define SPA_QUERYEVALUATOR_H
+
+#include <string>
+#include <memory>
+#include "qps/entity/evaluation/QueryEvaluationContext.h"
+#include "qps/entity/query/Query.h"
+
+class QueryEvaluator {
+private:
+    std::shared_ptr<QueryEvaluationContext> context;
+    std::vector<std::shared_ptr<Strategy>> strategies;
+
+public:
+    QueryEvaluator();
+    void setStrategies(const std::vector<std::shared_ptr<Strategy>>& strategies);
+    std::vector<std::string> evaluate(const std::shared_ptr<Query>& query);
+    std::shared_ptr<QueryEvaluationContext> getContext() const;
+};
+
+
+#endif //SPA_QUERYEVALUATOR_H

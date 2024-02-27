@@ -1,0 +1,267 @@
+TEST_CASE("PKB Modifies Integration with QPS - Positive Test Cases") {
+  std::shared_ptr<PKB> pkb = std::make_shared<PKB>();
+  std::shared_ptr<PKBWriter> writer = std::make_shared<PKBWriter>(pkb);
+  PKBReader *reader = new PKBReader(pkb);
+  QPS qps(reader);
+
+  StatementType ASSIGN_TYPE = StatementType::ASSIGN;
+  StatementType IF_TYPE = StatementType::IF;
+  StatementType WHILE_TYPE = StatementType::WHILE;
+  StatementType PRINT_TYPE = StatementType::PRINT;
+  StatementType READ_TYPE = StatementType::READ;
+  StatementType INVALID_TYPE = StatementType::INVALID;
+
+  SECTION("Modifies(STMT_ENTITY, VARIABLE) evaluates to true") {
+
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    writer->write(v1);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "cenX")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select s1 such that Modifies(s1, v)");
+    std::list<std::string> expectedResult = {"1"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY, VARIABLE) evaluates to false") {
+
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select s1 such that Modifies(s1, v)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY, WILDCARD) gets all modified variables for a statement") {
+
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "cenX")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "cenY")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "cenX")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(4, "cenY")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; Select s1 such that Modifies(s1, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3", "4"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY, WILDCARD) gets no modified variables for a statement") {
+
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("cenX"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("cenY"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(4, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(5, PRINT_TYPE)));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; Select s1 such that Modifies(s1, _)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY - IF, VARIABLE) evaluates to true") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("a1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("b1"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "a1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "b1")));
+
+    std::list<std::string> results = qps.runQuery("if if1; variable v; Select if1 such that Modifies(if1, v)");
+    std::list<std::string> expectedResult = {"1", "2"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(STMT_ENTITY - WHILE, VARIABLE) evaluates to false") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("x"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("y"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, WHILE_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "x")));
+
+    std::list<std::string> results = qps.runQuery("while w1; variable y; Select w1 such that Modifies(w1, y)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(ASSIGN_TYPE, WILDCARD) gets all modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; assign p2; Select p1 such that Modifies(p1, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  
+  SECTION("Modifies(INTEGER, WILDCARD) gets all modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; Select p1 such that Modifies(3, _)");
+    std::list<std::string> expectedResult = {"1", "2", "3"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  
+  SECTION("Modifies(INTEGER, WILDCARD) gets no modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+
+    std::list<std::string> results = qps.runQuery("assign p1; Select p1 such that Modifies(3, _)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(INTEGER, VARIABLE) gets all modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("variable v1; Select v1 such that Modifies(3, v1)");
+    std::list<std::string> expectedResult = {"p1"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(INTEGER, VARIABLE) gets no modified variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+
+    std::list<std::string> results = qps.runQuery("variable v1; Select v1 such that Modifies(3, v1)");
+    std::list<std::string> expectedResult = {};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+
+  SECTION("Modifies(INTEGER, IDENTIFIER) gets all variables for assign statements") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("p1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("p2"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, ASSIGN_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "p1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "p2")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(3, "p1")));
+
+    std::list<std::string> results = qps.runQuery("stmt s1; variable v; Select v such that Modifies(3, \"p1\")");
+    std::list<std::string> expectedResult = {"p1", "p2"};
+    TestUtils::assertEqualsIgnoringOrder(results, expectedResult);
+  }
+}
+
+TEST_CASE("PKB Modifies Integration with QPS - Negative Test Cases") {
+  std::shared_ptr<PKB> pkb = std::make_shared<PKB>();
+  std::shared_ptr<PKBWriter> writer = std::make_shared<PKBWriter>(pkb);
+  PKBReader *reader = new PKBReader(pkb);
+  QPS qps(reader);
+
+  StatementType ASSIGN_TYPE = StatementType::ASSIGN;
+  StatementType IF_TYPE = StatementType::IF;
+  StatementType WHILE_TYPE = StatementType::WHILE;
+  StatementType PRINT_TYPE = StatementType::PRINT;
+  StatementType READ_TYPE = StatementType::READ;
+
+  SECTION("Wildcard for the first variable") {
+    std::shared_ptr<VariableEntry> v1 = std::make_shared<VariableEntry>(VariableEntry("a1"));
+    std::shared_ptr<VariableEntry> v2 = std::make_shared<VariableEntry>(VariableEntry("b1"));
+    writer->write(v1);
+    writer->write(v2);
+
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(1, ASSIGN_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(2, IF_TYPE)));
+    writer->write(std::make_shared<StatementEntry>(StatementEntry(3, WHILE_TYPE)));
+
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(1, "a1")));
+    writer->write(std::make_shared<ModifiesEntry>(ModifiesEntry(2, "b1")));
+
+    REQUIRE_THROWS_AS(qps.runQuery("stmt s1; Select s1 such that Modifies(_, \"a1\")"), SemanticError);
+  }
+}

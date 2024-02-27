@@ -1,0 +1,41 @@
+#include "sp/ParsingStrategy/ConditionalExpressionParsingStrategy.h"
+
+#include "catch.hpp"
+#include "common/exception/ErrorConstants.h"
+#include "sp/ASTNode/ASTNode.h"
+#include "sp/SPTokenizer/SPToken.h"
+#include "unit_testing//src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+
+TEST_CASE("Testing ConditionalExpression parse()", "[ConditionalExpressionParsingStrategy]") {
+  ConditionalExpressionParsingStrategy strategy;
+
+  SECTION("Positive test case: Normal expression") {
+    // (a + x * y + z / b)
+    std::vector<SPToken> tokens = {*CommonTokens::OPEN_PARENTHESES_TOKEN,
+                                   *CommonTokens::A_TOKEN,
+                                   *CommonTokens::PLUS_TOKEN,
+                                   *CommonTokens::X_TOKEN,
+                                   *CommonTokens::MULTIPLY_TOKEN,
+                                   *CommonTokens::Y_TOKEN,
+                                   *CommonTokens::PLUS_TOKEN,
+                                   *CommonTokens::Z_TOKEN,
+                                   *CommonTokens::DIVIDE_TOKEN,
+                                   *CommonTokens::B_TOKEN,
+                                   *CommonTokens::CLOSE_PARENTHESES_TOKEN};
+    size_t current = 0;
+    int stmtNo = 0;
+
+    auto node = strategy.parse(tokens, current, stmtNo);
+    auto exprNode = std::dynamic_pointer_cast<ExpressionNode>(node);
+
+    // build expected expr node
+    auto multNode1 = ASTBuilder::buildSimpleExpressionNode(1, "*", CommonTokens::X_TOKEN, CommonTokens::Y_TOKEN);
+    auto aNode = std::make_shared<ExpressionNode>(1, CommonTokens::A_TOKEN);
+    auto plusNode1 = std::make_shared<ExpressionNode>(1, CommonTokens::PLUS_TOKEN, aNode, multNode1);
+    auto divideNode = ASTBuilder::buildSimpleExpressionNode(1, "/", CommonTokens::Z_TOKEN, CommonTokens::B_TOKEN);
+    auto expectedExprNode = std::make_shared<ExpressionNode>(1, CommonTokens::PLUS_TOKEN, plusNode1, divideNode);
+
+    REQUIRE(exprNode != nullptr);
+    REQUIRE(*exprNode == *exprNode);
+  }

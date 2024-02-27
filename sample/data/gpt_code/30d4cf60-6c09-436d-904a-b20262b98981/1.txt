@@ -1,0 +1,10 @@
+std::vector<std::pair<int, int>> resultVector;
+
+  for (const auto& entry : parentToChildMap) {
+    int parent = entry.first;
+    const std::vector<int>& childVector = entry.second;
+
+    for (int child : childVector) {
+      resultVector.push_back(std::make_pair(parent, child));
+    }
+  }

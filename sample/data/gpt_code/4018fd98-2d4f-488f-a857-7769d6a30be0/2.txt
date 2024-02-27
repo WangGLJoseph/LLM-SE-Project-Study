@@ -1,0 +1,23 @@
+#ifndef PARENTPREDICATE_H
+#define PARENTPREDICATE_H
+
+#include "Predicate.h"
+#include "qps/entity/evaluation/HeaderTable.h"
+#include "PredicateUtils.h"
+#include "common/spa_exception/SyntaxErrorException.h"
+#include "common/spa_exception/QPSEvaluationException.h"
+#include <memory>
+
+class ParentPredicate : public Predicate {
+private:
+    StatementRef lhs;
+    StatementRef rhs;
+    bool isValidRow(const std::vector<std::shared_ptr<Entity>>& row) const;
+
+public:
+    ParentPredicate(StatementRef lhs, StatementRef rhs);
+    std::shared_ptr<BaseTable> getTable(QueryManager &qm) override;
+    std::string toString() const override;
+};
+
+#endif // PARENTPREDICATE_H

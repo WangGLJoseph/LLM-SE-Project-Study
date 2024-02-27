@@ -1,0 +1,80 @@
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/' || c == '%');
+}
+
+string infixToPostfix(std::string expression) {
+    string result = "";
+    stack<char> operators;
+    map<char, int> precedence;
+    precedence['+'] = precedence['-'] = 1;
+    precedence['*'] = precedence['/'] = precedence['%'] = 2;
+    if (isOperator(expression[0])) {
+        throw SyntaxErrorException();
+    }
+
+    for (size_t i = 0; i < expression.length(); ++i) {
+        if (isdigit(expression[i])) {
+            while (i < expression.length() && isdigit(expression[i])) {
+                result += expression[i];
+                ++i;
+            }
+            --i;
+            result += " ";
+        } else if (expression[i] == '(') {
+            int count = 1;
+            i++;
+            string temp;
+            // Find the proper end
+            while (i < expression.length() && count > 0) {
+                if (expression[i] == '(') {
+                    count++;
+                }
+                if (expression[i] == ')') {
+                    count--;
+                    if (count > 0) {
+                        temp += expression[i];
+                    }
+                    // no need brackets if 0
+                } else {
+                    // normal
+                    temp += expression[i];
+                }
+                i++;
+            }
+            if (count > 0) {
+                // throw error
+                throw SyntaxErrorException("[QPS] Assign pattern mismatched parentheses, too many (");
+            }
+            i--;
+            // recurse sub-expression
+            string res = infixToPostfix(temp);
+            result += res;
+        } else if (expression[i] == ')') {
+            throw SyntaxErrorException("[QPS] Assign pattern mismatched parentheses, too many )");
+        } else if (!isOperator(expression[i])) {
+            // is a synonym: assumes no spaces and no random '(' or ')' characters
+            // reads in until the next operator
+            // validation should be already done in QPS
+            while (i < expression.length() && !isOperator(expression[i])) {
+                result += expression[i];
+                ++i;
+            }
+            --i;
+            result += " ";
+        } else {
+            while (!operators.empty() && precedence[operators.top()] >= precedence[expression[i]]) {
+                result += operators.top();
+                result += " ";
+                operators.pop();
+            }
+            operators.push(expression[i]);
+        }
+    }
+
+    while (!operators.empty()) {
+        result += operators.top();
+        result += " ";
+        operators.pop();
+    }
+    return result;
+}

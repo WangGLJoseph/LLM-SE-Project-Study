@@ -1,0 +1,29 @@
+bool ExpressionNode::isSubTree(const std::shared_ptr<ExpressionNode> &other) const {
+  // Empty tree is subtree of every tree
+  if (!other)
+    return true;
+
+  // Non-empty tree can't be a subtree of an empty tree
+  if (!this->symbol)
+    return false;
+
+  // Check if the data of both roots is same and data of left and right
+  // subtrees are also same
+  if (this->areIdentical(other))
+    return true;
+
+  // If the tree with root as current node doesn't match, then try left
+  // and right subtrees one by one
+  return (this->left && this->left->isSubTree(other)) || (this->right && this->right->isSubTree(other));
+}
+
+bool ExpressionNode::areIdentical(const std::shared_ptr<ExpressionNode> &otherTree) const {
+  if (!this->symbol && !otherTree)
+    return true;
+
+  if (!this->symbol || !otherTree)
+    return false;
+
+  return ((*this->symbol == *otherTree->symbol) && ((this->left ? this->left->areIdentical(otherTree->left) : !otherTree->left)) &&
+          ((this->right ? this->right->areIdentical(otherTree->right) : !otherTree->right)));
+}

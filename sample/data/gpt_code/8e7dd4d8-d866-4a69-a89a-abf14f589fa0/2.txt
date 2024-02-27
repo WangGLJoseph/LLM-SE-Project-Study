@@ -1,21 +1,41 @@
+// prompt 2: https://chat.openai.com/share/69b2d8ce-dffd-44f8-b7ab-48a128e89a6a
 #pragma once
 
-#include "qps/entity/query/Synonym.h"
-#include "common/Entity.h"
-#include <vector>
-#include <memory>
+#ifndef QUERYEVALUATIONCONTEXT_H
+#define QUERYEVALUATIONCONTEXT_H
 
-// Represents a list of possible values for a synonym.
-class SynonymValues {
+#include <memory>
+#include <unordered_map>
+#include <vector>
+#include "BaseTable.h" // Include the BaseTable class header
+#include "qps/entity/query/Synonym.h"
+#include "pkb/QueryPKB.h"
+
+class QueryEvaluationContext {
 private:
-    shared_ptr<Synonym> synonym;
-    std::vector<std::shared_ptr<Entity>> values;
+    std::unordered_map<Synonym, std::shared_ptr<BaseTable>> synonymToTableMap;
+    bool resultMustBeEmpty = false;    // A quick indicator of empty result, for early termination
+    std::shared_ptr<QueryManager> queryManager;
+    std::shared_ptr<BaseTable> resultTable;
+    std::vector<SynonymPtrSet> synonymGroups;
 
 public:
-    explicit SynonymValues(const shared_ptr<Synonym> &syn) : synonym(syn) {}
-    void addValue(const std::shared_ptr<Entity>& value);
-    [[nodiscard]] const std::vector<std::shared_ptr<Entity>>& getValues() const;
-    [[nodiscard]] shared_ptr<Synonym> getSynonym() const { return synonym; }
-    [[nodiscard]] vector<string> toStringList() const;
-    bool operator==(const SynonymValues &rhs) const;
+    QueryEvaluationContext();
+    void addTableForSynonym(const Synonym& synonym, const std::shared_ptr<BaseTable>& table);
+    void clearTables();
+    [[nodiscard]] std::shared_ptr<BaseTable> getTableForSynonym(const Synonym& synonym) const;
+    [[nodiscard]] bool containsSynonym(const Synonym& synonym) const;
+    [[nodiscard]] bool isTableInitialized(const Synonym& synonym) const;
+    void putTableForSynonymGroup(const Synonym& synonym, const std::shared_ptr<BaseTable>& table);
+    [[nodiscard]] std::vector<Synonym> getSynonyms() const;
+    [[nodiscard]] std::shared_ptr<QueryManager> getQueryManager() const;
+    void setQueryManager(const std::shared_ptr<QueryManager>& queryManager);
+    [[nodiscard]] std::vector<std::string> getResults() const;
+    void setResultTable(const std::shared_ptr<BaseTable>& _resultTable);
+    [[nodiscard]] std::shared_ptr<BaseTable> getResultTable() const;
+    [[nodiscard]] bool isCurrentResultEmpty() const;
+    void setSynonymGroups(const std::vector<SynonymPtrSet>& synonymGroups);
+    void setResultToFalse();
 };
+
+#endif // QUERY_EVALUATION_CONTEXT_H

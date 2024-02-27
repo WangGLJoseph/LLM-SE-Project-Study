@@ -1,96 +1,24 @@
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/Parser/Procedure.h
+File: Team19/Code19/src/spa/src/sp/Parser/SimpleParserFacade.h
 Generator: gpt
-Intervention: 2
+Intervention: 1
 Language: e
-Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
-ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Prompt: https://platform.openai.com/playground/p/TSrBejqZDhzJU0nYh4NsepD0
+ChatId: TSrBejqZDhzJU0nYh4NsepD0
 Code:
-class Procedure : public Grammar {
-public:
-	Procedure(int start, int end, std::shared_ptr<ASTNode> statementListTree);
-	int getStartLine() const override;
-	int getEndLine() const override;
-	std::shared_ptr<ASTNode> buildTree() override;
+#include "SimpleParser.h"
+#include "sp/AST/ASTHelper.h"
+#include "sp/SPTokenizer/SPTokenizer.h"
+#include "sp/SPTokenizer/FileProcessor.h"
+#include <memory>
 
+class SimpleParserFacade {
 private:
-	std::shared_ptr<ASTNode> statementListTree;
-	std::pair<int, int> lines;
-};
---------------------
-RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/Parser/Program.cpp
-Generator: gpt
-Intervention: 2
-Language: e
-Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
-ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
-Code:
-Program::Program(int end, std::vector<std::shared_ptr<ASTNode>> procedures) {
-	this->lines = std::make_pair(1, end);
-	this->procedures = procedures;
-}
+    std::unique_ptr<SimpleParser> parser;
 
-int Program::getStartLine() const {
-	return this->lines.first;
-}
-
-int Program::getEndLine() const {
-	return this->lines.second;
-}
-
-std::shared_ptr<ASTNode> Program::buildTree() {
-	std::shared_ptr<ASTNode> tree = std::make_shared<ASTNode>(
-		ASTNodeType::PROGRAMS, this->lines.first, Utility::getASTNodeType(ASTNodeType::PROGRAMS)
-	);
-
-	for (auto child : this->procedures) {
-		tree.get()->addChild(child);
-	}
-
-	return tree;
-}
---------------------
-RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/Parser/ReadStmt.h
-Generator: gpt
-Intervention: 2
-Language: e
-Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
-ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
-Code:
-class ReadStmt : public Stmt {
 public:
-    ReadStmt(const LexicalToken& variable, int start, int end);
-
-    std::shared_ptr<ASTNode> buildTree() override;
-    int getStartLine() const override;
-    int getEndLine() const override;
-
-private:
-    LexicalToken variable;
-    std::pair<int, int> lines;
-};
---------------------
-RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/Parser/CallStmt.h
-Generator: gpt
-Intervention: 2
-Language: e
-Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
-ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
-Code:
-class CallStmt : public Stmt {
-public:
-    CallStmt(const LexicalToken& variable, int start, int end);
-
-    std::shared_ptr<ASTNode> buildTree() override;
-    int getStartLine() const override;
-    int getEndLine() const override;
-
-private:
-    LexicalToken variable;
-    std::pair<int, int> lines;
+    SimpleParserFacade(const std::string& filename);
+    std::shared_ptr<ASTNode> parse();
 };
 --------------------
 RepoName: 23s2-cp-spa-team-19
@@ -103,85 +31,35 @@ ChatId: cJLjmmneCEs4z6ms7ZkBSxJB
 Code:
 class SimpleParser {
 public:
-   SimpleParser(); // Default constructor
-   SimpleParser(std::string filename);
-   std::shared_ptr<ASTNode> parseProgram();
+	SimpleParser(std::vector<LexicalToken> tokenStream);
+	std::shared_ptr<ASTNode> parseProgram();
 
-	// private:
+private:
 	std::vector<LexicalToken> tokenStream;
 	int tokenIndex;
 	void assertToken(LexicalToken token, LexicalTokenType type) const;
 	bool hasTokensLeft() const;
-	LexicalToken peekToken() const;
-	LexicalToken getToken();
+	LexicalToken peekNextToken();
+	LexicalToken getNextToken();
+	LexicalToken peekNextNextToken();
 	std::shared_ptr<ASTNode> parseProcedure();
 	std::shared_ptr<ASTNode> parseStmtLst();
 	std::shared_ptr<ASTNode> parseStmt();
 	std::shared_ptr<ASTNode> parseRead();
 	std::shared_ptr<ASTNode> parsePrint();
 	std::shared_ptr<ASTNode> parseCall();
-	void parseWhile();
-	void parseIf();
-	void parseAssign();
-	void parseCondExpr();
-	void parseRelExpr();
-	void parseRelFactor();
-	void parseExpr();
-	void parseTerm();
-	void parseFactor();
-	void parseVarName();
-	void parseProcName();
-	void parseConstValue();
-};
---------------------
-RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/Parser/Grammar.h
-Generator: gpt
-Intervention: 1
-Language: e
-Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
-ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
-Code:
-#include <utility> // Include necessary header for std::pair
-#include <memory>
-#include "sp/Utility.h"
-#include "sp/AST/ast.h"
-
-// Define the Grammar class
-class Grammar {
-protected:
-    // Virtual function returning a pair of integers
-    std::pair<int, int> lines;
-
-public:
-    virtual ~Grammar() {} // Virtual destructor
-
-    // Virtual function for building the tree
-    virtual std::shared_ptr<ASTNode> buildTree() = 0;
-    virtual int getStartLine() const = 0;
-    virtual int getEndLine() const = 0;
-
-};
---------------------
-RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/Parser/PrintStmt.h
-Generator: gpt
-Intervention: 2
-Language: e
-Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
-ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
-Code:
-class PrintStmt : public Stmt {
-public:
-    PrintStmt(const LexicalToken& variable, int start, int end);
-
-    std::shared_ptr<ASTNode> buildTree() override;
-    int getStartLine() const override;
-    int getEndLine() const override;
-
-private:
-    LexicalToken variable;
-    std::pair<int, int> lines;
+	std::shared_ptr<ASTNode> parseWhile();
+	std::shared_ptr<ASTNode> parseIf();
+	std::shared_ptr<ASTNode> parseAssign();
+	std::shared_ptr<ASTNode> parseCondExpr();
+	std::shared_ptr<ASTNode> parseRelExpr();
+	std::shared_ptr<ASTNode> parseRelFactor();
+	std::shared_ptr<ASTNode> parseExpr();
+	std::shared_ptr<ASTNode> parseTerm();
+	std::shared_ptr<ASTNode> parseFactor();
+	std::shared_ptr<ASTNode> parseVarName();
+	std::shared_ptr<ASTNode> parseProcName();
+	std::shared_ptr<ASTNode> parseConstValue();
 };
 --------------------
 RepoName: 23s2-cp-spa-team-19
@@ -192,53 +70,83 @@ Language: e
 Prompt: https://platform.openai.com/playground/p/cJLjmmneCEs4z6ms7ZkBSxJB?model=gpt-4&mode=chat
 ChatId: cJLjmmneCEs4z6ms7ZkBSxJB
 Code:
-SimpleParser::SimpleParser() {
-	
-}
-
-SimpleParser::SimpleParser(std::string filename) {
-	this->tokenStream = SPTokenizer::tokenize(SPTokenizer::readFileToString(filename));
+/**
+ * @brief Constructs a new Simple Parser object
+ *
+ * Reads the given file, tokenizes it and prepares for parsing.
+ *
+ * @param filename The name of the file to parse.
+ */
+SimpleParser::SimpleParser(std::vector<LexicalToken> tokenStream) {
+	this->tokenStream = tokenStream;
 	this->tokenIndex = 0;
 }
 
+/**
+ * @brief Parses the entire program and returns a tree representing it.
+ *
+ * @return std::shared_ptr<ASTNode> A pointer to the root of the parse tree.
+ */
 std::shared_ptr<ASTNode> SimpleParser::parseProgram() {
 	std::vector<std::shared_ptr<ASTNode>> procedures;
+	const int START_OF_PROGRAM = 1;
 
 	while (this->hasTokensLeft()) {
-		if (this->peekToken().getTokenType() == LexicalTokenType::WHITESPACE) {
-			this->getToken();
-			continue;
-		}
-
 		procedures.push_back(this->parseProcedure());
 	}
 
-	// Depending on how important the the number of lines is to the code, find out whether to further go ahead
-	// with finding the number of lines.
-	Program program = Program(-1, procedures);
+	std::shared_ptr<ASTNode> root = std::make_shared<ASTNode>(
+		ASTNodeType::PROGRAMS, START_OF_PROGRAM, ASTUtility::getASTNodeType(ASTNodeType::PROGRAMS)
+	);
 
-	return program.buildTree();
+	root->lineNumber = PROGRAM_LINE_NUMBER;
+	int maxLineNumber = 0;
+	for (auto& procedure : procedures) {
+		int temp = ASTTraverser::setLineNumbers(procedure, maxLineNumber);
+		root->addChild(procedure);
+		maxLineNumber = temp;
+	}
+
+	return root;
 }
 
+/**
+ * @brief Assert Token to check if the token's type matches the expected one.
+ *
+ * @param token A lexical token in the stream.
+ * @param type A expected lexical token type.
+ * @throws Retrieves a runtime_error if the token's type doesn't match the expected type.
+ */
+void SimpleParser::assertToken(LexicalToken token, LexicalTokenType type) const {
+	if (!token.isType(type)) {
+		throw std::runtime_error("Error: Expected " + LexicalTokenTypeMapper::printType(type) + " but got " + LexicalTokenTypeMapper::printType(token.getTokenType()) +
+			" At Line " + std::to_string(token.getLine()) + " Position " + std::to_string(token.getLinePosition()));
+	}
+}
+
+/**
+ * @brief Check if there are more tokens to parse.
+ *
+ * @return bool Returns true if there are more tokens in the token stream otherwise false.
+ */
 bool SimpleParser::hasTokensLeft() const {
 	return this->tokenIndex < this->tokenStream.size();
 }
 
-// Gets token, without advancing the index.
-LexicalToken SimpleParser::peekToken() const {
-	if (this->hasTokensLeft()) {
-		return this->tokenStream[this->tokenIndex];
-	}
-	else {
-		return LexicalToken(LexicalTokenType::NULL_TOKEN);
-	}
-}
-
-// Gets token, and advance the index to look for the next token.
-LexicalToken SimpleParser::getToken() {
+/**
+ * @brief Gets the token from the stream without advancing the index.
+ *
+ * @return LexicalToken The next token in the stream without advancing the index.
+ */
+LexicalToken SimpleParser::peekNextToken() {
 	if (this->hasTokensLeft()) {
 		LexicalToken token = this->tokenStream[this->tokenIndex];
-		this->tokenIndex++;
+
+		if (token.isType(LexicalTokenType::WHITESPACE)) {
+			this->tokenIndex++;
+			return peekNextToken();
+		}
+
 		return token;
 	}
 	else {
@@ -246,206 +154,309 @@ LexicalToken SimpleParser::getToken() {
 	}
 }
 
-void SimpleParser::assertToken(LexicalToken token, LexicalTokenType type) const {
-	if (token.getTokenType() != type) {
-		throw std::runtime_error("Error: Invalid SIMPLE syntax.");
-	}
-}
+/**
+ * @brief Gets the token from the stream and advances the index by 1.
+ *
+ * @return LexicalToken The next token in the stream.
+ */
+LexicalToken SimpleParser::getNextToken() {
+	if (this->hasTokensLeft()) {
+		LexicalToken token = this->tokenStream[this->tokenIndex];
+		this->tokenIndex++;
 
-std::shared_ptr<ASTNode> SimpleParser::parseProcedure() {
-	if (!this->hasTokensLeft()) {
-		throw std::runtime_error("Error: SimpleParser::parseProcedure encounter empty statement.");
-	}
-
-	LexicalToken procedureKeyword = this->getToken();
-	this->assertToken(procedureKeyword, LexicalTokenType::KEYWORD_PROCEDURE);
-
-	LexicalToken procedureName = this->getToken();
-	this->assertToken(procedureName, LexicalTokenType::NAME);
-	this->assertToken(this->getToken(), LexicalTokenType::SYMBOL_OPEN_BRACE);
-
-	// Parse Statement Lists;
-	std::shared_ptr<ASTNode> statementList = this->parseStmtLst();
-
-	LexicalToken closeBrace = this->getToken();
-	this->assertToken(closeBrace, LexicalTokenType::SYMBOL_CLOSE_BRACE);
-
-	Procedure procedure = Procedure(procedureKeyword.getLine(), closeBrace.getLine(), statementList);
-	return procedure.buildTree();
-}
-
-std::shared_ptr<ASTNode> SimpleParser::parseStmtLst() {
-	// Parse every statement until we see a closing bracket.
-	std::vector<std::shared_ptr<ASTNode>> statements;
-	int firstLine = this->peekToken().getLine();
-	while (this->peekToken().getTokenType() != LexicalTokenType::SYMBOL_CLOSE_BRACE) {
-		if (this->peekToken().getTokenType() == LexicalTokenType::WHITESPACE) {
-			this->getToken();
-			continue;
+		if (token.isType(LexicalTokenType::WHITESPACE)) {
+			return getNextToken();
 		}
-		statements.push_back(this->parseStmt());
+
+		return token;
 	}
-
-	int lastLine = this->peekToken().getLine();
-
-	StmtList stmtList = StmtList(firstLine, lastLine, statements);
-
-	return stmtList.buildTree();
-}
-
-std::shared_ptr<ASTNode> SimpleParser::parseStmt() {
-	// Add parsing logic for statement
-	// If next token is '=', we are assigning. Call assign.
-	// Then, Check keywords read/print/call.
-	// Then, check keywords while/if.
-	// If dont have keyword, this is an invalid statement.
-	if (!this->hasTokensLeft()) {
-		throw std::runtime_error("Error: SimpleParser::parseStmt encounter empty statement.");
+	else {
+		return LexicalToken(LexicalTokenType::NULL_TOKEN);
 	}
-
-	LexicalToken firstToken = this->peekToken();
-	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_CALL) {
-		return this->parseCall();
-	}
-
-	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_PRINT) {
-		return this->parsePrint();
-	}
-
-	if (firstToken.getTokenType() == LexicalTokenType::KEYWORD_READ) {
-		return this->parseRead();
-	}
-
-	throw std::runtime_error("Error: SimpleParser only accepts READ,CALL,PRINT statements now.");
-}
-
-std::shared_ptr<ASTNode> SimpleParser::parseRead() {
-	LexicalToken keyword = this->getToken();
-	this->assertToken(keyword, LexicalTokenType::KEYWORD_READ);
-
-	LexicalToken variable = this->getToken();
-	this->assertToken(variable, LexicalTokenType::NAME);
-
-	LexicalToken semicolon = this->getToken();
-	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
-
-	ReadStmt readStmt = ReadStmt(variable, keyword.getLine(), semicolon.getLine());
-
-	return readStmt.buildTree();
-}
-
-std::shared_ptr<ASTNode> SimpleParser::parsePrint() {
-	LexicalToken keyword = this->getToken();
-	this->assertToken(keyword, LexicalTokenType::KEYWORD_PRINT);
-
-	LexicalToken variable = this->getToken();
-	this->assertToken(variable, LexicalTokenType::NAME);
-
-	LexicalToken semicolon = this->getToken();
-	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
-
-	PrintStmt printStmt = PrintStmt(variable, keyword.getLine(), semicolon.getLine());
-
-	return printStmt.buildTree();
-}
-
-// To change to void later when building trees.
-std::shared_ptr<ASTNode> SimpleParser::parseCall() {
-	LexicalToken keyword = this->getToken();
-	this->assertToken(keyword, LexicalTokenType::KEYWORD_CALL);
-
-	LexicalToken variable = this->getToken();
-	this->assertToken(variable, LexicalTokenType::NAME);
-
-	LexicalToken semicolon = this->getToken();
-	this->assertToken(semicolon, LexicalTokenType::SYMBOL_SEMICOLON);
-
-	CallStmt callStmt = CallStmt(variable, keyword.getLine(), semicolon.getLine());
-
-	return callStmt.buildTree();
-}
-
-void SimpleParser::parseWhile() {
-	// Add parsing logic for while
-}
-
-void SimpleParser::parseIf() {
-	// Add parsing logic for if statement
-}
-
-void SimpleParser::parseAssign() {
-	// Add parsing logic for assignment
-}
-
-void SimpleParser::parseCondExpr() {
-	// Add parsing logic for condition expression
-}
-
-void SimpleParser::parseRelExpr() {
-	// Add parsing logic for relational expression
-}
-
-void SimpleParser::parseRelFactor() {
-	// Add parsing logic for relational factor (variable name or constant value or expression)
-}
-
-void SimpleParser::parseExpr() {
-	// Add parsing logic for expression (term or expression "+" term or expression "-" term)
-}
-
-void SimpleParser::parseTerm() {
-	// Add parsing logic for term (factor or term "*" factor or term "/" factor or term "%" factor)
-}
-
-void SimpleParser::parseFactor() {
-	// Add parsing logic for factor (variable name or constant value or "(" expr ")")
-}
-
-void SimpleParser::parseVarName() {
-	// Add parsing logic for variable name
-}
-
-void SimpleParser::parseProcName() {
-	// Add parsing logic for procedure name
-}
-
-void SimpleParser::parseConstValue() {
-	// Add parsing logic for constant value parsing
 }
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/Parser/Program.h
+File: Team19/Code19/src/spa/src/sp/Parser/SimpleParser.cpp
 Generator: gpt
-Intervention: 2
+Intervention: 1
 Language: e
-Prompt: https://platform.openai.com/playground/p/3mLKCsoXcgjIM0eMlvP3rIgb?model=gpt-4&mode=chat
-ChatId: 3mLKCsoXcgjIM0eMlvP3rIgb
+Prompt: https://platform.openai.com/playground/p/qA4gXcRsT0cbjv8cZDNsfqSW?mode=chat
+ChatId: qA4gXcRsT0cbjv8cZDNsfqSW
 Code:
-class Program : public Grammar {
-public:
-	Program(int end, std::vector<std::shared_ptr<ASTNode>> procedures);
+/**
+ * @brief Gets the token after the next token in the stream.
+ *
+ * First retrieves the next token, incrementing the token index, then retrieves the subsequent token without incrementing the token index.
+ * The token index is reset back 1 step after completing these actions.
+ *
+ * @return LexicalToken The token that is 2 steps ahead in the stream.
+ */
+LexicalToken SimpleParser::peekNextNextToken() {
+	// Store the current index
+	int originalIndex = this->tokenIndex;
 
-	int getStartLine() const override;
-	int getEndLine() const override;
-	std::shared_ptr<ASTNode> buildTree() override;
+	// Skip potential whitespace and get the token
+	this->getNextToken();
 
-private:
-	std::vector<std::shared_ptr<ASTNode>> procedures;
-	std::pair<int, int> lines;
-};
+	// Check the token after the one just returned by getNextToken()
+	LexicalToken nextToken = this->peekNextToken();
+
+	// Reset the token index to its original value
+	this->tokenIndex = originalIndex;
+
+	// Return the peeked token
+	return nextToken;
+}
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/AST/AST.cpp
+File: Team19/Code19/src/spa/src/sp/Parser/SimpleParser.cpp
 Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/NGm3fHHy62WWafdKCc95vHpD?mode=chat
+ChatId: NGm3fHHy62WWafdKCc95vHpD
+Code:
+/**
+ * @brief Parse a expression in the program.
+ *
+ * @return std::shared_ptr<ASTNode> A smart pointer pointing to the root of the parsed expression node tree.
+ */
+std::shared_ptr<ASTNode> SimpleParser::parseExpr() {
+	std::shared_ptr<ASTNode> left = parseTerm();
+
+	LexicalToken operation = peekNextToken();
+
+	while (operation.isType(LexicalTokenType::OPERATOR_EXPR)) {
+		this->getNextToken(); //consume operation token		
+
+		std::shared_ptr<ASTNode> operationNode;
+		if (operation.isType(LexicalTokenType::OPERATOR_PLUS)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::ADD, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::ADD));
+		}
+		else if (operation.isType(LexicalTokenType::OPERATOR_MINUS)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::SUBTRACT, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::SUBTRACT));
+		}
+
+		std::shared_ptr<ASTNode> right = parseTerm();
+
+		// Create a new AST node to combine the expr and term and add it under current operation
+		operationNode->addChild(left);
+		operationNode->addChild(right);
+
+		// Swap left operand and operation for next iteration
+		left = operationNode;
+		operation = peekNextToken();
+	}
+
+	return left;
+}
+
+/**
+ * @brief Parse a term in the program.
+ *
+ * @return std::shared_ptr<ASTNode> A smart pointer pointing to the root of the parsed term node tree.
+ */
+std::shared_ptr<ASTNode> SimpleParser::parseTerm() {
+	std::shared_ptr<ASTNode> left = parseFactor();
+
+	LexicalToken operation = peekNextToken();
+
+	while (operation.isType(LexicalTokenType::OPERATOR_TERM)) {
+		this->getNextToken(); //consume operation token
+
+		//		return std::make_shared<ASTNode>(ASTNodeType::CONSTANT, operation.getLine(), Utility::getASTNodeType(ASTNodeType::CONSTANT));
+		std::shared_ptr<ASTNode> operationNode;
+		if (operation.isType(LexicalTokenType::OPERATOR_MULTIPLY)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::MULTIPLY, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::MULTIPLY));
+		}
+		else if (operation.isType(LexicalTokenType::OPERATOR_DIVIDE)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::DIVIDE, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::DIVIDE));
+		}
+		else if (operation.isType(LexicalTokenType::OPERATOR_MODULO)) {
+			operationNode = std::make_shared<ASTNode>(ASTNodeType::MODULO, operation.getLine(), ASTUtility::getASTNodeType(ASTNodeType::MODULO));
+		}
+		else {
+			throw std::runtime_error("Parsing Term but operator is not of the following: *, /, %");
+		}
+
+		std::shared_ptr<ASTNode> right = parseFactor();
+
+		// Create a new AST node to combine the factor and term and add it under current operation
+		operationNode->addChild(left);
+		operationNode->addChild(right);
+
+		// Swap left operand and operation for next iteration
+		left = operationNode;
+		operation = peekNextToken();
+	}
+
+	return left;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/Parser/SimpleParserFacade.cpp
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/TSrBejqZDhzJU0nYh4NsepD0
+ChatId: TSrBejqZDhzJU0nYh4NsepD0
+Code:
+#include "SimpleParserFacade.h"
+
+SimpleParserFacade::SimpleParserFacade(const std::string& filename) {
+	std::string fileContent = FileProcessor::readFileToString(filename);
+	std::vector<LexicalToken> tokenStream = SPTokenizer::tokenize(fileContent);
+	parser = std::make_unique<SimpleParser>(tokenStream);
+}
+
+std::shared_ptr<ASTNode> SimpleParserFacade::parse() {
+	std::shared_ptr<ASTNode> tree_ptr = parser->parseProgram();
+	return tree_ptr;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/SPTokenizer/SPTokenizer.cpp
+Generator: copilot
 Intervention: 2
 Language: e
-Prompt: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
-ChatId: a181de60-e76f-496c-9bee-7ea80f2be651
+Prompt: github copilot
+ChatId: 
 Code:
-AST::AST(std::shared_ptr<ASTNode> root) : root(std::move(root)) {}
+std::vector<std::string> SPTokenizer::splitLine(const std::string& content) {
+	std::vector<std::string> result;
+	std::istringstream stream(content); // Create a stringstream from the content
+	std::string line;
+	while (std::getline(stream, line)) {
+		result.push_back(line);
+	}
+	return result;
+}
 
-const ASTNode* AST::getRoot() const {
-    return root.get();
+std::vector<LexicalToken> SPTokenizer::tokenize(const std::string& content) {
+	std::vector<LexicalToken> results;
+	std::vector<std::string> lines = SPTokenizer::splitLine(content);
+	int numberOfLines = static_cast<int>(lines.size());
+
+	bool isPreviousTokenKeyword = false;
+
+	for (int lineNumber = 1; lineNumber <= numberOfLines; lineNumber++) {
+		std::string line = lines[lineNumber - 1];
+		std::string originalLine = line.substr();
+
+		while (!line.empty()) {
+			bool matchedSomething = false;
+			for (auto const& rule : LexicalTokenTypeMapper::tokenToRegexPairs) {
+				std::smatch match;
+				if (!std::regex_search(line, match, std::regex(rule.second))) {
+					continue;
+				}
+				LexicalTokenType type = rule.first;
+
+				LexicalToken t(type, lineNumber, (int)(originalLine.size() - line.size()), match.str());
+				assertValidToken(type, match.str());
+
+				if (rule.first != LexicalTokenType::WHITESPACE) {
+					results.push_back(t);
+				}
+				matchedSomething = true;
+				line = line.substr(match.str().size());
+				break;
+			}
+			if (!matchedSomething) {
+				throw std::runtime_error("Error: Invalid SIMPLE syntax.");
+			}
+		}
+
+		if (lineNumber != lines.size()) {
+			LexicalToken newLine(LexicalTokenType::WHITESPACE, lineNumber, -1, "new line");
+			results.push_back(newLine);
+		}
+	}
+	return results;
+}
+
+void SPTokenizer::assertValidToken(LexicalTokenType type, const std::string& name) {
+	if (type != LexicalTokenType::NAME) {
+		return;
+	}
+	std::string pattern = "([a-zA-Z][a-zA-Z0-9]*)"; // Pattern to match an alphanumeric string with the first character being a letter
+	std::regex regexPattern(pattern);
+	if (!std::regex_match(name, regexPattern)) {
+		throw std::runtime_error("ERROR: Name not valid " + name);
+	}
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/SPTokenizer/LexicalTokenType.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/hqmTI5WojSoGp9ObQfd7Yegx?mode=chat
+ChatId: hqmTI5WojSoGp9ObQfd7Yegx
+Code:
+const bool LexicalTokenTypeMapper::isType(LexicalTokenType t1, LexicalTokenType t2) {
+	std::unordered_map<LexicalTokenType, std::vector<LexicalTokenType>> lexicalTokenTypes = {
+		// Symbols
+		{LexicalTokenType::SYMBOL_OPEN_BRACE, {LexicalTokenType::SYMBOL_OPEN_BRACE}},
+		{LexicalTokenType::SYMBOL_CLOSE_BRACE, {LexicalTokenType::SYMBOL_CLOSE_BRACE}},
+		{LexicalTokenType::SYMBOL_OPEN_PAREN, {LexicalTokenType::SYMBOL_OPEN_PAREN}},
+		{LexicalTokenType::SYMBOL_CLOSE_PAREN, {LexicalTokenType::SYMBOL_CLOSE_PAREN}},
+		{LexicalTokenType::SYMBOL_SEMICOLON, {LexicalTokenType::SYMBOL_SEMICOLON}},
+
+		// Operators
+		{LexicalTokenType::OPERATOR_ASSIGN, {LexicalTokenType::OPERATOR_ASSIGN}},
+		{LexicalTokenType::OPERATOR_NOT, {LexicalTokenType::OPERATOR_NOT}},
+		{LexicalTokenType::OPERATOR_AND, {LexicalTokenType::OPERATOR_CONDITIONAL, LexicalTokenType::OPERATOR_AND}},
+		{LexicalTokenType::OPERATOR_OR, {LexicalTokenType::OPERATOR_CONDITIONAL, LexicalTokenType::OPERATOR_OR}},
+		{LexicalTokenType::OPERATOR_GREATER, {LexicalTokenType::OPERATOR_RELATIONAL, LexicalTokenType::OPERATOR_GREATER}},
+		{LexicalTokenType::OPERATOR_GREATER_EQUAL, {LexicalTokenType::OPERATOR_RELATIONAL, LexicalTokenType::OPERATOR_GREATER_EQUAL}},
+		{LexicalTokenType::OPERATOR_LESS, {LexicalTokenType::OPERATOR_RELATIONAL, LexicalTokenType::OPERATOR_LESS}},
+		{LexicalTokenType::OPERATOR_LESS_EQUAL, {LexicalTokenType::OPERATOR_RELATIONAL, LexicalTokenType::OPERATOR_LESS_EQUAL}},
+		{LexicalTokenType::OPERATOR_IS_EQUAL, {LexicalTokenType::OPERATOR_RELATIONAL, LexicalTokenType::OPERATOR_IS_EQUAL}},
+		{LexicalTokenType::OPERATOR_NOT_EQUAL, {LexicalTokenType::OPERATOR_RELATIONAL, LexicalTokenType::OPERATOR_NOT_EQUAL}},
+		{LexicalTokenType::OPERATOR_PLUS, {LexicalTokenType::OPERATOR_EXPR, LexicalTokenType::OPERATOR_PLUS}},
+		{LexicalTokenType::OPERATOR_MINUS, {LexicalTokenType::OPERATOR_EXPR, LexicalTokenType::OPERATOR_MINUS}},
+		{LexicalTokenType::OPERATOR_MULTIPLY, {LexicalTokenType::OPERATOR_TERM, LexicalTokenType::OPERATOR_MULTIPLY}},
+		{LexicalTokenType::OPERATOR_DIVIDE, {LexicalTokenType::OPERATOR_TERM, LexicalTokenType::OPERATOR_DIVIDE}},
+		{LexicalTokenType::OPERATOR_MODULO, {LexicalTokenType::OPERATOR_TERM, LexicalTokenType::OPERATOR_MODULO}},
+
+		// Keywords
+		{LexicalTokenType::KEYWORD_PROCEDURE,{LexicalTokenType::KEYWORD_PROCEDURE,LexicalTokenType::NAME}},
+		{LexicalTokenType::KEYWORD_WHILE,{LexicalTokenType::KEYWORD_WHILE,LexicalTokenType::NAME}},
+		{LexicalTokenType::KEYWORD_IF,{LexicalTokenType::KEYWORD_IF,LexicalTokenType::NAME}},
+		{LexicalTokenType::KEYWORD_THEN,{LexicalTokenType::KEYWORD_THEN,LexicalTokenType::NAME}},
+		{LexicalTokenType::KEYWORD_ELSE,{LexicalTokenType::KEYWORD_ELSE,LexicalTokenType::NAME}},
+		{LexicalTokenType::KEYWORD_READ,{LexicalTokenType::KEYWORD_READ,LexicalTokenType::NAME}},
+		{LexicalTokenType::KEYWORD_CALL,{LexicalTokenType::KEYWORD_CALL,LexicalTokenType::NAME}},
+		{LexicalTokenType::KEYWORD_PRINT,{LexicalTokenType::KEYWORD_PRINT,LexicalTokenType::NAME}},
+
+		// General Tokens
+		{LexicalTokenType::INTEGER,{LexicalTokenType::INTEGER}},
+		{LexicalTokenType::NAME,{LexicalTokenType::NAME}},
+		{LexicalTokenType::WHITESPACE,{LexicalTokenType::WHITESPACE}},
+		{LexicalTokenType::NEW_LINE,{LexicalTokenType::NEW_LINE}},
+
+		// Error Token and Null Token
+		{LexicalTokenType::ERROR,{LexicalTokenType::ERROR}},
+		{LexicalTokenType::NULL_TOKEN,{LexicalTokenType::NULL_TOKEN}}
+	};
+
+	auto search = lexicalTokenTypes.find(t1);
+
+	if (search != lexicalTokenTypes.end()) {
+		// Key exists, search the TokenType in the vector
+		auto& vec = search->second;
+
+		if (std::find(vec.begin(), vec.end(), t2) != vec.end()) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
 }
 --------------------
 RepoName: 23s2-cp-spa-team-19
@@ -529,11 +540,20 @@ public:
      */
     std::string toString() const;
 
-    // To be set as private in future
+    /**
+    * @brief Converts the AST node to a string representation in Reverse Polish Notation (RPN).
+    *
+    * @return A string representation of the AST node in RPN.
+    */
+    std::string getRPNForm();
+
+    // To be set as private in future, probably milestone 2
     ASTNodeType type;
     std::vector<std::shared_ptr<ASTNode>> children;
     int lineNumber;
     std::string value;
+
+
 private:
     std::shared_ptr<ASTNode> root;
 
@@ -546,7 +566,10 @@ private:
     std::string recursiveString(int tabs) const;
 };
 
-
+/*
+* @brief Hash function for ASTNode.
+* This is to help with putting ASTNode on an unordered_map or unordered_set.
+*/
 namespace std {
     template<> struct hash<ASTNode> {
         std::size_t operator()(const ASTNode& node) const {
@@ -554,6 +577,122 @@ namespace std {
             return std::hash<long long>{}(node.hash());
         }
     };
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/AST/ASTUtility.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+ChatId: a181de60-e76f-496c-9bee-7ea80f2be651
+Code:
+std::string ASTUtility::getASTNodeType(ASTNodeType t) {
+    switch (t) {
+        case ASTNodeType::PROGRAMS:
+            return "Program";
+        case ASTNodeType::PROCEDURE:
+            return "Procedure";
+        case ASTNodeType::STATEMENT_LIST:
+            return "StatementList";
+        case ASTNodeType::ASSIGN:
+            return "Assign";
+        case ASTNodeType::CALL:
+            return "Call";
+        case ASTNodeType::IF_ELSE_THEN:
+            return "IfElseThen";
+        case ASTNodeType::PRINT:
+            return "Print";
+        case ASTNodeType::READ:
+            return "Read";
+        case ASTNodeType::WHILE:
+            return "While";
+        case ASTNodeType::NOT:
+            return "!";
+        case ASTNodeType::AND:
+            return "&&";
+        case ASTNodeType::OR:
+            return "||";
+        case ASTNodeType::GREATER:
+            return ">";
+        case ASTNodeType::GREATER_OR_EQUAL:
+            return ">=";
+        case ASTNodeType::LESSER:
+            return "<";
+        case ASTNodeType::LESSER_OR_EQUAL:
+            return "<=";
+        case ASTNodeType::EQUAL:
+            return "==";
+        case ASTNodeType::NOT_EQUAL:
+            return "!=";
+        case ASTNodeType::ADD:
+            return "+";
+        case ASTNodeType::SUBTRACT:
+            return "-";
+        case ASTNodeType::MULTIPLY:
+            return "*";
+        case ASTNodeType::DIVIDE:
+            return "/";
+        case ASTNodeType::MODULO:
+            return "%";
+        case ASTNodeType::VARIABLE:
+            return "Variable";
+        case ASTNodeType::CONSTANT:
+            return "Constant";
+        case ASTNodeType::ERROR:
+            return "Error";
+        default:
+            throw "Error";
+    };
+}
+
+bool ASTUtility::nodeIsStatement(ASTNodeType t) {
+    return t == ASTNodeType::ASSIGN || t == ASTNodeType::CALL 
+        || t == ASTNodeType::IF_ELSE_THEN || t == ASTNodeType::PRINT 
+        || t == ASTNodeType::READ || t == ASTNodeType::WHILE;
+}
+
+bool ASTUtility::nodeIsRelExpression(ASTNodeType t) {
+	return  t == ASTNodeType::GREATER || t == ASTNodeType::GREATER_OR_EQUAL 
+        || t == ASTNodeType::LESSER || t == ASTNodeType::LESSER_OR_EQUAL 
+        || t == ASTNodeType::EQUAL || t == ASTNodeType::NOT_EQUAL;
+}
+
+bool ASTUtility::nodeIsCondExpression(ASTNodeType t) {
+	return t == ASTNodeType::AND || t == ASTNodeType::OR 
+		|| t == ASTNodeType::NOT;
+}
+bool ASTUtility::nodeIsValidOperator(ASTNodeType t) {
+	return t == ASTNodeType::ADD || t == ASTNodeType::SUBTRACT 
+		|| t == ASTNodeType::MULTIPLY || t == ASTNodeType::DIVIDE 
+		|| t == ASTNodeType::MODULO;
+}
+
+bool ASTUtility::nodeIsValidRelFactor(ASTNodeType t) {
+	return t == ASTNodeType::VARIABLE || t == ASTNodeType::CONSTANT;
+}
+
+bool ASTUtility::nodeCanFormValidExpression(ASTNodeType t) {
+    return nodeIsRelExpression(t)
+        || nodeIsCondExpression(t)
+        || nodeIsValidOperator(t)
+        || nodeIsValidRelFactor(t);
+}
+
+bool ASTUtility::nodeIsProgram(ASTNodeType t) {
+	return t == ASTNodeType::PROGRAMS;
+}
+
+bool ASTUtility::nodeIsProcedure(ASTNodeType t) {
+	return t == ASTNodeType::PROCEDURE;
+}
+
+bool ASTUtility::nodeIsStatementList(ASTNodeType t) {
+	return t == ASTNodeType::STATEMENT_LIST;
+}
+
+bool ASTUtility::nodeIsIfElse(ASTNodeType t) {
+	return t == ASTNodeType::IF_ELSE_THEN;
 }
 --------------------
 RepoName: 23s2-cp-spa-team-19
@@ -584,30 +723,28 @@ void ASTNode::setValue(std::string value) {
     this->value = value;
 }
 
-// Implementation of hash function for ASTNode
 std::size_t ASTNode::hash() const {
     // Concatenate the properties of ASTNode
     std::stringstream ss;
-    ss << Utility::getASTNodeType(type) << lineNumber << value;
+    ss << ASTUtility::getASTNodeType(type) << lineNumber << value;
 
     // Hash the concatenated string
     std::hash<std::string> hasher;
     return hasher(ss.str());
 }
 
-// Method to convert AST node to a string
 std::string ASTNode::toString() const {
     return "String representations: \n" + recursiveString(0);
 }
 
-// Helper method to convert AST node to a string recursively
 std::string ASTNode::recursiveString(int tabs) const {
     std::ostringstream stringStream;
 
-    // to tab a tree representing the children
+    // to tab a tree representing the children - each tab represents a level of the tree
     for (int i = 0; i < tabs; ++i)
         stringStream << "  ";
-    stringStream << "Type: " << Utility::getASTNodeType(type) << ", Line Number: " << lineNumber << ", Value: " << value << "\n";
+    stringStream << "Type: " << ASTUtility::getASTNodeType(type) << ", Line Number: " << lineNumber << ", Value: " << value << "\n";
+    // depth-first search to print the children recursively
     for (const auto& child : children) {
         stringStream << child->recursiveString(tabs + 1);
     }
@@ -619,558 +756,3887 @@ bool ASTNode::operator==(const ASTNode& other) const {
         lineNumber == other.lineNumber &&
         value == other.value;
 }
---------------------
-RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractor.h
-Generator: gpt
-Intervention: 0
-Language: e
-Prompt: 
-ChatId: 
-Code:
-// prompt https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
 
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include "pkb/PKBWriterManager.h"
-#include "sp/AST/ASTNode.h" // Assuming you have ASTNode defined in ASTNode.h
-
-class DesignExtractor {
-public:
-    // Constructor taking in the root node of the AST
-    DesignExtractor(std::shared_ptr<ASTNode> root, std::shared_ptr<PKBWriterManager> pkbWriterManager);
-
-    const ASTNode& getRoot() const {
-        return *root;
+std::string ASTNode::getRPNForm() {
+    if (!ASTUtility::nodeIsValidOperator(type) && !ASTUtility::nodeIsValidRelFactor(type)) {
+        throw std::runtime_error("ERROR: ASTNode is not an operator");
+    }
+    if (children.size() > 2) {
+		throw std::runtime_error("ERROR: ASTNode is not valid expression");
     }
 
-    std::unordered_map<std::string, std::unordered_set<std::string>> stringInformation;
-    std::unordered_map<std::string, std::unordered_set<int>> intInformation;
-    void extractAll();
-    void populatePKB();
+    if (children.size() == 0) {
+        return "'" + value + "'";
+    }
+    std::string result;
 
+    // depth-first search to concatenate the children recursively into RPN
+    for (const auto& child : children) {
+		result += child->getRPNForm();
+	}
+    result = result + "'" + value + "'";
+    return result;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/AST/ASTUtility.h
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: github copilot
+ChatId: 
+Code:
+/*
+* @brief Utility class for AST
+* 
+* This class contains static methods that are used to determine node types/design types
+* of AST nodes. It also contains methods to check if a node is a statement, expression,
+* or basically any entity types
+*/
+class ASTUtility {
+public:
+    /**
+     * @brief Check the type of AST node by string
+     * @param accepting an enum object of AST Node
+     * @return the string representation of the AST Node type
+     */
+    static std::string getASTNodeType(ASTNodeType t);
 
-    // all the method below should be private in the future
-    // Method to extract all variables from the AST
-    void extractFollows();
-    void extractFollowsStar();
-    void extractParents();
-    void extractParentsStar();
-    void extractUses();
-    void extractModifies();
+    /**
+     * @brief Check if accepting AST node is a statement
+     * @return true if AST is either assign, call, if-else-then, print, read, or while,
+     * and false otherwise
+     */
+    static bool nodeIsStatement(ASTNodeType t);
 
-    std::unordered_set<int> extractAssigns();
-    std::unordered_set<std::string> extractConstants();
-    std::unordered_set<std::string> extractProcedures();
-    std::unordered_set<int> extractStatements();
-    std::unordered_set<int> extractIf();
-    std::unordered_set<int> extractWhiles();
-    std::unordered_set<int> extractCall();
-    std::unordered_set<int> extractRead();
-    std::unordered_set<int> extractPrint();
-    std::unordered_set<std::string> extractVariables();
-    std::shared_ptr<ASTNode> root;
-    std::shared_ptr<PKBWriterManager> pkbWriterManager;
+    /**
+    * @brief Check if accepting AST node is an expression
+    * @return true if AST node is ">" or ">=" or "<" or "<=" or "==" or "!=", and false otherwise.
+     */
+    static bool nodeIsRelExpression(ASTNodeType t);
 
+    /*
+    * @brief Check if accepting AST node is a conditional expression
+    * @return true if AST node is "!" or "&&" or "||", and false otherwise.
+    */
+    static bool nodeIsCondExpression(ASTNodeType t);
 
-    void printContent();
+    /*
+    * @brief Check if accepting AST node is a valid operator
+    * @return true if AST node is "+" or "-" or "*" or "/" or "%", and false otherwise.
+    */
+    static bool nodeIsValidOperator(ASTNodeType t);
 
-private:
-    void entityRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& entities, ASTNodeType type);
-    void statementRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& statements, ASTNodeType type);
-    void procedureRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& procedures);
+    /*
+    * @brief Check if accepting AST node is a valid relational factor
+    * @return true if AST node is a variable or constant, and false otherwise.
+    */
+    static bool nodeIsValidRelFactor(ASTNodeType t);
 
-    // To be implemented later
-    // void relationRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& relations, ASTNodeType type);
+    /*
+    * @brief Check if accepting AST node is a valid expression
+    * @return true if AST node consists of: valid relational expression,
+    * conditioanl expression, valid operator, or valid relational factor, and false otherwise.
+    */
+    static bool nodeCanFormValidExpression(ASTNodeType t);
 
-    // void recursivelyExtractVariables(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& variables);
-	// void recursivelyExtractConstants(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& constants);
+    /*
+    * @brief Check if accepting AST node is a program
+    * @return true if AST node is a program, and false otherwise.
+    */
+    static bool nodeIsProgram(ASTNodeType t);
+
+    /*
+    * @brief Check if accepting AST node is a procedure
+    * @return true if AST node is a procedure, and false otherwise.
+    */
+    static bool nodeIsProcedure(ASTNodeType t);
+
+    /*
+    * @brief Check if accepting AST node is a statement list
+    * @return true if AST node is a statement list, and false otherwise.
+    */
+    static bool nodeIsStatementList(ASTNodeType t);
+
+    /*
+    * @brief Check if accepting AST node is an if-else statement
+    * @return true if AST node is an if-else statement, and false otherwise.
+    */
+    static bool nodeIsIfElse(ASTNodeType t);
 };
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractor.cpp
-Generator: gpt
-Intervention: 0
+File: Team19/Code19/src/spa/src/sp/DesignExtractor/DesignExtractorFacade.h
+Generator: copilot
+Intervention: 2
 Language: e
-Prompt: 
+Prompt: github copilot
 ChatId: 
 Code:
-// prompt https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
+/*
+* The DesignExtractorFacade class is responsible for extracting all the design abstractions from the AST.
+* It is the main entry point for the Design Extractor component.
+* It combined all visitors/extractor class from a higher level logical view where we parse a program
+* and extract all the design abstractions through visiting them.
+* 
+* The following are summary of implementation details
+* 
+• procedure: extracts Procedure_name, StatementList, Uses, Modifies (to be put on contexts)
+• stmtLst: extracts Statement, Read, Assign, Print, Call (put on hold for now), While, If, Follows
+• stmt
+• read (statement): extracts Read, Variable, Modifies.
+• print (statement): extracts Print, Variable, Uses.
+• assign (statement): extracts Assign, Variable, Constant, Uses, Modifies, Patterns
+• call (statement)  // TODO later
+• while (statement): extracts While (line number), Variable, Constant, Uses, Modifies, Parent, Follows
+• if (statement): extracts If (line num), Variable, Constant, Uses, Modifies, Parent, Follows
+• variable: extracts Variable, Uses, Modifies
+• constant: extracts Constant, Uses
+*/
+class DesignExtractorFacade {
+public:
+    /*
+    * Constructor for the DesignExtractorFacade, which takes in the root AST node and the PKBWriterManager.
+    */
+    DesignExtractorFacade(std::shared_ptr<ASTNode> root, std::shared_ptr<PKBWriterManager> pkbWriterManager);
 
-#include "sp/AST/ASTNode.h"
-#include "sp/Utility.h"
-#include "DesignExtractor.h"
-#include <unordered_set>
+    /*
+    * Extracts all the design abstractions from the AST, starting from the root node which is asserted
+    * to be of type PROGRAMS. All the procedures are visited and their design abstractions are extracted.
+    * It recursively called all other visitors to extract the design abstractions.
+    */
+    void extractAll();
 
-DesignExtractor::DesignExtractor(std::shared_ptr<ASTNode> root, std::shared_ptr<PKBWriterManager> pkbWriterManager)
-    : root(std::move(root)), pkbWriterManager(std::move(pkbWriterManager)) {
-    // No need to assign them in the constructor body
-    std::cout << "Initialized" << std::endl;
-}
+private:
+    std::shared_ptr<ASTNode> root;
+    std::shared_ptr<PKBWriterManager> pkbWriterManager;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/sp/DesignExtractor/Visitor/IVisitor.h
+Generator: chatgpt
+Intervention: 2
+Language: e
+Prompt: https://chat.openai.com/share/7d5c29d9-43f6-4c36-b04e-0fca3b0e96ff
+ChatId: 7d5c29d9-43f6-4c36-b04e-0fca3b0e96ff
+Code:
+/*
+* Shortened definition of a list of ASTNode pointers for convenience
+* Note: This should only be used inside DesignExtractor/Visitor classes
+*/
+typedef std::vector<std::shared_ptr<ASTNode>> listnode;
 
-void DesignExtractor::populatePKB() {
-  std::shared_ptr<ConstantWriter> constantWriter = pkbWriterManager->getConstantWriter();
-    std::shared_ptr<VariableWriter> variableWriter = pkbWriterManager->getVariableWriter();
-    std::shared_ptr<ProcedureWriter> procedureWriter = pkbWriterManager->getProcedureWriter();
-    std::shared_ptr<CallWriter> callWriter = pkbWriterManager->getCallWriter();
-    std::shared_ptr<PrintWriter> printWriter = pkbWriterManager->getPrintWriter();
-    std::shared_ptr<ReadWriter> readWriter = pkbWriterManager->getReadWriter();
-    std::shared_ptr<AssignWriter> assignWriter = pkbWriterManager->getAssignWriter();
-    std::shared_ptr<IfWriter> ifWriter = pkbWriterManager->getIfWriter();
-    std::shared_ptr<WhileWriter> whileWriter = pkbWriterManager->getWhileWriter();
-    std::shared_ptr<StatementWriter> statementWriter = pkbWriterManager->getStatementWriter();
+/*
+* Abstract class for the Visitor pattern, which all other visitors will inherit from
+*/
+class IVisitor {
+public:
+    /*
+    * The destructor for the IVisitor class
+    */
+    virtual ~IVisitor() {}
 
+    /*
+    * The constructor for the IVisitor class in default
+    */
+    explicit IVisitor(std::shared_ptr<ASTNode> root, std::shared_ptr<PKBWriterManager> pkbWriterManager)
+        : root(root), pkbWriterManager(pkbWriterManager) {}
 
-    for (const auto& pair : stringInformation) {
-        for (auto value : pair.second) {
-            if (pair.first == Utility::getASTNodeType(ASTNodeType::CONSTANT)) {
-				int intValue = std::stoi(value);
-				constantWriter->insertConstant(intValue);
-            }
-            else if (pair.first == Utility::getASTNodeType(ASTNodeType::VARIABLE)) {
-                variableWriter->insertVariable(value);
-			}
-            else if (pair.first == Utility::getASTNodeType(ASTNodeType::PROCEDURE)) {
-				procedureWriter->insertProcedure(value);
-			}
-		}
-	}
-
-    for (const auto& pair : intInformation) {
-        for (auto value : pair.second) {
-            if (pair.first == Utility::getASTNodeType(ASTNodeType::CALL)) {
-				callWriter->insertCall(value);
-			}
-            else if (pair.first == Utility::getASTNodeType(ASTNodeType::PRINT)) {
-				printWriter->insertPrint(value);
-			}
-            else if (pair.first == Utility::getASTNodeType(ASTNodeType::READ)) {
-				readWriter->insertRead(value);
-			}
-            else if (pair.first == Utility::getASTNodeType(ASTNodeType::ASSIGN)) {
-				assignWriter->insertAssign(value);
-			}
-            else if (pair.first == Utility::getASTNodeType(ASTNodeType::IF_ELSE_THEN)) {
-				ifWriter->insertIf(value);
-			}
-            else if (pair.first == Utility::getASTNodeType(ASTNodeType::WHILE)) {
-				whileWriter->insertWhile(value);
-			}
-            else if (pair.first == Utility::getASTNodeType(ASTNodeType::STATEMENT_LIST)) {
-                statementWriter->insertStatement(value);
-            }
-        }
-    }
-    std::cout << "PKB Populated\n" << std::endl;
-}
-
-
-void DesignExtractor::extractAll() {
-	// Implementation of extractAll method goes here
-	extractFollows();
-	extractFollowsStar();
-	extractParents();
-	extractParentsStar();
-	extractUses();
-	extractModifies();
-
-    this->stringInformation[Utility::getDesignType(ASTNodeType::PROCEDURE)] = extractProcedures();
-
-    this->intInformation[Utility::getDesignType(ASTNodeType::ASSIGN)] = extractAssigns();
-    this->intInformation[Utility::getDesignType(ASTNodeType::IF_ELSE_THEN)] = extractIf();
-    this->intInformation[Utility::getDesignType(ASTNodeType::WHILE)] = extractWhiles();
-    this->intInformation[Utility::getDesignType(ASTNodeType::CALL)] = extractCall();
-    this->intInformation[Utility::getDesignType(ASTNodeType::READ)] = extractRead();
-    this->intInformation[Utility::getDesignType(ASTNodeType::PRINT)] = extractPrint();
-
-    this->intInformation[Utility::getDesignType(ASTNodeType::STATEMENT_LIST)] = extractStatements();
-
-    this->stringInformation[Utility::getDesignType(ASTNodeType::CONSTANT)] = extractConstants();
-    this->stringInformation[Utility::getDesignType(ASTNodeType::VARIABLE)] = extractVariables();
-
-    std::cout << "Information Extracted\n" << std::endl;
-
-    printContent();
-}
-
-
-void DesignExtractor::printContent() {
-    // Print contents of stringInformation
-    std::cout << "Contents of stringInformation:" << std::endl;
-    for (const auto& pair : stringInformation) {
-        std::cout << pair.first << ": {";
-        const auto& set = pair.second;
-        for (const auto& str : set) {
-            std::cout << str << ", ";
-        }
-        std::cout << "}" << std::endl;
-    }
-
-    // Print contents of intInformation
-    std::cout << "Contents of intInformation:" << std::endl;
-    for (const auto& pair : intInformation) {
-        std::cout << pair.first << ": {";
-        const auto& set = pair.second;
-        for (const auto& num : set) {
-            std::cout << num << ", ";
-        }
-        std::cout << "}" << std::endl;
-    }
-}
-
-void DesignExtractor::entityRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& entities, ASTNodeType type) {
-    if (node->type == type) {
-        // If it's a variable node, add it to the set
-        entities.push_back(*node);
-    }
-    // Recursively traverse children
-    for (const auto& child : node->children) {
-        entityRecursiveExtractor(child, entities, type);
-    }
-}
-
-
-void DesignExtractor::statementRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& statements, ASTNodeType type) {
-    if (node->type == type) {
-        // If it's a variable node, add it to the set
-        statements.push_back(*node);
-    }
-    // Recursively traverse children
-    for (const auto& child : node->children) {
-        entityRecursiveExtractor(child, statements, type);
-    }
-}
-
-void DesignExtractor::procedureRecursiveExtractor(const std::shared_ptr<ASTNode>& node, std::vector<ASTNode>& procedures) {
-    if (node->type == ASTNodeType::PROCEDURE) {
-        // If it's a variable node, add it to the set
-        procedures.push_back(*node);
-    }
-    // Recursively traverse children
-    for (const auto& child : node->children) {
-        procedureRecursiveExtractor(child, procedures);
-    }
-}
-
-
-// Relations
-
-void DesignExtractor::extractFollows() {
-    // Implementation of extractFollows method goes here
-}
-
-void DesignExtractor::extractFollowsStar() {
-    // Implementation of extractFollowsStar method goes here
-}
-
-void DesignExtractor::extractParents() {
-    // Implementation of extractParents method goes here
-}
-
-void DesignExtractor::extractParentsStar() {
-    // Implementation of extractParentsStar method goes here
-}
-
-void DesignExtractor::extractUses() {
-    // Implementation of extractUses method goes here
-}
-
-void DesignExtractor::extractModifies() {
-    // Implementation of extractModifies method goes here
-}
-
-// Programs
-
-std::unordered_set<std::string> DesignExtractor::extractProcedures() {
-    // Implementation of extractProcedures method goes here
-    std::vector<ASTNode> variables;
-    procedureRecursiveExtractor(root, variables);
-
-    std::unordered_set<std::string> procedureNames;
-    for (auto node : variables) {
-        procedureNames.insert(node.value);
-    }
-
-    return procedureNames;
-}
-
-// Statements
-
-std::unordered_set<int> DesignExtractor::extractAssigns() {
-    // Implementation of extractAssigns method goes here
-    return std::unordered_set<int>();
-}
-
-std::unordered_set<int> DesignExtractor::extractStatements() {
-    // Implementation of extractStatements method goes here
-    std::unordered_set<int> allStatements;
+    /*
+    * The visit method that will be implemented by all visitors,
+    * which recursively visits the AST and performs the necessary operations
+    * in depth-first-search manner
+    */
+    virtual void visit() = 0;
     
-    std::unordered_set<int> assigns = this->intInformation[Utility::getDesignType(ASTNodeType::ASSIGN)];
-    std::unordered_set<int> ifs = this->intInformation[Utility::getDesignType(ASTNodeType::IF_ELSE_THEN)];
-    std::unordered_set<int> whiles = this->intInformation[Utility::getDesignType(ASTNodeType::WHILE)];
-    std::unordered_set<int> calls = this->intInformation[Utility::getDesignType(ASTNodeType::CALL)];
-    std::unordered_set<int> reads = this->intInformation[Utility::getDesignType(ASTNodeType::READ)];
-    std::unordered_set<int> prints = this->intInformation[Utility::getDesignType(ASTNodeType::PRINT)];
+    // all these methods should be set to private at some point
+    std::shared_ptr<ASTNode> root;
+    std::shared_ptr<PKBWriterManager> pkbWriterManager;
+    std::vector<std::shared_ptr<ASTNode>> contexts;
+};
 
-    allStatements.insert(assigns.begin(), assigns.end());
-    allStatements.insert(ifs.begin(), ifs.end());
-    allStatements.insert(whiles.begin(), whiles.end());
-    allStatements.insert(calls.begin(), calls.end());
-    allStatements.insert(reads.begin(), reads.end());
-    allStatements.insert(prints.begin(), prints.end());
-    return allStatements;
-}
-
-std::unordered_set<int> DesignExtractor::extractIf() {
-    // Implementation of extractIf method goes here
-    return std::unordered_set<int>();
-}
-
-std::unordered_set<int> DesignExtractor::extractWhiles() {
-    // Implementation of extractWhiles method goes here
-    return std::unordered_set<int>();
-}
-
-std::unordered_set<int> DesignExtractor::extractCall() {
-    // Implementation of extractCall method goes here
-    std::unordered_set<int> callStatements;
-
-    std::vector<ASTNode> prints;
-    statementRecursiveExtractor(root, prints, ASTNodeType::CALL);
-
-    for (auto node : prints) {
-        callStatements.insert(node.lineNumber);
+/*
+* Additional abstract class which group all Statements under a pattern
+* It is used to group statements like assignment, while, if, call, and print, read.
+*/
+class StatementVisitor : public IVisitor {
+public:
+    /*
+    * The constructor for the StatementVisitor class, which takes in the root node of the AST,
+    * a list of contexts (previous relevant nodes), and a PKBWriterManager.
+    */
+    StatementVisitor(std::shared_ptr<ASTNode> root, listnode contexts,
+        std::shared_ptr<PKBWriterManager> pkbWriterManager)
+		: IVisitor(root, pkbWriterManager) {
+    	this->contexts = listnode(contexts.begin(), contexts.end());
     }
+    
+    /*
+    * The visit method that will be implemented by all StatementVisitors,
+    * as inherited from the IVisitor class
+    */
+    virtual void visit() = 0;
 
-    return callStatements;
-}
+    /*
+    * The method to add a context to the list of contexts
+    */
+    virtual void addContext(std::shared_ptr<ASTNode> context) = 0;
 
-std::unordered_set<int> DesignExtractor::extractRead() {
-    // Implementation of extractRead method goes here
-    std::unordered_set<int> readStatements;
-
-    std::vector<ASTNode> prints;
-    statementRecursiveExtractor(root, prints, ASTNodeType::READ);
-
-    for (auto node : prints) {
-        readStatements.insert(node.lineNumber);
-    }
-
-    return readStatements;
-}
-
-std::unordered_set<int> DesignExtractor::extractPrint() {
-    // Implementation of extractPrint method goes here
-    std::unordered_set<int> printStatements;
-
-    std::vector<ASTNode> prints;
-    statementRecursiveExtractor(root, prints, ASTNodeType::PRINT);
-
-    for (auto node : prints) {
-        printStatements.insert(node.lineNumber);
-    }
-
-    return printStatements;
-}
-
-// Entities
-
-std::unordered_set<std::string> DesignExtractor::extractVariables() {
-    // Recursive function to traverse the AST and extract variables
-    // Implementation of extractVariablesRecursive method goes here
-    std::vector<ASTNode> variables;
-    entityRecursiveExtractor(root, variables, ASTNodeType::VARIABLE);
-
-    std::unordered_set<std::string> variableNames;
-    for (auto node : variables) {
-		variableNames.insert(node.value);
-	}
-
-	return variableNames;
-}
-
-
-std::unordered_set<std::string> DesignExtractor::extractConstants() {
-    // Implementation of extractConstants method goes here
-    std::vector<ASTNode> constants;
-    entityRecursiveExtractor(root, constants, ASTNodeType::CONSTANT);
-
-    std::unordered_set<std::string> constantValues;
-    for (auto node : constants) {
-        constantValues.insert(node.value);
-    }
-
-    return constantValues;
-}
+    /*
+    * The method to set the parents of the contexts, which takes in
+    * a list of context, the current nodes, and a PKBWriterManager,
+    * commonly then recursively traverses the AST to set the parents of the contexts if
+    * the node is not a procedure node
+	*/
+    virtual void setParents(listnode contexts, std::shared_ptr<ASTNode> root, std::shared_ptr<PKBWriterManager> pkbWriterManager) = 0;
+};
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/spa/src/sp/Utility.cpp
+File: Team19/Code19/src/spa/src/sp/DesignExtractor/Visitor/AssignVisitor.h
 Generator: gpt
 Intervention: 2
 Language: e
-Prompt: https://chat.openai.com/share/a181de60-e76f-496c-9bee-7ea80f2be651
-ChatId: a181de60-e76f-496c-9bee-7ea80f2be651
+Prompt: https://platform.openai.com/playground/p/WEPuYktjSFWSXYtIjbHMb5KZ?model=gpt-4&mode=chat
+ChatId: WEPuYktjSFWSXYtIjbHMb5KZ
 Code:
-std::string Utility::getASTNodeType(ASTNodeType t) {
-    switch (t) {
-        case ASTNodeType::PROGRAMS:
-            return "Program";
-        case ASTNodeType::PROCEDURE:
-            return "Procedure";
-        case ASTNodeType::STATEMENT_LIST:
-            return "StatementList";
-        case ASTNodeType::ASSIGN:
-            return "Assign";
-        case ASTNodeType::CALL:
-            return "Call";
-        case ASTNodeType::IF_ELSE_THEN:
-            return "IfElseThen";
-        case ASTNodeType::PRINT:
-            return "Print";
-        case ASTNodeType::READ:
-            return "Read";
-        case ASTNodeType::WHILE:
-            return "While";
-        case ASTNodeType::NOT:
-            return "Not";
-        case ASTNodeType::AND:
-            return "And";
-        case ASTNodeType::OR:
-            return "Or";
-        case ASTNodeType::GREATER:
-            return "Greater";
-        case ASTNodeType::GREATER_OR_EQUAL:
-            return "GreaterOrEqual";
-        case ASTNodeType::LESSER:
-            return "Lesser";
-        case ASTNodeType::LESSER_OR_EQUAL:
-            return "LesserOrEqual";
-        case ASTNodeType::EQUAL:
-            return "EqualEqual";
-        case ASTNodeType::NOT_EQUAL:
-            return "NotEqual";
-        case ASTNodeType::ADD:
-            return "Add";
-        case ASTNodeType::SUBTRACT:
-            return "Subtract";
-        case ASTNodeType::MULTIPLY:
-            return "Multiply";
-        case ASTNodeType::DIVIDE:
-            return "Divide";
-        case ASTNodeType::MODULO:
-            return "Modulo";
-        case ASTNodeType::VARIABLE:
-            return "Variable";
-        case ASTNodeType::CONSTANT:
-            return "Constant";
-        case ASTNodeType::ERROR:
-            return "Error";
-        default:
-            throw "Error";
+/*
+* A visitor for the assign statement which should
+* call on all relevant extractors and sub-visitors
+*
+* This class is inherited from the IVisitor class,
+* so additional documentation should be taken from the
+* base abstract class unless further specified
+*/
+class AssignVisitor : public StatementVisitor {
+public:
+	AssignVisitor(std::shared_ptr<ASTNode> root, listnode context, std::shared_ptr<PKBWriterManager> pkbWriterManager);
+
+	void visit() override;
+	void addContext(std::shared_ptr<ASTNode> context) override;
+	void setParents(listnode contexts, std::shared_ptr<ASTNode> root, std::shared_ptr<PKBWriterManager> pkbWriterManager) override;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/commons/ShuntingYard.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+std::string ShuntingYard::convertToPostfix(const std::string& infixExpression) {
+  return infixToPostfix(infixExpression);
+}
+
+int ShuntingYard::precedence(char c) {
+  if (c == '+' || c == '-') {
+    return 1;
+  } else if (c == '*' || c == '/') {
+    return 2;
+  } else if (c == '^') {
+    return 3;
+  } else {
+    return -1;
+  }
+}
+
+bool ShuntingYard::isOperator(char c) {
+  return c == '+' || c == '-' || c == '*' || c == '/' || c == '^';
+}
+
+bool ShuntingYard::isOperand(char c) {
+  return c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';
+}
+
+bool ShuntingYard::isLeftParenthesis(char c) {
+  return c == '(';
+}
+
+bool ShuntingYard::isRightParenthesis(char c) {
+  return c == ')';
+}
+
+std::string ShuntingYard::infixToPostfix(const std::string& infixExpression) {
+    std::string postfixExpression;
+    std::stack<char> stack;
+    for (char c : infixExpression) {
+        if (c == ' ') {
+        continue;
+        }
+        if (isOperand(c)) {
+            postfixExpression += "'";
+            postfixExpression += c;
+            postfixExpression += "'";
+        } else if (isOperator(c)) {
+            while (!stack.empty() && isOperator(stack.top()) && ( precedence(c) <= precedence(stack.top()))) {
+                postfixExpression += "'";
+                postfixExpression += stack.top();
+                postfixExpression += "'";
+                stack.pop();
+            }
+            stack.push(c);
+        } else if (isLeftParenthesis(c)) {
+            stack.push(c);
+        } else if (isRightParenthesis(c)) {
+            while (!stack.empty() && !isLeftParenthesis(stack.top())) {
+                postfixExpression += "'";
+                postfixExpression += stack.top();
+                postfixExpression += "'";
+                stack.pop();
+            }
+            stack.pop();
+        }
+    }
+    while (!stack.empty()) {
+        postfixExpression += "'";
+        postfixExpression += stack.top();
+        postfixExpression += "'";
+        stack.pop();
+    }
+    return postfixExpression;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/commons/ShuntingYard.h
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ShuntingYard {
+public:
+  static std::string convertToPostfix(const std::string& infixExpression);
+private:
+  static int precedence(char c);
+  static bool isOperator(char c);
+  static bool isOperand(char c);
+  static bool isLeftParenthesis(char c);
+  static bool isRightParenthesis(char c);
+  static std::string infixToPostfix(const std::string& infixExpression);
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/patterns/IfPatternWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class IfPatternWriter: public IControlPatternWriter {
+private:
+    std::shared_ptr<IfPatternStore> ifPatternStore;
+public:
+    explicit IfPatternWriter(std::shared_ptr<IfPatternStore> store) : ifPatternStore(std::move(store)) {}
+
+    /**
+     * @brief Adds an "If" control variable to the store.
+     * @param statementNumber The statement number of the if statement.
+     * @param ifControlVariable The control variable of the if statement.
+     */
+    void addIfControlVariable(int statementNumber, const std::string& ifControlVariable) {
+        ifPatternStore->addIfPattern(statementNumber, ifControlVariable);
+    }
+
+    // Clears all if patterns from the store.
+    void clear() override {
+        ifPatternStore->clear();
+    }
+
+    void addControlPattern(int statementNumber, const std::string& controlPattern) override {
+      addIfControlVariable(statementNumber, controlPattern);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/patterns/WhilePatternWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class WhilePatternWriter: public IControlPatternWriter {
+private:
+    std::shared_ptr<WhilePatternStore> whilePatternStore;
+public:
+    explicit WhilePatternWriter(std::shared_ptr<WhilePatternStore> store) : whilePatternStore(std::move(store)) {}
+
+    /**
+     * @brief Adds a "While" control variable to the store.
+     * @param statementNumber The statement number of the while statement.
+     * @param whileControlVariable The control variable of the while statement.
+     */
+    void addWhileControlVariable(int statementNumber, const std::string& whileControlVariable) {
+        whilePatternStore->addWhilePattern(statementNumber, whileControlVariable);
+    }
+
+    // Clears all while patterns from the store.
+    void clear() override {
+        whilePatternStore->clear();
+    }
+
+    void addControlPattern(int statementNumber, const std::string& controlPattern) override {
+        addWhileControlVariable(statementNumber, controlPattern);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/patterns/AssignPatternWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class AssignPatternWriter : public IAssignPatternWriter {
+private:
+    std::shared_ptr<AssignPatternStore> assignPatternStore;
+public:
+    explicit AssignPatternWriter(std::shared_ptr<AssignPatternStore> store) : assignPatternStore(std::move(store)) {}
+
+    /**
+     * @brief Adds an "Assign" pattern to the store.
+     * @param statementNumber The statement number of the assignment statement.
+     * @param LHS The left hand side of the assignment statement.
+     * @param RHS The right hand side of the assignment statement.
+     */
+    void addAssignPattern(int statementNumber, std::string LHS, std::string RHS) override {
+      assignPatternStore->addAssignPattern(statementNumber, LHS, RHS);
+    }
+
+    // Clears all assign patterns from the store.
+    void clear() override {
+      assignPatternStore->clear();
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/relationships/FollowsTWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class FollowsTWriter : public IRelationshipWriter<int, int> {
+private:
+    std::shared_ptr<FollowsTStore> followsTStore;
+
+public:
+    explicit FollowsTWriter(std::shared_ptr<FollowsTStore> store) : followsTStore(std::move(store)) {}
+
+    void addRelationship(int precedingStmt, int followingStmt) override {
+      addFollowsT(precedingStmt, followingStmt);
+    }
+
+    void clear() override {
+      followsTStore->clear();
+    }
+
+    // Custom methods
+    /**
+     * @brief Adds a "FollowsT" relationship between a preceding statement and a following statement.
+     * @param stmtNum The statement number of the preceding statement.
+     * @param followingStmt The statement number of the following statement.
+     */
+    void addFollowsT(int stmtNum, int followingStmt) {
+      followsTStore->addRelationship(stmtNum, followingStmt);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/relationships/UsesSWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class UsesSWriter : public IRelationshipWriter<int , std::string> {
+private:
+    std::shared_ptr<UsesSStore> usesSStore;
+
+public:
+    explicit UsesSWriter(std::shared_ptr<UsesSStore> store) : usesSStore(std::move(store)) {}
+
+    void addRelationship(int stmtNum, std::string var) override {
+        addUsesS(stmtNum, var);
+    }
+
+    void clear() override {
+      usesSStore->clear();
+    }
+
+    // Custom methods
+    /**
+     * @brief Adds a "Uses" relationship between a statement and a variable.
+     * @param stmtNum The statement number of the statement that uses the variable.
+     * @param var The variable that is used by the statement.
+     */
+    void addUsesS(int stmtNum, const std::string& var) {
+      usesSStore->addRelationship(stmtNum, var);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/relationships/ParentWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ParentWriter : public IRelationshipWriter<int, int> {
+private:
+    std::shared_ptr<ParentStore> parentStore;
+
+public:
+    explicit ParentWriter(std::shared_ptr<ParentStore> store) : parentStore(std::move(store)) {}
+
+    void addRelationship(int parent, int child) override {
+        addParent(parent, child);
+    }
+
+    void clear() override {
+        parentStore->clear();
+    }
+
+    // Custom methods
+    /**
+     * @brief Adds a "Parent" relationship between a parent and a child.
+     * @param parent The parent statement number.
+     * @param child The child statement number.
+     */
+    void addParent(int parent, int child) {
+        parentStore->addRelationship(parent, child);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/relationships/FollowsWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class FollowsWriter : public IRelationshipWriter<int, int> {
+private:
+    std::shared_ptr<FollowsStore> followsStore;
+
+public:
+    explicit FollowsWriter(std::shared_ptr<FollowsStore> store) : followsStore(std::move(store)) {}
+
+    void addRelationship(int precedingStmt, int followingStmt) override {
+        addFollows(precedingStmt, followingStmt);
+    }
+
+    void clear() override {
+        followsStore->clear();
+    }
+
+    // Custom methods
+    /**
+     * @brief Adds a "Follows" relationship between a preceding statement and a following statement.
+     * @param stmtNum The statement number of the preceding statement.
+     * @param followingStmt The statement number of the following statement.
+     */
+    void addFollows(int stmtNum, int followingStmt) {
+        followsStore->addRelationship(stmtNum, followingStmt);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/relationships/UsesPWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class UsesPWriter : public IRelationshipWriter<std::string , std::string> {
+private:
+    std::shared_ptr<UsesPStore> usesPStore;
+
+public:
+    explicit UsesPWriter(std::shared_ptr<UsesPStore> store) : usesPStore(std::move(store)) {}
+
+    void addRelationship(std::string proc, std::string var) override {
+        addUsesP(proc, var);
+    }
+
+    void clear() override {
+      usesPStore->clear();
+    }
+
+    // Custom methods
+    /**
+     * @brief Adds a "Uses" relationship between a procedure and a variable.
+     * @param proc The procedure that uses the variable.
+     * @param var The variable that is used by the procedure.
+     */
+    void addUsesP(const std::string& proc, const std::string& var) {
+      usesPStore->addRelationship(proc, var);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/relationships/ParentTWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ParentTWriter : public IRelationshipWriter<int, int> {
+private:
+    std::shared_ptr<ParentTStore> parentTStore;
+
+public:
+    explicit ParentTWriter(std::shared_ptr<ParentTStore> store) : parentTStore(std::move(store)) {}
+
+    void addRelationship(int parent, int child) override {
+        addParentT(parent, child);
+    }
+
+    void clear() override {
+        parentTStore->clear();
+    }
+
+    // Custom methods
+    /**
+     * @brief Adds a "ParentT" relationship between a parent and a child.
+     * @param parent The parent statement number.
+     * @param child The child statement number.
+     */
+    void addParentT(int parent, int child) {
+        parentTStore->addRelationship(parent, child);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/relationships/ModifiesSWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ModifiesSWriter : public IRelationshipWriter<int , std::string> {
+private:
+    std::shared_ptr<ModifiesSStore> modifiesSStore;
+
+public:
+    explicit ModifiesSWriter(std::shared_ptr<ModifiesSStore> store) : modifiesSStore(std::move(store)) {}
+
+    void addRelationship(int stmtNum, std::string var) override {
+      addModifiesS(stmtNum, var);
+    }
+
+    void clear() override {
+      modifiesSStore->clear();
+    }
+
+    // Custom methods
+    /**
+     * @brief Adds a "Modifies" relationship between a statement and a variable.
+     * @param stmtNum The statement number of the statement that modifies the variable.
+     * @param var The variable that is modified by the statement.
+     */
+    void addModifiesS(int stmtNum, std::string var) {
+
+      modifiesSStore->addRelationship(stmtNum, var);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/relationships/ModifiesPWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ModifiesPWriter : public IRelationshipWriter<std::string , std::string> {
+private:
+    std::shared_ptr<ModifiesPStore> modifiesPStore;
+
+public:
+    explicit ModifiesPWriter(std::shared_ptr<ModifiesPStore> store) : modifiesPStore(std::move(store)) {}
+
+    void addRelationship(std::string proc, std::string var) override {
+        addModifiesP(proc, var);
+    }
+
+    void clear() override {
+      modifiesPStore->clear();
+    }
+
+    // Custom methods
+    /**
+     * @brief Adds a "Modifies" relationship between a procedure and a variable.
+     * @param proc The procedure that modifies the variable.
+     * @param var The variable that is modified by the procedure.
+     */
+    void addModifiesP(std::string proc, std::string var) {
+      modifiesPStore->addRelationship(proc, var);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/ReadWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ReadWriter: public IEntityWriter<int> {
+private:
+    std::shared_ptr<ReadStore> readStore;
+public:
+    explicit ReadWriter(std::shared_ptr<ReadStore> rs) : readStore(std::move(rs)) {}
+
+    bool addEntity(int entity) override {
+      return insertRead(entity);
+    }
+
+    void clear() override {
+      readStore->clear();
+    }
+
+    /**
+     * @brief Inserts a "Read" statement into the store.
+     * @param stmtNum The statement number of the read statement.
+     * @return True if the read statement is successfully inserted, false otherwise.
+     */
+    bool insertRead(int stmtNum) {
+      return readStore->addEntity(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/StatementWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class StatementWriter: public IEntityWriter<int> {
+private:
+    std::shared_ptr<StatementStore> statementStore;
+public:
+    explicit StatementWriter(std::shared_ptr<StatementStore> ss) : statementStore(std::move(ss)) {}
+
+    bool addEntity(int entity) override {
+      return insertStatement(entity);
+    }
+
+    void clear() override {
+      statementStore->clear();
+    }
+
+    /**
+     * @brief Inserts a statement into the store.
+     * @param stmtNum The statement number to be inserted.
+     * @return True if the statement is successfully inserted, false otherwise.
+     */
+    bool insertStatement(int stmtNum) {
+      return statementStore->addEntity(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/ProcedureWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ProcedureWriter: public IEntityWriter<std::string> {
+private:
+    std::shared_ptr<ProcedureStore> procedureStore;
+public:
+    explicit ProcedureWriter(std::shared_ptr<ProcedureStore> ps) : procedureStore(std::move(ps)) {}
+
+    bool addEntity(std::string entity) override {
+        return insertProcedure(entity);
+    }
+
+    void clear() override {
+        procedureStore->clear();
+    }
+
+    /**
+     * @brief Inserts a procedure into the store.
+     * @param procedureName The name of the procedure to be inserted.
+     * @return True if the procedure is successfully inserted, false otherwise.
+     */
+    bool insertProcedure(const std::string& procedureName) {
+        return procedureStore->addEntity(procedureName);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/CallWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class CallWriter: public IEntityWriter<int> {
+private:
+    std::shared_ptr<CallStore> callStore;
+public:
+    explicit CallWriter(std::shared_ptr<CallStore> cs) : callStore(std::move(cs)) {}
+
+    bool addEntity(int entity) override {
+      return insertCall(entity);
+    }
+
+    void clear() override {
+      callStore->clear();
+    }
+
+    /**
+     * @brief Inserts a "Call" statement into the store.
+     * @param stmtNum The statement number of the call statement.
+     * @return True if the call statement is successfully inserted, false otherwise.
+     */
+    bool insertCall(int stmtNum) {
+      return callStore->addEntity(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/PrintWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class PrintWriter: public IEntityWriter<int> {
+private:
+    std::shared_ptr<PrintStore> printStore;
+public:
+    explicit PrintWriter(std::shared_ptr<PrintStore> ps) : printStore(std::move(ps)) {}
+
+    bool addEntity(int entity) override {
+      return insertPrint(entity);
+    }
+
+    void clear() override {
+      printStore->clear();
+    }
+
+    /**
+     * @brief Inserts a "Print" statement into the store.
+     * @param stmtNum The statement number of the print statement.
+     * @return True if the print statement is successfully inserted, false otherwise.
+     */
+    bool insertPrint(int stmtNum) {
+      return printStore->addEntity(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/WhileWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class WhileWriter: public IEntityWriter<int> {
+private:
+    std::shared_ptr<WhileStore> whileStore;
+public:
+    explicit WhileWriter(std::shared_ptr<WhileStore> ws) : whileStore(std::move(ws)) {}
+
+    bool addEntity(int entity) override {
+      return insertWhile(entity);
+    }
+
+    void clear() override {
+      whileStore->clear();
+    }
+
+    /**
+     * @brief Inserts a while statement into the PKB.
+     * @param stmtNum The statement number of the while statement.
+     * @return True if the while statement is successfully inserted, false otherwise.
+     */
+    bool insertWhile(int stmtNum) {
+      return whileStore->addEntity(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/VariableWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class VariableWriter: public IEntityWriter<std::string> {
+private:
+    std::shared_ptr<VariableStore> variableStore;
+public:
+  explicit VariableWriter(std::shared_ptr<VariableStore> vs) {
+    variableStore = std::move(vs);
+  }
+
+  bool addEntity(std::string entity) override {
+    return insertVariable(entity);
+  }
+
+  void clear() override {
+    variableStore->clear();
+  }
+
+  /**
+   * @brief Inserts a variable into the store.
+   * @param variable The variable to be inserted.
+   * @return True if the variable is successfully inserted, false otherwise.
+   */
+  bool insertVariable (std::string &variable) {
+    return variableStore->addEntity(variable);
+  }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/IfWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class IfWriter: public IEntityWriter<int> {
+private:
+    std::shared_ptr<IfStore> ifStore;
+public:
+    explicit IfWriter(std::shared_ptr<IfStore> is) : ifStore(std::move(is)) {}
+
+    bool addEntity(int entity) override {
+      return insertIf(entity);
+    }
+
+    void clear() override {
+      ifStore->clear();
+    }
+
+    /**
+     * @brief Inserts an "If" statement into the store.
+     * @param stmtNum The statement number of the if statement.
+     * @return True if the if statement is successfully inserted, false otherwise.
+     */
+    bool insertIf(int stmtNum) {
+      return ifStore->addEntity(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/ConstantWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ConstantWriter: public IEntityWriter<int> {
+private:
+    std::shared_ptr<ConstantStore> constantStore;
+public:
+    explicit ConstantWriter(std::shared_ptr<ConstantStore> cs) : constantStore(std::move(cs)) {}
+
+    bool addEntity(int entity) override {
+        return insertConstant(entity);
+    }
+
+    void clear() override {
+        constantStore->clear();
+    }
+
+    /**
+     * @brief Inserts a constant into the store.
+     * @param constantValue The value of the constant to be inserted.
+     * @return True if the constant is successfully inserted, false otherwise.
+     */
+    bool insertConstant(int constantValue) {
+        return constantStore->addEntity(constantValue);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/writers/entities/AssignWriter.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class AssignWriter: public IEntityWriter<int> {
+private:
+    std::shared_ptr<AssignStore> assignStore;
+public:
+    explicit AssignWriter(std::shared_ptr<AssignStore> as) : assignStore(std::move(as)) {}
+
+    bool addEntity(int entity) override {
+        return insertAssign(entity);
+    }
+
+    void clear() override {
+        assignStore->clear();
+    }
+
+    /**
+     * @brief Inserts an "Assign" statement into the store.
+     * @param stmtNum The statement number of the assign statement.
+     * @return True if the assign statement is successfully inserted, false otherwise.
+     */
+    bool insertAssign(int stmtNum) {
+        return assignStore->addEntity(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/PKBReaderManager.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class PKBReaderManager {
+private:
+    std::shared_ptr<PKB> pkb;
+
+    std::shared_ptr<AssignReader> assignReader;
+    std::shared_ptr<VariableReader> variableReader;
+    std::shared_ptr<ProcedureReader> procedureReader;
+    std::shared_ptr<StatementReader> statementReader;
+    std::shared_ptr<IfReader> ifReader;
+    std::shared_ptr<WhileReader> whileReader;
+    std::shared_ptr<CallReader> callReader;
+    std::shared_ptr<ReadReader> readReader;
+    std::shared_ptr<ConstantReader> constantReader;
+    std::shared_ptr<PrintReader> printReader;
+
+    std::shared_ptr<FollowsReader> followsReader;
+    std::shared_ptr<FollowsTReader> followsTReader;
+    std::shared_ptr<ParentReader> parentReader;
+    std::shared_ptr<ParentTReader> parentTReader;
+    std::shared_ptr<ModifiesPReader> modifiesPReader;
+    std::shared_ptr<ModifiesSReader> modifiesSReader;
+    std::shared_ptr<UsesPReader> usesPReader;
+    std::shared_ptr<UsesSReader> usesSReader;
+
+    std::shared_ptr<AssignPatternReader> assignPatternReader;
+    std::shared_ptr<IfPatternReader> ifPatternReader;
+    std::shared_ptr<WhilePatternReader> whilePatternReader;
+
+public:
+    explicit PKBReaderManager(const std::shared_ptr<PKB>& pkb): pkb(pkb) {
+      assignReader = std::make_shared<AssignReader>(pkb->getAssignStore());
+      variableReader = std::make_shared<VariableReader>(pkb->getVariableStore());
+      procedureReader = std::make_shared<ProcedureReader>(pkb->getProcedureStore());
+      statementReader = std::make_shared<StatementReader>(pkb->getStatementStore());
+      ifReader = std::make_shared<IfReader>(pkb->getIfStore());
+      whileReader = std::make_shared<WhileReader>(pkb->getWhileStore());
+      callReader = std::make_shared<CallReader>(pkb->getCallStore());
+      readReader = std::make_shared<ReadReader>(pkb->getReadStore());
+      constantReader = std::make_shared<ConstantReader>(pkb->getConstantStore());
+      printReader = std::make_shared<PrintReader>(pkb->getPrintStore());
+
+      followsReader = std::make_shared<FollowsReader>(pkb->getFollowsStore());
+      followsTReader = std::make_shared<FollowsTReader>(pkb->getFollowsTStore());
+      parentReader = std::make_shared<ParentReader>(pkb->getParentStore());
+      parentTReader = std::make_shared<ParentTReader>(pkb->getParentTStore());
+      modifiesPReader = std::make_shared<ModifiesPReader>(pkb->getModifiesPStore());
+      modifiesSReader = std::make_shared<ModifiesSReader>(pkb->getModifiesSStore());
+      usesPReader = std::make_shared<UsesPReader>(pkb->getUsesPStore());
+      usesSReader = std::make_shared<UsesSReader>(pkb->getUsesSStore());
+
+
+      assignPatternReader = std::make_shared<AssignPatternReader>(pkb->getAssignPatternStore());
+      ifPatternReader = std::make_shared<IfPatternReader>(pkb->getIfPatternStore());
+      whilePatternReader = std::make_shared<WhilePatternReader>(pkb->getWhilePatternStore());
+    }
+
+    // Entity Readers
+    std::shared_ptr<AssignReader> getAssignReader() {
+        return assignReader;
+    }
+
+    std::shared_ptr<VariableReader> getVariableReader() {
+        return variableReader;
+    }
+
+    std::shared_ptr<ProcedureReader> getProcedureReader() {
+        return procedureReader;
+    }
+
+    std::shared_ptr<StatementReader> getStatementReader() {
+        return statementReader;
+    }
+
+    std::shared_ptr<IfReader> getIfReader() {
+        return ifReader;
+    }
+
+    std::shared_ptr<WhileReader> getWhileReader() {
+        return whileReader;
+    }
+
+    std::shared_ptr<CallReader> getCallReader() {
+        return callReader;
+    }
+
+    std::shared_ptr<ReadReader> getReadReader() {
+        return readReader;
+    }
+
+    std::shared_ptr<ConstantReader> getConstantReader() {
+        return constantReader;
+    }
+
+    std::shared_ptr<PrintReader> getPrintReader() {
+        return printReader;
+    }
+
+    // Relationship Readers
+
+    std::shared_ptr<FollowsReader> getFollowsReader() {
+        return followsReader;
+    }
+
+    std::shared_ptr<FollowsTReader> getFollowsTReader() {
+        return followsTReader;
+    }
+
+    std::shared_ptr<ParentReader> getParentReader() {
+        return parentReader;
+    }
+
+    std::shared_ptr<ParentTReader> getParentTReader() {
+        return parentTReader;
+    }
+
+    std::shared_ptr<ModifiesPReader> getModifiesPReader() {
+        return modifiesPReader;
+    }
+
+    std::shared_ptr<ModifiesSReader> getModifiesSReader() {
+        return modifiesSReader;
+    }
+
+    std::shared_ptr<UsesPReader> getUsesPReader() {
+        return usesPReader;
+    }
+
+    std::shared_ptr<UsesSReader> getUsesSReader() {
+        return usesSReader;
+    }
+
+    // Pattern Readers
+    std::shared_ptr<AssignPatternReader> getAssignPatternReader() {
+        return assignPatternReader;
+    }
+
+    std::shared_ptr<IfPatternReader> getIfPatternReader() {
+        return ifPatternReader;
+    }
+
+    std::shared_ptr<WhilePatternReader> getWhilePatternReader() {
+        return whilePatternReader;
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/patterns/assign/AssignPatternStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @brief A store for managing assign patterns.
+ */
+class AssignPatternStore : public IAssignPatternReader, public IAssignPatternWriter {
+private:
+    std::unordered_map<int, std::string> LHSMap;
+    std::unordered_map<int, std::string> RHSMap;
+public:
+    // Adds an assign pattern to the store.
+    void addAssignPattern(int statementNumber, std::string LHS, std::string RHS) override {
+        LHSMap[statementNumber] = std::move(LHS);
+        RHSMap[statementNumber] = std::move(RHS);
+    }
+
+    // Clears all assign patterns from the store.
+    void clear() override {
+        LHSMap.clear();
+        RHSMap.clear();
+    }
+
+    // Checks if the store is empty.
+    bool isEmpty() override {
+        return LHSMap.empty() && RHSMap.empty();
+    }
+
+    // Retrieves the assign pattern for a given statement number.
+    std::pair<std::string, std::string> getPattern(int statementNumber) override {
+        return std::make_pair(LHSMap[statementNumber], RHSMap[statementNumber]);
+    }
+
+    // Retrieves all assign patterns from the store.
+    std::unordered_map<int, std::pair<std::string, std::string>> getAllPatterns() override {
+        std::unordered_map<int, std::pair<std::string, std::string>> result;
+        for (auto const& [key, value] : LHSMap) {
+            result[key] = std::make_pair(value, RHSMap.at(key));
+        }
+        return result;
+    }
+
+    // Get LHS of the assign pattern for a given statement number.
+    std::string getLHS(int statementNumber) override {
+        return LHSMap.at(statementNumber);
+    }
+
+    // Get RHS of the assign pattern for a given statement number.
+    std::string getRHS(int statementNumber) override {
+        return RHSMap.at(statementNumber);
+    }
+
+    // Checks if the store contains a given assign pattern.
+    bool contains(int statementNumber) override {
+        return LHSMap.find(statementNumber) != LHSMap.end();
+    }
+
+    // Retrieves all statement numbers from the store.
+    std::unordered_set<int> getAllStatementNumbers() override {
+        std::unordered_set<int> result;
+        for (auto const& [key, value] : LHSMap) {
+            result.insert(key);
+        }
+        return result;
+    }
+
+    // Checks if the store contains a LHS and returns the set of statement numbers that contain the LHS.
+    std::unordered_set<int> getStatementNumbersWithLHS(const std::string& LHS) override {
+        std::unordered_set<int> result;
+        for (auto const& [key, value] : LHSMap) {
+            if (value == LHS) {
+                result.insert(key);
+            }
+        }
+        return result;
+    }
+
+    // Checks if the store contains a RHS and returns the set of statement numbers that contain the RHS.
+    std::unordered_set<int> getStatementNumbersWithRHS(const std::string& RHS) override {
+        std::unordered_set<int> result;
+        for (auto const& [key, value] : RHSMap) {
+            if (value == RHS) {
+                result.insert(key);
+            }
+        }
+        return result;
+    }
+
+    // Checks if the store contains a partial RHS and returns the set of statement numbers that contain the partial RHS.
+    std::unordered_set<int> getStatementNumbersWithPartialRHS(const std::string& RHS) override {
+        std::unordered_set<int> result;
+        std::regex tokenRegex("[^\\+\\-\\*/%\\^\\(\\) ]+"); // Regex to split by operators and spaces
+        for (auto const& [key, value] : RHSMap) {
+            bool foundQuote = false;
+            std::string temp;
+            for (auto const& i : value) {
+                if (i == '\'') {
+                    if (foundQuote) {
+                        if (temp == RHS) {
+                            result.insert(key);
+                            temp = "";
+                            foundQuote = false;
+                            break; // Match found, no need to continue checking
+                        }
+                        temp = "";
+                    }
+                    foundQuote = !foundQuote;
+                    continue;
+                }
+                if (foundQuote) {
+                    temp += i;
+                }
+            }
+        }
+        return result;
+    }
+
+    // Checks if the store contains a LHS and RHS and returns the set of statement numbers that contain the LHS and RHS.
+    std::unordered_set<int> getStatementNumbersWithLHSRHS(const std::string&LHS, const std::string& RHS) override {
+        std::unordered_set<int> result;
+        for (auto const& [key, value] : LHSMap) {
+            if (value == LHS && RHSMap.at(key) == RHS) {
+                result.insert(key);
+            }
+        }
+        return result;
+    }
+
+    // Checks if the store contains a LHS and a partial RHS and returns the set of statement numbers that contain the LHS and partial RHS.
+    std::unordered_set<int> getStatementNumbersWithLHSPartialRHS(const std::string& LHS, const std::string& RHS) override {
+        std::unordered_set<int> result;
+        for (auto const& [key, value] : LHSMap) {
+            if (value == LHS) {
+                std::regex tokenRegex("[^\\+\\-\\*/%\\^\\(\\) ]+"); // Regex to split by operators and spaces
+                std::string rhsAtKey = RHSMap.at(key);
+                bool foundQuote = false;
+                std::string temp;
+                for (auto const& i : rhsAtKey) {
+                    if (i == '\'') {
+                        if (foundQuote) {
+                            if (temp == RHS) {
+                                result.insert(key);
+                                temp = "";
+                                foundQuote = false;
+                                break; // Match found, no need to continue checking
+                            }
+                            temp = "";
+                        }
+                        foundQuote = !foundQuote;
+                        continue;
+                    }
+                    if (foundQuote) {
+                        temp += i;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/patterns/assign/IAssignPatternWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class IAssignPatternWriter {
+public:
+    virtual void addAssignPattern(int statementNumber, std::string LHS, std::string RHS) = 0;
+
+    virtual void clear() = 0;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/patterns/assign/IAssignPatternReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class IAssignPatternReader {
+public:
+    virtual bool isEmpty() = 0;
+
+    virtual std::string getLHS(int statementNumber) = 0;
+
+    virtual std::string getRHS(int statementNumber) = 0;
+
+    virtual std::unordered_map<int, std::pair<std::string, std::string>> getAllPatterns() = 0;
+
+    virtual std::unordered_set<int> getAllStatementNumbers() = 0;
+
+    virtual std::pair<std::string, std::string> getPattern(int statementNumber) = 0;
+
+    virtual bool contains(int statementNumber) = 0;
+
+    virtual std::unordered_set<int> getStatementNumbersWithLHS(const std::string& LHS) = 0;
+
+    virtual std::unordered_set<int> getStatementNumbersWithRHS(const std::string& RHS) = 0;
+
+    virtual std::unordered_set<int> getStatementNumbersWithPartialRHS(const std::string& partialRHS) = 0;
+
+    virtual std::unordered_set<int> getStatementNumbersWithLHSRHS (const std::string& LHS, const std::string& RHS) = 0;
+
+    virtual std::unordered_set<int> getStatementNumbersWithLHSPartialRHS (const std::string& LHS, const std::string& partialRHS) = 0;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/patterns/control/IControlPatternWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class IControlPatternWriter {
+public:
+    virtual void addControlPattern(int statementNumber, const std::string& controlPattern) = 0;
+
+    virtual void clear() = 0;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/patterns/control/WhilePatternStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class WhilePatternStore : public ControlPatternStore {
+public:
+    void addWhilePattern(int statementNumber, const std::string& whilePattern) {
+        addControlPattern(statementNumber, whilePattern);
+    }
+
+    std::unordered_set<std::string> getWhilePatternsWithStatementNumber(int statementNumber) {
+        return getControlPatternsWithStatementNumber(statementNumber);
+    }
+
+    std::unordered_set<int> getStatementNumbersWithWhilePattern(const std::string& whilePattern) {
+      return getStatementNumbersWithControlPattern(whilePattern);
+    }
+
+    std::unordered_set<std::string> getAllWhilePatterns() {
+      return getAllControlPatterns();
+    }
+
+    std::unordered_set<int> getAllStatementNumbersWithWhilePattern() {
+      return getAllStatementNumbers();
+    }
+
+    bool hasWhilePatternAtStatement(int statementNumber, const std::string& whilePattern) {
+      return hasControlPatternAtStatement(statementNumber, whilePattern);
+    }
+
+    bool hasWhilePattern(const std::string& whilePattern) {
+      return hasControlPattern(whilePattern);
+    }
+
+    bool hasStatementNumberWithWhilePattern(int statementNumber) {
+      return hasStatementNumber(statementNumber);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/patterns/control/ControlPatternStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ControlPatternStore: public IControlPatternReader, public IControlPatternWriter {
+private:
+    TemplateMapSet<int, std::string> controlPatterns;
+    TemplateMapSet<std::string, int> reverseControlPatterns;
+public:
+    /**
+     * Check if the store is empty
+     * @return true if the store is empty, false otherwise
+     */
+    bool isEmpty() override {
+        return controlPatterns.isEmpty() && reverseControlPatterns.isEmpty();
     };
-}
 
-std::string Utility::getDesignType(ASTNodeType t) {
-    return getASTNodeType(t);
-}
+    /**
+     * Get all statement numbers in the store with control patterns
+     * @return unordered_set<int>: Set of statement numbers
+     */
+    std::unordered_set<int> getAllStatementNumbers() override {
+        return controlPatterns.getKeys();
+    };
+
+    /**
+     * Get all control variables with a given statement number
+     * @param statementNumber
+     * @return unordered_set<string>: Set of control variables
+     */
+    std::unordered_set<std::string> getControlPatternsWithStatementNumber(int statementNumber) override {
+      return controlPatterns.getValuesByKey(statementNumber);
+    };
+
+    /**
+     * Get all statement numbers with a given control pattern
+     * @param controlPattern
+     * @return unordered_set<int>: Set of statement numbers
+     */
+    std::unordered_set<int> getStatementNumbersWithControlPattern(const std::string& controlPattern) override {
+      return reverseControlPatterns.getValuesByKey(controlPattern);
+    };
+
+    /**
+     * Check if the store has a given statement number
+     * @param statementNumber
+     * @return true if the store has the statement number, false otherwise
+     */
+    bool hasStatementNumber(int statementNumber) override {
+        return controlPatterns.hasKey(statementNumber);
+    };
+
+    /**
+     * Check if the store has a given control pattern
+     * @param controlPattern
+     * @return true if the store has the control pattern, false otherwise
+     */
+    bool hasControlPattern(const std::string& controlPattern) override {
+        return reverseControlPatterns.hasKey(controlPattern);
+    };
+
+    /**
+     * Check if the store has a given control pattern at a given statement number
+     * @param statementNumber
+     * @param controlPattern
+     * @return true if the store has the control pattern at the statement number, false otherwise
+     */
+    bool hasControlPatternAtStatement(int statementNumber, const std::string& controlPattern) override {
+        return controlPatterns.hasKeyValue(statementNumber, controlPattern);
+    };
+
+    /**
+     * Get all control patterns in the store
+     * @return unordered_set<string>: Set of control patterns
+     */
+    std::unordered_set<std::string> getAllControlPatterns() override {
+        return reverseControlPatterns.getKeys();
+    };
+
+    /**
+     * Add a control pattern to the store
+     * @param statementNumber
+     * @param controlPattern
+     */
+    void addControlPattern(int statementNumber, const std::string& controlPattern) override {
+          controlPatterns.addKeyValue(statementNumber, controlPattern);
+          reverseControlPatterns.addKeyValue(controlPattern, statementNumber);
+    };
+
+    /**
+     * Clear all control patterns from the store
+     */
+    void clear() override {
+        controlPatterns.clear();
+        reverseControlPatterns.clear();
+    }
+};
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/unit_testing/src/sp/ParseCallStatement_AI.cpp
-Generator: gpt
+File: Team19/Code19/src/spa/src/pkb/stores/patterns/control/IControlPatternReader.h
+Generator: copilot
 Intervention: 2
 Language: e
-Prompt: https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat
-ChatId: BL0U9QBHRxSO8JyQGo0KpEUZ
+Prompt: used copilot
+ChatId: 
 Code:
-TEST_CASE("CallStmt parsing throws an error with invalid syntax", "[SimpleParser]") {
-	const std::string testFileName = "../../../../../tests/sp/ParserTest/Stmt_Invalid1.txt";
-	REQUIRE(std::filesystem::exists(testFileName));
-	SimpleParser parser(testFileName);
+class IControlPatternReader {
+public:
+    virtual bool isEmpty() = 0;
 
-	// For this test, we expect parsing to terminate due to erroneous input.
-	CHECK_THROWS_AS(parser.parseCall(), std::runtime_error);
-}
+    virtual std::unordered_set<std::string> getControlPatternsWithStatementNumber(int statementNumber) = 0;
+
+    virtual std::unordered_set<int> getStatementNumbersWithControlPattern(const std::string& controlPattern) = 0;
+
+    virtual bool hasControlPatternAtStatement(int statementNumber, const std::string& controlPattern) = 0;
+
+    virtual bool hasStatementNumber(int statementNumber) = 0;
+
+    virtual bool hasControlPattern(const std::string& controlPattern) = 0;
+
+    virtual std::unordered_set<int> getAllStatementNumbers() = 0;
+
+    virtual std::unordered_set<std::string> getAllControlPatterns() = 0;
+};
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/unit_testing/src/sp/ParseCallStatement_AI.cpp
-Generator: gpt
+File: Team19/Code19/src/spa/src/pkb/stores/patterns/control/IfPatternStore.h
+Generator: copilot
 Intervention: 2
 Language: e
-Prompt: https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat
-ChatId: CRO1bXNAQZB3Adua8DmfPuWb
+Prompt: used copilot
+ChatId: 
 Code:
-TEST_CASE("Testing CallStmt::buildTree()", "[CallStmt]") {
-	// Generate test file
-	const std::string testFileName = "../../../../../tests/sp/ParserTest/CallStmt1.txt";
-	REQUIRE(std::filesystem::exists(testFileName));
-	SimpleParser parser(testFileName);
+class IfPatternStore : public ControlPatternStore {
+public:
+    void addIfPattern(int statementNumber, const std::string& ifPattern) {
+      addControlPattern(statementNumber, ifPattern);
+    }
 
-	SECTION("Testing tree root node") {
-		std::shared_ptr<ASTNode> tree_ptr = parser.parseCall();
+    std::unordered_set<std::string> getIfPatternsWithStatementNumber(int statementNumber) {
+      return getControlPatternsWithStatementNumber(statementNumber);
+    }
 
-		REQUIRE(tree_ptr->type == ASTNodeType::CALL);
-		REQUIRE(tree_ptr->lineNumber == 1);
-		REQUIRE(tree_ptr->value == Utility::getASTNodeType(ASTNodeType::CALL));
+    std::unordered_set<int> getStatementNumbersWithIfPattern(const std::string& ifPattern) {
+      return getStatementNumbersWithControlPattern(ifPattern);
+    }
 
-		SECTION("Testing tree child node") {
-			const auto& children = tree_ptr->children;
-			REQUIRE(children.size() == 1);
-			REQUIRE(children[0]->type == ASTNodeType::VARIABLE);
-			REQUIRE(children[0]->lineNumber == 1);
-			REQUIRE(children[0]->value == "x");
-		}
-	}
-}
+    std::unordered_set<std::string> getAllIfPatterns() {
+      return getAllControlPatterns();
+    }
+
+    std::unordered_set<int> getAllStatementNumbersWithIfPattern() {
+      return getAllStatementNumbers();
+    }
+
+    bool hasIfPatternAtStatement(int statementNumber, const std::string& ifPattern) {
+      return hasControlPatternAtStatement(statementNumber, ifPattern);
+    }
+
+    bool hasIfPattern(const std::string& ifPattern) {
+      return hasControlPattern(ifPattern);
+    }
+
+    bool hasStatementNumberWithIfPattern(int statementNumber) {
+      return hasStatementNumber(statementNumber);
+    }
+};
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/unit_testing/src/sp/ParsePrintStatement_AI.cpp
-Generator: gpt
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/IRelationshipReader.h
+Generator: copilot
 Intervention: 2
 Language: e
-Prompt: https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat
-ChatId: BL0U9QBHRxSO8JyQGo0KpEUZ
+Prompt: used copilot
+ChatId: 
 Code:
-TEST_CASE("PrintStmt parsing throws an error with invalid syntax", "[SimpleParser]") {
-	const std::string testFileName = "../../../../../tests/sp/ParserTest/CallStmt1.txt";
-	REQUIRE(std::filesystem::exists(testFileName));
-	SimpleParser parser(testFileName);
+/**
+ * @brief Interface for reading key-value relationships.
+ *
+ * This interface defines the contract for a component that can read relationships
+ * between keys and values, where a single key may be associated with multiple values,
+ * and vice versa.
+ *
+ * @tparam KeyType The data type of the key in the relationship.
+ * @tparam ValueType The data type of the value in the relationship.
+ */
+template <typename KeyType, typename ValueType>
+class IRelationshipReader {
+public:
+    /**
+     * Checks if there are any relationships stored.
+     * @return true if no relationships exist, false otherwise.
+     */
+    virtual bool isEmpty() = 0;
 
-	// For this test, we expect parsing to terminate due to erroneous input.
-	CHECK_THROWS_AS(parser.parsePrint(), std::runtime_error);
-}
+    /**
+     * Retrieves all relationships in a map where each key is associated with a set of values.
+     * @return A map of keys to sets of values.
+     */
+    virtual std::unordered_map<KeyType, std::unordered_set<ValueType>> getKeyValueRelationships() = 0;
+
+    /**
+     * Retrieves all relationships in a map where each value is associated with a set of keys.
+     * @return A map of values to sets of keys.
+     */
+    virtual std::unordered_map<ValueType, std::unordered_set<KeyType>> getValueKeyRelationships() = 0;
+
+    /**
+     * Retrieves all values associated with a given key.
+     * @param key The key to retrieve values for.
+     * @return A set of values associated with the key.
+     */
+    virtual std::unordered_set<ValueType> getRelationshipsByKey(KeyType key) = 0;
+
+    /**
+     * Retrieves all keys associated with a given value.
+     * @param value The value to retrieve keys for.
+     * @return A set of keys associated with the value.
+     */
+    virtual std::unordered_set<KeyType> getRelationshipsByValue(ValueType value) = 0;
+
+    /**
+     * Checks if a specific relationship exists between a key and a value.
+     * @param key The key part of the relationship to check.
+     * @param value The value part of the relationship to check.
+     * @return true if the relationship exists, false otherwise.
+     */
+    virtual bool hasRelationship(KeyType key, ValueType value) = 0;
+
+    /**
+     * Retrieves all keys in the store.
+     * @return A set of keys.
+     */
+    virtual std::unordered_set<KeyType> getKeys() = 0;
+
+    /**
+     * Retrieves all values in the store.
+     * @return A set of values.
+     */
+    virtual std::unordered_set<ValueType> getValues() = 0;
+};
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/unit_testing/src/sp/ParsePrintStatement_AI.cpp
-Generator: gpt
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/types/ModifiesPStore.h
+Generator: copilot
 Intervention: 2
 Language: e
-Prompt: https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat
-ChatId: CRO1bXNAQZB3Adua8DmfPuWb
+Prompt: used copilot
+ChatId: 
 Code:
-TEST_CASE("Testing PrintStmt::buildTree()", "[PrintStmt]") {
-	// Generate test file
-	const std::string testFileName = "../../../../../tests/sp/ParserTest/PrintStmt1.txt";
-	REQUIRE(std::filesystem::exists(testFileName));
-	SimpleParser parser(testFileName);
-	std::shared_ptr<ASTNode> tree_ptr = parser.parsePrint();
+/**
+ * @class ModifiesPStore
+ * Manages "Modifies" relationships for procedures in a SIMPLE program.
+ * This store captures relationships where a procedure modifies a certain variable.
+ *
+ * Inherits from RelationshipStore<std::string, std::string> to provide
+ * functionality for managing relationships between procedures (identified by name)
+ * and the variables they modify.
+ */
+class ModifiesPStore : public RelationshipStore<std::string, std::string> {
+    // Additional functionality specific to procedure-variable modifications can be added here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/types/ParentTStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class ParentTStore
+ * Specialization of RelationshipStore for transitive 'Parent*' relationships.
+ * This store manages the 'Parent*' relationships where one statement
+ * is nested within another statement, either directly or indirectly through
+ * multiple levels of nesting in a SIMPLE program.
+ *
+ * Inherits all functionalities from RelationshipStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class ParentTStore : public RelationshipStore<int, int> {
+    // This class can be used to instantiate a RelationshipStore
+    // specific for the 'Parent*' relationship between statements.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/types/FollowsTStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class FollowsTStore
+ * Specialization of RelationshipStore for transitive 'Follows*' relationships.
+ * This store manages transitive 'Follows*' relationships where a statement
+ * follows another either directly or through a series of statements in a SIMPLE program.
+ *
+ * Inherits all functionalities from RelationshipStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class FollowsTStore: public RelationshipStore<int, int> {
+    // This class can be used to instantiate a RelationshipStore
+    // specific for the 'Follows*' relationship between statements.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/types/FollowsStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class FollowsStore
+ * Specialization of RelationshipStore for 'Follows' relationships.
+ * This store manages direct 'Follows' relationships where one statement
+ * directly follows another in a SIMPLE program.
+ *
+ * Inherits all functionalities from RelationshipStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class FollowsStore: public RelationshipStore<int, int> {
+    // This class can be used to instantiate a RelationshipStore
+    // specific for the 'Follows' relationship between statements.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/types/UsesPStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class UsesPStore
+ * Manages "Uses" relationships for procedures in a SIMPLE program.
+ * This store captures relationships where a procedure uses a certain variable.
+ *
+ * Inherits from RelationshipStore<std::string, std::string> to provide
+ * functionality for managing relationships between procedures (identified by name)
+ * and the variables they use.
+ */
+class UsesPStore : public RelationshipStore<std::string, std::string> {
 
-	REQUIRE(tree_ptr->type == ASTNodeType::PRINT);
-	REQUIRE(tree_ptr->lineNumber == 1);
-	REQUIRE(tree_ptr->value == Utility::getASTNodeType(ASTNodeType::PRINT));
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/types/ModifiesSStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class ModifiesSStore
+ * Manages "Modifies" relationships for statements in a SIMPLE program.
+ * This store captures relationships where a particular statement (identified by number)
+ * modifies a certain variable.
+ *
+ * Inherits from RelationshipStore<int, std::string> to provide
+ * functionality for managing relationships between statement numbers and variables.
+ */
+class ModifiesSStore : public RelationshipStore<int, std::string> {
+    // Additional functionality specific to statement-variable modifications can be added here
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/types/ParentStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class ParentStore
+ * Specialization of RelationshipStore for 'Parent' relationships.
+ * This store manages the 'Parent' relationships where one statement
+ * is directly nested within another statement in a SIMPLE program.
+ *
+ * Inherits all functionalities from RelationshipStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class ParentStore : public RelationshipStore<int, int> {
+    // This class can be used to instantiate a RelationshipStore
+    // specific for the 'Parent' relationship between statements.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/types/UsesSStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class UsesSStore
+ * Manages "Uses" relationships for statements in a SIMPLE program.
+ * This store captures relationships where a particular statement (identified by number)
+ * uses a certain variable.
+ *
+ * Inherits from RelationshipStore<int, std::string> to provide
+ * functionality for managing relationships between statement numbers and variables.
+ */
+class UsesSStore : public RelationshipStore<int, std::string> {
 
-	SECTION("Testing tree child node") {
-		const auto& children = tree_ptr->children;
-		REQUIRE(children.size() == 1);
-		REQUIRE(children[0]->type == ASTNodeType::VARIABLE);
-		REQUIRE(children[0]->lineNumber == 1);
-		REQUIRE(children[0]->value == "x");
-	}
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/RelationshipStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+template <typename KeyType, typename ValueType>
+class RelationshipStore: public IRelationshipReader<KeyType, ValueType> , public IRelationshipWriter<KeyType, ValueType> {
+private:
+    TemplateMapSet<KeyType, ValueType> keyToValueMap;
+    TemplateMapSet<ValueType, KeyType> valueToKeyMap;
+public:
+    /**
+     * Check if the store is empty
+     * @return true if the store is empty, false otherwise
+     */
+    bool isEmpty() override {
+        return keyToValueMap.isEmpty();
+    };
+    /**
+     * Check if the Relationship exists for a given key-value pair
+     * @param key
+     * @param value
+     * @return true if the Relationship exists, false otherwise
+     */
+    bool hasRelationship(KeyType key, ValueType value) override {
+        return keyToValueMap.hasKeyValue(key, value);
+    };
+    /**
+     * Add a relationship to the store
+     * @param key
+     * @param value
+     */
+    void addRelationship(KeyType key, ValueType value) override {
+        keyToValueMap.addKeyValue(key, value);
+        valueToKeyMap.addKeyValue(value, key);
+    };
+    /**
+     * Get all key-value relationships
+     * @return map of key-value relationships
+     */
+    std::unordered_map<KeyType, std::unordered_set<ValueType>> getKeyValueRelationships() override {
+        return keyToValueMap.getMapSet();
+    };
+    /**
+     * Get all value-key relationships
+     * @return map of value-key relationships
+     */
+    std::unordered_map<ValueType, std::unordered_set<KeyType>> getValueKeyRelationships() override {
+        return valueToKeyMap.getMapSet();
+    };
+
+    /**
+     * Get all keys in the store
+     * @return set of keys
+     */
+    std::unordered_set<KeyType> getKeys() override {
+        return keyToValueMap.getKeys();
+    };
+
+    /**
+     * Get all values in the store
+     * @return set of values
+     */
+    std::unordered_set<ValueType> getValues() override {
+        return valueToKeyMap.getKeys();
+    };
+
+    /**
+     * Get all values related to a given key
+     * @param key
+     * @return The set of values related to the given key
+     */
+    std::unordered_set<ValueType> getRelationshipsByKey(KeyType key) override {
+        return keyToValueMap.getValuesByKey(key);
+    };
+    /**
+     * Get all keys related to a given value
+     * @param value
+     * @return
+     */
+    std::unordered_set<KeyType> getRelationshipsByValue(ValueType value) override {
+        return valueToKeyMap.getValuesByKey(value);
+    };
+    /**
+     * Clears all stored relationships from the store.
+     * This method resets both the key-to-value and value-to-key mappings, effectively
+     * removing all relationships.
+     */
+    void clear() override {
+        keyToValueMap.clear();
+        valueToKeyMap.clear();
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/relationships/IRelationshipWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @brief Interface for writing key-value relationships.
+ *
+ * This interface defines the contract for a component that can add relationships
+ * between keys and values. Each key can be associated with multiple values.
+ *
+ * @tparam KeyType The data type of the key in the relationship.
+ * @tparam ValueType The data type of the value in the relationship.
+ */
+template <typename KeyType, typename ValueType>
+class IRelationshipWriter {
+public:
+    /**
+     * Adds a relationship between a key and a value.
+     * If the key already exists, the value is added to the existing set of values.
+     * If the key does not exist, it is created and associated with the value.
+     *
+     * @param key The key to associate the value with.
+     * @param value The value to be associated with the key.
+     */
+    virtual void addRelationship(KeyType key, ValueType value) = 0;
+
+    // Clears all entities from the store.
+    virtual void clear() = 0;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/PrintStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class PrintStore
+ * Specialization of EntityStore for 'Print' entity.
+ * This store manages the collection of statement numbers in a SIMPLE program
+ * that are of type 'Print'.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class PrintStore: public EntityStore<int> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'Print' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/IfStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class IfStore
+ * Specialization of EntityStore for 'If' entity.
+ * This store manages the collection of statement numbers in a SIMPLE program
+ * that are of type 'If'.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class IfStore: public EntityStore<int> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'If' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/WhileStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class WhileStore
+ * Specialization of EntityStore for 'While' entity.
+ * This store manages the collection of statement numbers in a SIMPLE program
+ * that are of type 'While'.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class WhileStore: public EntityStore<int> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'While' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/CallStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class CallStore
+ * Specialization of EntityStore for 'Call' entity.
+ * This store manages the collection of statement numbers in a SIMPLE program
+ * that are of type 'Call'.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class CallStore: public EntityStore<int> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'Call' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/ReadStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class ReadStore
+ * Specialization of EntityStore for 'Read' entity.
+ * This store manages the collection of statement numbers in a SIMPLE program
+ * that are of type 'Read'.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class ReadStore: public EntityStore<int> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'Read' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/ConstantStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class ConstantStore
+ * Specialization of EntityStore for 'Constant' entity.
+ * This store manages the collection of constants used in a SIMPLE program.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to int, representing SIMPLE constants.
+ */
+class ConstantStore: public EntityStore<int> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'Constant' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/ProcedureStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class ProcedureStore
+ * Specialization of EntityStore for 'Procedure' entity.
+ * This store manages the collection of procedures declared in a SIMPLE program.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to string, representing SIMPLE procedure names.
+ */
+class ProcedureStore: public EntityStore<std::string> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'Procedure' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/VariableStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class VariableStore
+ * Specialization of EntityStore for 'Variable' entity.
+ * This store manages the collection of variable names in a SIMPLE program.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to string, representing SIMPLE variable names.
+ */
+class VariableStore: public EntityStore<std::string> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'Variable' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/StatementStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class StatementStore
+ * Specialization of EntityStore for 'Statement' entity.
+ * This store manages the collection of statement numbers in a SIMPLE program.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class StatementStore: public EntityStore<int> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'Statement' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/types/AssignStore.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @class AssignStore
+ * Specialization of EntityStore for 'Assign' entity.
+ * This store manages the collection of statement numbers in a SIMPLE program
+ * that are of type 'Assign'.
+ *
+ * Inherits all functionalities from EntityStore.
+ * Template parameters are set to int, representing SIMPLE statement numbers.
+ */
+class AssignStore: public EntityStore<int> {
+    // This class can be used to instantiate an EntityStore
+    // specific for the 'Assign' Entity.
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/IEntityWriter.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @brief Interface for writing entities into a store.
+ *
+ * @tparam EntityType The type of the entity being managed.
+ */
+template <typename EntityType>
+class IEntityWriter {
+public:
+    // Adds an entity to the store.
+    virtual bool addEntity(EntityType entity) = 0;
+
+    // Clears all entities from the store.
+    virtual void clear() = 0;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/IEntityReader.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @brief Interface for reading entities from a store.
+ *
+ * @tparam EntityType The type of the entity being managed.
+ */
+template <typename EntityType>
+class IEntityReader {
+public:
+    // Checks if the store is empty.
+    virtual bool isEmpty() const = 0;
+
+    // Checks if the store contains a given entity.
+    virtual bool contains(EntityType entity) const = 0;
+
+    // Retrieves all entities from the store.
+    virtual std::unordered_set<EntityType> getAllEntities() const = 0;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/stores/entities/EntityStore.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @brief A store that manages a collection of entities of a certain type.
+ *
+ * @tparam EntityType The type of entities being stored.
+ */
+template <typename EntityType>
+class EntityStore : public IEntityReader<EntityType>, public IEntityWriter<EntityType> {
+private:
+    std::unordered_set<EntityType> entities;
+
+public:
+    // IEntityWriter implementation
+    bool addEntity(EntityType entity) override {
+        return entities.insert(entity).second;
+    }
+
+    void clear() override {
+        entities.clear();
+    }
+
+    // IEntityReader implementation
+    bool isEmpty() const override {
+        return entities.empty();
+    }
+
+    bool contains(EntityType entity) const override {
+        return entities.find(entity) != entities.end();
+    }
+
+    std::unordered_set<EntityType> getAllEntities() const override {
+        return entities;
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/PKBWriterManager.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class PKBWriterManager {
+private:
+    std::shared_ptr<PKB> pkb;
+
+    std::shared_ptr<FollowsWriter> followsWriter;
+    std::shared_ptr<FollowsTWriter> followsTWriter;
+    std::shared_ptr<ParentWriter> parentWriter;
+    std::shared_ptr<ParentTWriter> parentTWriter;
+    std::shared_ptr<UsesPWriter> usesPWriter;
+    std::shared_ptr<UsesSWriter> usesSWriter;
+    std::shared_ptr<ModifiesPWriter> modifiesPWriter;
+    std::shared_ptr<ModifiesSWriter> modifiesSWriter;
+
+    std::shared_ptr<AssignWriter> assignWriter;
+    std::shared_ptr<VariableWriter> variableWriter;
+    std::shared_ptr<ConstantWriter> constantWriter;
+    std::shared_ptr<ProcedureWriter> procedureWriter;
+    std::shared_ptr<StatementWriter> statementWriter;
+    std::shared_ptr<IfWriter> ifWriter;
+    std::shared_ptr<WhileWriter> whileWriter;
+    std::shared_ptr<CallWriter> callWriter;
+    std::shared_ptr<ReadWriter> readWriter;
+    std::shared_ptr<PrintWriter> printWriter;
+
+    std::shared_ptr<AssignPatternWriter> assignPatternWriter;
+    std::shared_ptr<IfPatternWriter> ifPatternWriter;
+    std::shared_ptr<WhilePatternWriter> whilePatternWriter;
+
+public:
+    explicit PKBWriterManager(const std::shared_ptr<PKB>& pkb): pkb(pkb) {
+      followsWriter = std::make_shared<FollowsWriter>(pkb->getFollowsStore());
+      followsTWriter = std::make_shared<FollowsTWriter>(pkb->getFollowsTStore());
+      parentWriter = std::make_shared<ParentWriter>(pkb->getParentStore());
+      parentTWriter = std::make_shared<ParentTWriter>(pkb->getParentTStore());
+      usesPWriter = std::make_shared<UsesPWriter>(pkb->getUsesPStore());
+      usesSWriter = std::make_shared<UsesSWriter>(pkb->getUsesSStore());
+      modifiesPWriter = std::make_shared<ModifiesPWriter>(pkb->getModifiesPStore());
+      modifiesSWriter = std::make_shared<ModifiesSWriter>(pkb->getModifiesSStore());
+
+      assignWriter = std::make_shared<AssignWriter>(pkb->getAssignStore());
+      variableWriter = std::make_shared<VariableWriter>(pkb->getVariableStore());
+      constantWriter = std::make_shared<ConstantWriter>(pkb->getConstantStore());
+      procedureWriter = std::make_shared<ProcedureWriter>(pkb->getProcedureStore());
+      statementWriter = std::make_shared<StatementWriter>(pkb->getStatementStore());
+      ifWriter = std::make_shared<IfWriter>(pkb->getIfStore());
+      whileWriter = std::make_shared<WhileWriter>(pkb->getWhileStore());
+      callWriter = std::make_shared<CallWriter>(pkb->getCallStore());
+      readWriter = std::make_shared<ReadWriter>(pkb->getReadStore());
+      printWriter = std::make_shared<PrintWriter>(pkb->getPrintStore());
+
+      assignPatternWriter = std::make_shared<AssignPatternWriter>(pkb->getAssignPatternStore());
+      ifPatternWriter = std::make_shared<IfPatternWriter>(pkb->getIfPatternStore());
+      whilePatternWriter = std::make_shared<WhilePatternWriter>(pkb->getWhilePatternStore());
+    }
+    // Relationships
+    std::shared_ptr<FollowsWriter> getFollowsWriter() {
+      return followsWriter;
+    }
+
+    std::shared_ptr<FollowsTWriter> getFollowsTWriter() {
+      return followsTWriter;
+    }
+
+    std::shared_ptr<ParentWriter> getParentWriter() {
+      return parentWriter;
+    }
+
+    std::shared_ptr<ParentTWriter> getParentTWriter() {
+      return parentTWriter;
+    }
+
+    std::shared_ptr<UsesPWriter> getUsesPWriter() {
+      return usesPWriter;
+    }
+
+    std::shared_ptr<UsesSWriter> getUsesSWriter() {
+      return usesSWriter;
+    }
+
+    std::shared_ptr<ModifiesPWriter> getModifiesPWriter() {
+      return modifiesPWriter;
+    }
+
+    std::shared_ptr<ModifiesSWriter> getModifiesSWriter() {
+      return modifiesSWriter;
+    }
+
+    // Entities
+    std::shared_ptr<VariableWriter> getVariableWriter() {
+      return variableWriter;
+    }
+
+    std::shared_ptr<ConstantWriter> getConstantWriter() {
+      return constantWriter;
+    }
+
+    std::shared_ptr<ProcedureWriter> getProcedureWriter() {
+      return procedureWriter;
+    }
+
+    std::shared_ptr<StatementWriter> getStatementWriter() {
+      return statementWriter;
+    }
+
+    std::shared_ptr<IfWriter> getIfWriter() {
+      return ifWriter;
+    }
+
+    std::shared_ptr<WhileWriter> getWhileWriter() {
+      return whileWriter;
+    }
+
+    std::shared_ptr<CallWriter> getCallWriter() {
+      return callWriter;
+    }
+
+    std::shared_ptr<ReadWriter> getReadWriter() {
+      return readWriter;
+    }
+
+    std::shared_ptr<PrintWriter> getPrintWriter() {
+      return printWriter;
+    }
+
+    std::shared_ptr<AssignWriter> getAssignWriter() {
+      return assignWriter;
+    }
+
+    // Patterns
+    std::shared_ptr<AssignPatternWriter> getAssignPatternWriter() {
+      return assignPatternWriter;
+    }
+
+    std::shared_ptr<IfPatternWriter> getIfPatternWriter() {
+      return ifPatternWriter;
+    }
+
+    std::shared_ptr<WhilePatternWriter> getWhilePatternWriter() {
+      return whilePatternWriter;
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/PKB.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class PKB {
+private:
+    // Relationship stores
+    std::shared_ptr<FollowsStore> followsStore;
+    std::shared_ptr<FollowsTStore> followsTStore;
+    std::shared_ptr<ParentStore> parentStore;
+    std::shared_ptr<ParentTStore> parentTStore;
+    std::shared_ptr<UsesPStore> usesPStore;
+    std::shared_ptr<UsesSStore> usesSStore;
+    std::shared_ptr<ModifiesPStore> modifiesPStore;
+    std::shared_ptr<ModifiesSStore> modifiesSStore;
+
+    // Entity stores
+    std::shared_ptr<StatementStore> statementStore;
+    std::shared_ptr<ReadStore> readStore;
+    std::shared_ptr<PrintStore> printStore;
+    std::shared_ptr<CallStore> callStore;
+    std::shared_ptr<WhileStore> whileStore;
+    std::shared_ptr<IfStore> ifStore;
+    std::shared_ptr<AssignStore> assignStore;
+    std::shared_ptr<VariableStore> variableStore;
+    std::shared_ptr<ConstantStore> constantStore;
+    std::shared_ptr<ProcedureStore> procedureStore;
+
+    // Pattern stores
+    std::shared_ptr<AssignPatternStore> assignPatternStore;
+    std::shared_ptr<IfPatternStore> ifPatternStore;
+    std::shared_ptr<WhilePatternStore> whilePatternStore;
+public:
+    PKB() {
+        // Initialise all relationship stores
+        followsTStore = std::make_shared<FollowsTStore>();
+        followsStore = std::make_shared<FollowsStore>();
+        parentStore = std::make_shared<ParentStore>();
+        parentTStore = std::make_shared<ParentTStore>();
+        usesPStore = std::make_shared<UsesPStore>();
+        usesSStore = std::make_shared<UsesSStore>();
+        modifiesPStore = std::make_shared<ModifiesPStore>();
+        modifiesSStore = std::make_shared<ModifiesSStore>();
+
+        // Initialize all entities stores
+        statementStore = std::make_shared<StatementStore>();
+        readStore = std::make_shared<ReadStore>();
+        printStore = std::make_shared<PrintStore>();
+        callStore = std::make_shared<CallStore>();
+        whileStore = std::make_shared<WhileStore>();
+        ifStore = std::make_shared<IfStore>();
+        assignStore = std::make_shared<AssignStore>();
+        variableStore = std::make_shared<VariableStore>();
+        constantStore = std::make_shared<ConstantStore>();
+        procedureStore = std::make_shared<ProcedureStore>();
+
+        // Initialize all pattern stores
+        assignPatternStore = std::make_shared<AssignPatternStore>();
+        ifPatternStore = std::make_shared<IfPatternStore>();
+        whilePatternStore = std::make_shared<WhilePatternStore>();
+    }
+
+    // Relationship Getters
+    std::shared_ptr<FollowsStore> getFollowsStore() { return followsStore; }
+    std::shared_ptr<FollowsTStore> getFollowsTStore() { return followsTStore; }
+    std::shared_ptr<ParentStore> getParentStore() { return parentStore; }
+    std::shared_ptr<ParentTStore> getParentTStore() { return parentTStore; }
+    std::shared_ptr<UsesPStore> getUsesPStore() { return usesPStore; }
+    std::shared_ptr<UsesSStore> getUsesSStore() { return usesSStore; }
+    std::shared_ptr<ModifiesPStore> getModifiesPStore() { return modifiesPStore; }
+    std::shared_ptr<ModifiesSStore> getModifiesSStore() { return modifiesSStore; }
+
+    // Entity Getters
+    std::shared_ptr<StatementStore> getStatementStore() { return statementStore; }
+    std::shared_ptr<ReadStore> getReadStore() { return readStore; }
+    std::shared_ptr<PrintStore> getPrintStore() { return printStore; }
+    std::shared_ptr<CallStore> getCallStore() { return callStore; }
+    std::shared_ptr<WhileStore> getWhileStore() { return whileStore; }
+    std::shared_ptr<IfStore> getIfStore() { return ifStore; }
+    std::shared_ptr<AssignStore> getAssignStore() { return assignStore; }
+    std::shared_ptr<VariableStore> getVariableStore() { return variableStore; }
+    std::shared_ptr<ConstantStore> getConstantStore() { return constantStore; }
+    std::shared_ptr<ProcedureStore> getProcedureStore() { return procedureStore; }
+
+    // Pattern Getters
+    std::shared_ptr<AssignPatternStore> getAssignPatternStore() { return assignPatternStore; }
+    std::shared_ptr<IfPatternStore> getIfPatternStore() { return ifPatternStore; }
+    std::shared_ptr<WhilePatternStore> getWhilePatternStore() { return whilePatternStore; }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/templates/TemplateMapSet.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+/**
+ * @brief Template class for key-set of values store.
+ *
+ * @tparam KeyType Type of keys in the TemplateMapSet.
+ * @tparam ValueType Type of values in the TemplateMapSet.
+ */
+template <typename KeyType, typename ValueType>
+class TemplateMapSet {
+private:
+    std::unordered_map<KeyType, std::unordered_set<ValueType>> map;
+public:
+    /**
+     * @brief Construct an empty TemplateMapSet.
+     */
+    TemplateMapSet();
+    /**
+     * @brief Checks if the TemplateMapSet is empty.
+     */
+
+    /**
+     * @brief Get all values in the TemplateMapSet.
+     *
+     * @return Map of all key-values in the TemplateMapSet.
+     */
+    bool isEmpty() {
+        return this->map.empty();
+    }
+
+    std::unordered_map<KeyType, std::unordered_set<ValueType>> getMapSet();
+
+    /**
+     * @brief Get all keys in the TemplateMapSet.
+     *
+     * @return Set of all keys in the TemplateMapSet.
+     */
+    std::unordered_set<KeyType> getKeys();
+
+    /**
+     * @brief Get all values in the TemplateMapSet.
+     *
+     * @return Set of all values in the TemplateMapSet.
+     */
+    std::unordered_set<ValueType> getValues();
+
+    /**
+     * @brief Get the set of values associated with the given key.
+     *
+     * @param key Key to search for.
+     * @return Set of values associated with the given key.
+     */
+    std::unordered_set<ValueType> getValuesByKey(KeyType key);
+
+    /**
+     * @brief Check if the given key exists in the TemplateMapSet.
+     *
+     * @param key Key to search for.
+     * @return True if the key exists in the TemplateMapSet, false otherwise.
+     */
+    bool hasKey(KeyType key);
+
+    /**
+     * @brief Check if the given value exists in the TemplateMapSet for a given key.
+     *
+     * @param key Key to search for.
+     * @param value Value to search for.
+     * @return True if the value exists in the TemplateMapSet, false otherwise.
+     */
+    bool hasKeyValue(KeyType key, ValueType value);
+
+    /**
+     * @brief Add a key-value pair to the TemplateMapSet.
+     *
+     * @param key Key to add.
+     * @param value Value to add.
+     */
+    void addKeyValue(KeyType key, ValueType value);
+
+    /**
+     * @brief Remove the key-value pair associated with the given key from the TemplateMapSet.
+     *
+     * @param key Key to remove.
+     */
+    void remove(KeyType key);
+
+    /**
+     * @brief Clear all key-value pairs from the TemplateMapSet.
+     */
+    void clear();
+};
+
+/**
+ * Default implementations for TemplateMapSet's methods.
+ */
+template <typename KeyType, typename ValueType>
+TemplateMapSet<KeyType, ValueType>::TemplateMapSet() = default;
+
+template <typename KeyType, typename ValueType>
+std::unordered_map<KeyType, std::unordered_set<ValueType>> TemplateMapSet<KeyType, ValueType>::getMapSet() {
+    return this->map;
+}
+
+template <typename KeyType, typename ValueType>
+std::unordered_set<KeyType> TemplateMapSet<KeyType, ValueType>::getKeys() {
+  std::unordered_set<KeyType> keys;
+    for (auto const& pair : this->map) {
+        keys.insert(pair.first);
+    }
+    return keys;
+}
+
+template <typename KeyType, typename ValueType>
+std::unordered_set<ValueType> TemplateMapSet<KeyType, ValueType>::getValues() {
+  std::unordered_set<ValueType> values;
+    for (auto const& pair : this->map) {
+        for (auto const& value : pair.second) {
+            values.insert(value);
+        }
+    }
+    return values;
+}
+
+template <typename KeyType, typename ValueType>
+std::unordered_set<ValueType> TemplateMapSet<KeyType, ValueType>::getValuesByKey(KeyType key) {
+    if (this->map.find(key) == this->map.end()) {
+        return std::unordered_set<ValueType>();
+    }
+    return this->map[key];
+}
+
+template <typename KeyType, typename ValueType>
+bool TemplateMapSet<KeyType, ValueType>::hasKey(KeyType key) {
+    return this->map.find(key) != this->map.end();
+}
+
+template <typename KeyType, typename ValueType>
+bool TemplateMapSet<KeyType, ValueType>::hasKeyValue(KeyType key, ValueType value) {
+    if (this->map.find(key) == this->map.end()) {
+        return false;
+    }
+    return this->map[key].find(value) != this->map[key].end();
+}
+
+template <typename KeyType, typename ValueType>
+void TemplateMapSet<KeyType, ValueType>::addKeyValue(KeyType key, ValueType value) {
+    this->map[key].insert(value);
+}
+
+template <typename KeyType, typename ValueType>
+void TemplateMapSet<KeyType, ValueType>::remove(KeyType key) {
+    this->map.erase(key);
+}
+
+template <typename KeyType, typename ValueType>
+void TemplateMapSet<KeyType, ValueType>::clear() {
+    this->map.clear();
 }
 --------------------
 RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/unit_testing/src/sp/LexicalTokenTest_AI.cpp
+File: Team19/Code19/src/spa/src/pkb/readers/patterns/AssignPatternReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class AssignPatternReader : public IAssignPatternReader {
+private:
+    std::shared_ptr<AssignPatternStore> assignPatternStore;
+public:
+    explicit AssignPatternReader(std::shared_ptr<AssignPatternStore> store) : assignPatternStore(std::move(store)) {}
+
+    // Inherited methods
+    bool isEmpty() override {
+        return assignPatternStore->isEmpty();
+    }
+
+    std::string getLHS(int statementNumber) override {
+        return assignPatternStore->getLHS(statementNumber);
+    }
+
+    std::string getRHS(int statementNumber) override {
+        return assignPatternStore->getRHS(statementNumber);
+    }
+
+    std::unordered_map<int, std::pair<std::string, std::string>> getAllPatterns() override {
+        return assignPatternStore->getAllPatterns();
+    }
+
+    std::pair<std::string, std::string> getPattern(int statementNumber) override {
+        return assignPatternStore->getPattern(statementNumber);
+    }
+
+    bool contains(int statementNumber) override {
+        return assignPatternStore->contains(statementNumber);
+    }
+
+    std::unordered_set<int> getAllStatementNumbers() override {
+        return assignPatternStore->getAllStatementNumbers();
+    }
+
+    std::unordered_set<int> getStatementNumbersWithLHS(const std::string& LHS) override {
+        return assignPatternStore->getStatementNumbersWithLHS(LHS);
+    }
+
+    std::unordered_set<int> getStatementNumbersWithRHS(const std::string& RHS) override {
+        return assignPatternStore->getStatementNumbersWithRHS(RHS);
+    }
+
+    std::unordered_set<int> getStatementNumbersWithPartialRHS(const std::string& partialRHS) override {
+        return assignPatternStore->getStatementNumbersWithPartialRHS(partialRHS);
+    }
+
+    std::unordered_set<int> getStatementNumbersWithLHSRHS (const std::string& LHS, const std::string& RHS) override {
+        return assignPatternStore->getStatementNumbersWithLHSRHS(LHS, RHS);
+    }
+
+    std::unordered_set<int> getStatementNumbersWithLHSPartialRHS (const std::string& LHS, const std::string& partialRHS) override {
+        return assignPatternStore->getStatementNumbersWithLHSPartialRHS(LHS, partialRHS);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/patterns/IfPatternReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class IfPatternReader: public IControlPatternReader {
+private:
+    std::shared_ptr<IfPatternStore> ifPatternStore;
+public:
+    explicit IfPatternReader(std::shared_ptr<IfPatternStore> store) : ifPatternStore(std::move(store)) {}
+
+    // Custom methods
+    /**
+     * @brief Gets the statement numbers of the "If" patterns that match the given control variable.
+     * @param controlVariable
+     * @return unordered_set<int>: The set of statement numbers of all "If" patterns that match the given control variable.
+     */
+    std::unordered_set<int> getStatementNumbersOfIfControlVariable(const std::string& controlVariable) {
+      return ifPatternStore->getStatementNumbersWithIfPattern(controlVariable);
+    };
+
+    /**
+     * @brief Gets the "If" pattern of the given statement.
+     * @param statementNumber
+     * @return std::string: The control variable of the "If" pattern of the given statement.
+     */
+    std::unordered_set<std::string> getControlVariablesOfIfStatement(int statementNumber) {
+      return ifPatternStore->getIfPatternsWithStatementNumber(statementNumber);
+    };
+
+    /**
+     * @brief Checks if a specific "If" pattern exists for the given statement.
+     * @return true if the "If" pattern exists, false otherwise.
+     */
+    bool hasStatementNumberWithIfPattern(int statementNumber) {
+      return ifPatternStore->hasStatementNumberWithIfPattern(statementNumber);
+    };
+
+    /**
+     * @brief Gets all statement numbers of "If" control variables.
+     * @return unordered_set<int>: The set of statement numbers of all "If" control variables.
+     */
+    std::unordered_set<int> getAllStatementNumbersOfIfControlVariables() {
+      return ifPatternStore->getAllStatementNumbers();
+    };
+
+    /**
+     * @brief Gets the statement numbers of all "If" control variables.
+     * @return unordered_set<int>: The set of statement numbers of all "If" control variables.
+     */
+    std::unordered_set<std::string> getAllIfControlVariables() {
+      return ifPatternStore->getAllIfPatterns();
+    };
+
+    // Inherited methods
+    /**
+     * Check if the store is empty
+     * @return true if the store is empty, false otherwise
+     */
+    bool isEmpty() override {
+        return ifPatternStore->isEmpty();
+    };
+
+    std::unordered_set<int> getAllStatementNumbers() override {
+        return ifPatternStore->getAllStatementNumbers();
+    };
+
+    std::unordered_set<std::string> getControlPatternsWithStatementNumber(int statementNumber) override {
+      return ifPatternStore->getIfPatternsWithStatementNumber(statementNumber);
+    };
+
+    std::unordered_set<int> getStatementNumbersWithControlPattern(const std::string& controlPattern) override {
+        return ifPatternStore->getStatementNumbersWithIfPattern(controlPattern);
+    };
+
+    bool hasStatementNumber(int statementNumber) override {
+        return ifPatternStore->hasStatementNumberWithIfPattern(statementNumber);
+    };
+
+    bool hasControlPattern(const std::string& controlPattern) override {
+        return ifPatternStore->hasIfPattern(controlPattern);
+    };
+
+
+    bool hasControlPatternAtStatement(int statementNumber, const std::string& controlPattern) override {
+      return ifPatternStore->hasIfPatternAtStatement(statementNumber, controlPattern);
+    };
+
+    std::unordered_set<std::string> getAllControlPatterns() override {
+        return ifPatternStore->getAllIfPatterns();
+    };
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/patterns/WhilePatternReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class WhilePatternReader: public IControlPatternReader {
+private:
+    std::shared_ptr<WhilePatternStore> whilePatternStore;
+public:
+    explicit WhilePatternReader(std::shared_ptr<WhilePatternStore> store) : whilePatternStore(std::move(store)) {}
+
+    // Custom methods
+    /**
+     * @brief Gets the statement numbers of the "While" patterns that match the given control variable.
+     * @param controlVariable
+     * @return unordered_set<int>: The set of statement numbers of all "While" patterns that match the given control variable.
+     */
+    std::unordered_set<int> getStatementNumbersOfWhileControlVariable(const std::string& controlVariable) {
+      return whilePatternStore->getStatementNumbersWithWhilePattern(controlVariable);
+    };
+
+    /**
+     * @brief Gets the "While" pattern of the given statement.
+     * @param statementNumber
+     * @return std::string: The control variable of the "While" pattern of the given statement.
+     */
+    std::unordered_set<std::string> getControlVariablesOfWhileStatement(int statementNumber) {
+      return whilePatternStore->getWhilePatternsWithStatementNumber(statementNumber);
+    };
+
+    /**
+     * @brief Checks while a specwhileic "While" pattern exists for the given statement.
+     * @return true while the "While" pattern exists, false otherwise.
+     */
+    bool hasStatementNumberWithWhilePattern(int statementNumber) {
+      return whilePatternStore->hasStatementNumberWithWhilePattern(statementNumber);
+    };
+
+    /**
+     * @brief Gets all statement numbers of "While" control variables.
+     * @return unordered_set<int>: The set of statement numbers of all "While" control variables.
+     */
+    std::unordered_set<int> getAllStatementNumbersOfWhileControlVariables() {
+      return whilePatternStore->getAllStatementNumbers();
+    };
+
+    /**
+     * @brief Gets the statement numbers of all "While" control variables.
+     * @return unordered_set<int>: The set of statement numbers of all "While" control variables.
+     */
+    std::unordered_set<std::string> getAllWhileControlVariables() {
+      return whilePatternStore->getAllWhilePatterns();
+    };
+
+    // Inherited methods
+    /**
+     * Check while the store is empty
+     * @return true while the store is empty, false otherwise
+     */
+    bool isEmpty() override {
+      return whilePatternStore->isEmpty();
+    };
+
+    std::unordered_set<int> getAllStatementNumbers() override {
+      return whilePatternStore->getAllStatementNumbers();
+    };
+
+    std::unordered_set<std::string> getControlPatternsWithStatementNumber(int statementNumber) override {
+      return whilePatternStore->getWhilePatternsWithStatementNumber(statementNumber);
+    };
+
+    std::unordered_set<int> getStatementNumbersWithControlPattern(const std::string& controlPattern) override {
+      return whilePatternStore->getStatementNumbersWithWhilePattern(controlPattern);
+    };
+
+    bool hasStatementNumber(int statementNumber) override {
+      return whilePatternStore->hasStatementNumberWithWhilePattern(statementNumber);
+    };
+
+    bool hasControlPattern(const std::string& controlPattern) override {
+      return whilePatternStore->hasWhilePattern(controlPattern);
+    };
+
+
+    bool hasControlPatternAtStatement(int statementNumber, const std::string& controlPattern) override {
+      return whilePatternStore->hasWhilePatternAtStatement(statementNumber, controlPattern);
+    };
+
+    std::unordered_set<std::string> getAllControlPatterns() override {
+      return whilePatternStore->getAllWhilePatterns();
+    };
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/relationships/ParentTReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ParentTReader: public IRelationshipReader<int, int> {
+private:
+    std::shared_ptr<ParentTStore> parentTStore;
+public:
+    explicit ParentTReader(std::shared_ptr<ParentTStore> store) {
+      parentTStore = std::move(store);
+    }
+    // Custom methods
+    /**
+     * @brief Gets the parentT statement numbers of all "ParentT" relationships.
+     * @return unordered_set<int>: The set of statement numbers of s1 in ParentT(s1, s2)
+     */
+    std::unordered_set<int> getAllParentTs() {
+      return parentTStore->getKeys();
+    }
+
+    /**
+     * @brief Gets the childT statement numbers of all "ParentT" relationships.
+     * @return unordered_set<int>: The set of statement numbers of s2 in ParentT(s1, s2)
+     */
+    std::unordered_set<int> getAllChildrenT() {
+      return parentTStore->getValues();
+    }
+
+    /**
+     * @brief Gets the set of statement numbers of parentT of the given childT statement.
+     * @param stmt
+     * @return unordered_set<int>: The set of statement number of all s1 in ParentT(s1, stmt)
+     */
+    std::unordered_set<int> getParentT(int child) {
+      return parentTStore->getRelationshipsByValue(child);
+    }
+
+    /**
+     * @brief Gets the set of statement number of the children of the given parentT statement.
+     * @param stmt: stmt in ParentT(stmt, s2)
+     * @return unordered_set<int>: The set of statement numbers of all s2 in ParentT(stmt, s2)
+     */
+    std::unordered_set<int> getChildT(int parentT) {
+      return parentTStore->getRelationshipsByKey(parentT);
+    }
+
+    /**
+     * @brief Checks if a specific "ParentT" relationship exists between a parentT and a childT.
+     * @param parentT The parentT part of the relationship to check.
+     * @param childT The childT part of the relationship to check.
+     * @return true if the relationship exists, false otherwise.
+     */
+    bool hasParentT(int parentT, int childT) {
+      return parentTStore->hasRelationship(parentT, childT);
+    }
+
+    // Inherited methods
+    bool isEmpty() override {
+      return parentTStore->isEmpty();
+    }
+
+    std::unordered_map<int, std::unordered_set<int>> getKeyValueRelationships() override {
+      return parentTStore->getKeyValueRelationships();
+    }
+
+    std::unordered_map<int, std::unordered_set<int>> getValueKeyRelationships() override {
+      return parentTStore->getValueKeyRelationships();
+    }
+
+    std::unordered_set<int> getKeys() override {
+      return getAllParentTs();
+    }
+
+    std::unordered_set<int> getValues() override {
+      return getAllChildrenT();
+    }
+
+    std::unordered_set<int> getRelationshipsByValue(int stmtNum) override {
+      return getParentT(stmtNum);
+    }
+
+    std::unordered_set<int> getRelationshipsByKey(int stmtNum) override {
+      return getChildT(stmtNum);
+    }
+
+    bool hasRelationship(int stmt1, int stmt2) override {
+      return hasParentT(stmt1, stmt2);
+    }
+
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/relationships/ParentReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ParentReader: public IRelationshipReader<int, int> {
+private:
+    std::shared_ptr<ParentStore> parentStore;
+public:
+    explicit ParentReader(std::shared_ptr<ParentStore> store) {
+      parentStore = std::move(store);
+    }
+    // Custom methods
+    /**
+     * @brief Gets the parent statement numbers of all "Parent" relationships.
+     * @return unordered_set<int>: The set of statement numbers of s1 in Parent(s1, s2)
+     */
+    std::unordered_set<int> getAllParents() {
+      return parentStore->getKeys();
+    }
+
+    /**
+     * @brief Gets the child statement numbers of all "Parent" relationships.
+     * @return unordered_set<int>: The set of statement numbers of s2 in Parent(s1, s2)
+     */
+    std::unordered_set<int> getAllChildren() {
+      return parentStore->getValues();
+    }
+
+    /**
+     * @brief Gets the statement number of parent of the given child statement.
+     * @param stmt
+     * @return unordered_set<int>: The set of statement number of all s1 in Parent*(s1, stmt)
+     */
+    std::unordered_set<int> getParent(int child) {
+      return parentStore->getRelationshipsByValue(child);
+    }
+
+    /**
+     * @brief Gets the statement number of the child of the given parent statement.
+     * @param stmt: stmt in Parent(stmt, s2)
+     * @return unordered_set<int>: The set of statement numbers of all s2 in Parent(stmt, s2)
+     */
+    std::unordered_set<int> getChild(int parent) {
+      return parentStore->getRelationshipsByKey(parent);
+    }
+
+    /**
+     * @brief Checks if a specific relationship exists between a parent and a child.
+     * @param parent The parent part of the relationship to check.
+     * @param child The child part of the relationship to check.
+     * @return true if the relationship exists, false otherwise.
+     */
+    bool hasParent(int parent, int child) {
+      return parentStore->hasRelationship(parent, child);
+    }
+
+    // Inherited methods
+    bool isEmpty() override {
+      return parentStore->isEmpty();
+    }
+
+    std::unordered_map<int, std::unordered_set<int>> getKeyValueRelationships() override {
+      return parentStore->getKeyValueRelationships();
+    }
+
+    std::unordered_map<int, std::unordered_set<int>> getValueKeyRelationships() override {
+      return parentStore->getValueKeyRelationships();
+    }
+
+    std::unordered_set<int> getKeys() override {
+      return getAllParents();
+    }
+
+    std::unordered_set<int> getValues() override {
+      return getAllChildren();
+    }
+
+    std::unordered_set<int> getRelationshipsByValue(int stmtNum) override {
+      return getParent(stmtNum);
+    }
+
+    std::unordered_set<int> getRelationshipsByKey(int stmtNum) override {
+      return getChild(stmtNum);
+    }
+
+    bool hasRelationship(int stmt1, int stmt2) override {
+      return hasParent(stmt1, stmt2);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/relationships/FollowsTReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class FollowsTReader: public IRelationshipReader<int, int> {
+private:
+    std::shared_ptr<FollowsTStore> followsTStore;
+public:
+    explicit FollowsTReader(std::shared_ptr<FollowsTStore> store) {
+      followsTStore = std::move(store);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets the preceding statement numbers of all "FollowsT" relationships.
+     * @return unordered_set<int>: The set of statement numbers of s1 in FollowsT(s1, s2)
+     */
+    std::unordered_set<int> getAllPreFollowsT() {
+      return followsTStore->getKeys();
+    }
+
+    /**
+     * @brief Gets the post statement numbers of all "FollowsT" relationships.
+     * @return unordered_set<int>: The set of statement numbers of s2 in FollowsT(s1, s2)
+     */
+    std::unordered_set<int> getAllPostFollowsT() {
+      return followsTStore->getValues();
+    }
+
+    /**
+     * @brief Gets the set of statements number of reversed "FollowsT" relationships of the given statement.
+     * @param stmt
+     * @return unordered_set<int>: The set of statement number of all s1 in FollowsT(s1, stmt)
+     */
+    std::unordered_set<int> getPreFollowsT(int stmt) {
+      return followsTStore->getRelationshipsByValue(stmt);
+    }
+
+    /**
+     * @brief Gets the set of statements number of "FollowsT" relationships of the given statement.
+     * @param stmt: stmt in FollowsT(stmt, s2)
+     * @return unordered_set<int>: The set of statement numbers of all s2 in FollowsT(stmt, s2)
+     */
+    std::unordered_set<int> getPostFollowsT(int stmt) {
+      return followsTStore->getRelationshipsByKey(stmt);
+    }
+
+    /**
+     * @brief Checks if a specific "FollowsT" relationship exists between two statements.
+     * @param stmt1: The statement number of the first statement.
+     * @param stmt2: The statement number of the second statement.
+     * @return true if the "FollowsT" relationship exists, false otherwise.
+     */
+    bool hasFollowsT(int stmt1, int stmt2) {
+      return followsTStore->hasRelationship(stmt1, stmt2);
+    }
+    // Inherited methods
+    bool isEmpty() override {
+      return followsTStore->isEmpty();
+    }
+
+    std::unordered_map<int, std::unordered_set<int>> getKeyValueRelationships() override {
+      return followsTStore->getKeyValueRelationships();
+    }
+
+    std::unordered_map<int, std::unordered_set<int>> getValueKeyRelationships() override {
+      return followsTStore->getValueKeyRelationships();
+    }
+
+    std::unordered_set<int> getKeys() override {
+      return getAllPreFollowsT();
+    }
+
+    std::unordered_set<int> getValues() override {
+      return getAllPostFollowsT();
+    }
+
+    std::unordered_set<int> getRelationshipsByValue(int stmtNum) override {
+      return getPreFollowsT(stmtNum);
+    }
+
+    std::unordered_set<int> getRelationshipsByKey(int stmtNum) override {
+      return getPostFollowsT(stmtNum);
+    }
+
+    bool hasRelationship(int stmt1, int stmt2) override {
+      return hasFollowsT(stmt1, stmt2);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/relationships/FollowsReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class FollowsReader: public IRelationshipReader<int, int> {
+private:
+    std::shared_ptr<FollowsStore> followsStore;
+public:
+    explicit FollowsReader(std::shared_ptr<FollowsStore> store) {
+      followsStore = std::move(store);
+    }
+
+    // Inherited methods
+    bool isEmpty() override {
+      return followsStore->isEmpty();
+    }
+
+    std::unordered_map<int, std::unordered_set<int>> getKeyValueRelationships() override {
+      return followsStore->getKeyValueRelationships();
+    }
+
+    std::unordered_map<int, std::unordered_set<int>> getValueKeyRelationships() override {
+      return followsStore->getValueKeyRelationships();
+    }
+
+    std::unordered_set<int> getKeys() override {
+      return getAllPreFollows();
+    }
+
+    std::unordered_set<int> getValues() override {
+      return getAllPostFollows();
+    }
+
+    std::unordered_set<int> getRelationshipsByValue(int stmtNum) override {
+      return getPreFollows(stmtNum);
+    }
+
+    std::unordered_set<int> getRelationshipsByKey(int stmtNum) override {
+      return getPostFollows(stmtNum);
+    }
+
+    bool hasRelationship(int stmt1, int stmt2) override {
+      return hasFollows(stmt1, stmt2);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets the preceding statement numbers of all "Follows" relationships.
+     * @return unordered_set<int>: The set of statement numbers of s1 in Follows(s1, s2)
+     */
+    std::unordered_set<int> getAllPreFollows() {
+      return followsStore->getKeys();
+    }
+
+    /**
+     * @brief Gets the post statement numbers of all "Follows" relationships.
+     * @return unordered_set<int>: The set of statement numbers of s2 in Follows(s1, s2)
+     */
+    std::unordered_set<int> getAllPostFollows() {
+      return followsStore->getValues();
+    }
+
+    /**
+     * @brief Gets the statement number of reversed "Follows" relationships of the given statement.
+     * @param stmt
+     * @return unordered_set<int>: The set of statement number of all s1 in Follows(s1, stmt)
+     */
+    std::unordered_set<int> getPreFollows(int stmt) {
+      return followsStore->getRelationshipsByValue(stmt);
+    }
+
+    /**
+     * @brief Gets the statement number of "Follows" relationships of the given statement.
+     * @param stmt: stmt in Follows(stmt, s2)
+     * @return unordered_set<int>: The set of statement numbers of all s2 in Follows(stmt, s2)
+     */
+    std::unordered_set<int> getPostFollows(int stmt) {
+      return followsStore->getRelationshipsByKey(stmt);
+    }
+
+    /**
+     * @brief Checks if a specific "Follows" relationship exists between a given statement and another statement.
+     * @param stmt1 The statement number of the first statement.
+     * @param stmt2 The statement number of the second statement.
+     * @return true if the "Follows" relationship exists, false otherwise.
+     */
+    bool hasFollows(int stmt1, int stmt2) {
+      return followsStore->hasRelationship(stmt1, stmt2);
+    }
+
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/CallReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class CallReader: public IEntityReader<int> {
+private:
+    std::shared_ptr<CallStore> callStore;
+public:
+    explicit CallReader(std::shared_ptr<CallStore> store) {
+      callStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return callStore->isEmpty();
+    }
+
+    std::unordered_set<int> getAllEntities() const override {
+        return getAllCalls();
+    }
+
+    bool contains(int stmtNum) const override {
+      return hasCall(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all statement numbers of "Call" statements.
+     * @return unordered_set<int>: The set of statement numbers of all "Call" statements.
+     */
+    std::unordered_set<int> getAllCalls() const {
+      return callStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific "Call" statement exists.
+     * @param stmtNum The statement number to check.
+     * @return true if the "Call" statement exists, false otherwise.
+     */
+    bool hasCall(int stmtNum) const {
+      return callStore->contains(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/IfReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class IfReader: public IEntityReader<int> {
+private:
+    std::shared_ptr<IfStore> ifStore;
+public:
+    explicit IfReader(std::shared_ptr<IfStore> store) {
+      ifStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return ifStore->isEmpty();
+    }
+
+    std::unordered_set<int> getAllEntities() const override {
+        return getAllIfs();
+    }
+
+    bool contains(int stmtNum) const override {
+      return hasIf(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all statement numbers of "If" statements.
+     * @return unordered_set<int>: The set of statement numbers of all "If" statements.
+     */
+    std::unordered_set<int> getAllIfs() const {
+      return ifStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific "If" statement exists.
+     * @param stmtNum The statement number to check.
+     * @return true if the "If" statement exists, false otherwise.
+     */
+    bool hasIf(int stmtNum) const {
+      return ifStore->contains(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/AssignReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class AssignReader: public IEntityReader<int> {
+private:
+    std::shared_ptr<AssignStore> assignStore;
+public:
+    explicit AssignReader(std::shared_ptr<AssignStore> store) {
+        assignStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return assignStore->isEmpty();
+    }
+
+    std::unordered_set<int> getAllEntities() const override {
+        return getAllAssigns();
+    }
+
+    bool contains(int stmtNum) const override {
+      return hasAssign(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all statement numbers of "Assign" statements.
+     * @return unordered_set<int>: The set of statement numbers of all "Assign" statements.
+     */
+    std::unordered_set<int> getAllAssigns() const {
+      return assignStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific "Assign" statement exists.
+     * @param stmtNum The statement number to check.
+     * @return true if the "Assign" statement exists, false otherwise.
+     */
+    bool hasAssign(int stmtNum) const {
+      return assignStore->contains(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/ConstantReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ConstantReader: public IEntityReader<int> {
+private:
+    std::shared_ptr<ConstantStore> constantStore;
+public:
+    explicit ConstantReader(std::shared_ptr<ConstantStore> store) {
+      constantStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return constantStore->isEmpty();
+    }
+
+    std::unordered_set<int> getAllEntities() const override {
+        return getAllConstants();
+    }
+
+    bool contains(int stmtNum) const override {
+      return hasConstant(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all constant values.
+     * @return unordered_set<int>: The set of all constant values.
+     */
+    std::unordered_set<int> getAllConstants() const {
+      return constantStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific constant exists.
+     * @param constant The constant value to check.
+     * @return true if the constant exists, false otherwise.
+     */
+    bool hasConstant(int constant) const {
+      return constantStore->contains(constant);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/PrintReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class PrintReader: public IEntityReader<int> {
+private:
+    std::shared_ptr<PrintStore> printStore;
+public:
+    explicit PrintReader(std::shared_ptr<PrintStore> store) {
+      printStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return printStore->isEmpty();
+    }
+
+    std::unordered_set<int> getAllEntities() const override {
+        return getAllPrints();
+    }
+
+    bool contains(int stmtNum) const override {
+      return hasPrint(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all statement numbers of "Print" statements.
+     * @return unordered_set<int>: The set of statement numbers of all "Print" statements.
+     */
+    std::unordered_set<int> getAllPrints() const {
+      return printStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific "Print" statement exists.
+     * @param stmtNum The statement number to check.
+     * @return true if the "Print" statement exists, false otherwise.
+     */
+    bool hasPrint(int stmtNum) const {
+      return printStore->contains(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/VariableReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class VariableReader: public IEntityReader<std::string> {
+private:
+    std::shared_ptr<VariableStore> variableStore;
+public:
+    explicit VariableReader(std::shared_ptr<VariableStore> vs) {
+        variableStore = std::move(vs);
+    }
+
+    bool isEmpty() const override {
+        return variableStore->isEmpty();
+    }
+
+    std::unordered_set<std::string> getAllEntities() const override {
+        return getAllVariables();
+    }
+
+    bool contains(std::string variable) const override {
+      return hasVariable(variable);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all variable names.
+     * @return unordered_set<string>: The set of all variable names.
+     */
+    std::unordered_set<std::string> getAllVariables() const {
+      return variableStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific variable exists.
+     * @param variable The variable name to check.
+     * @return true if the variable exists, false otherwise.
+     */
+    bool hasVariable(std::string variable) const {
+      return variableStore->contains(std::move(variable));
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/WhileReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class WhileReader: public IEntityReader<int> {
+private:
+    std::shared_ptr<WhileStore> whileStore;
+public:
+    explicit WhileReader(std::shared_ptr<WhileStore> store) {
+      whileStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return whileStore->isEmpty();
+    }
+
+    std::unordered_set<int> getAllEntities() const override {
+        return getAllWhiles();
+    }
+
+    bool contains(int stmtNum) const override {
+      return hasWhile(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all statement numbers of "While" statements.
+     * @return unordered_set<int>: The set of statement numbers of all "While" statements.
+     */
+    std::unordered_set<int> getAllWhiles() const {
+      return whileStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific "While" statement exists.
+     * @param stmtNum The statement number to check.
+     * @return true if the "While" statement exists, false otherwise.
+     */
+    bool hasWhile(int stmtNum) const {
+      return whileStore->contains(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/StatementReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class StatementReader: public IEntityReader<int> {
+private:
+    std::shared_ptr<StatementStore> statementStore;
+public:
+    explicit StatementReader(std::shared_ptr<StatementStore> store) {
+      statementStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return statementStore->isEmpty();
+    }
+
+    std::unordered_set<int> getAllEntities() const override {
+        return getAllStatements();
+    }
+
+    bool contains(int stmtNum) const override {
+      return hasStatement(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all statement numbers.
+     * @return unordered_set<int>: The set of all statement numbers.
+     */
+    std::unordered_set<int> getAllStatements() const {
+      return statementStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific statement exists.
+     * @param stmtNum The statement number to check.
+     * @return true if the statement exists, false otherwise.
+     */
+    bool hasStatement(int stmtNum) const {
+      return statementStore->contains(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/ReadReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ReadReader: public IEntityReader<int> {
+private:
+    std::shared_ptr<ReadStore> readStore;
+public:
+    explicit ReadReader(std::shared_ptr<ReadStore> store) {
+      readStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return readStore->isEmpty();
+    }
+
+    std::unordered_set<int> getAllEntities() const override {
+        return getAllReads();
+    }
+
+    bool contains(int stmtNum) const override {
+      return hasRead(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all statement numbers of "Read" statements.
+     * @return unordered_set<int>: The set of statement numbers of all "Read" statements.
+     */
+    std::unordered_set<int> getAllReads() const {
+      return readStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific "Read" statement exists.
+     * @param stmtNum The statement number to check.
+     * @return true if the "Read" statement exists, false otherwise.
+     */
+    bool hasRead(int stmtNum) const {
+      return readStore->contains(stmtNum);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/readers/entities/ProcedureReader.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class ProcedureReader: public IEntityReader<std::string> {
+private:
+    std::shared_ptr<ProcedureStore> procedureStore;
+public:
+    explicit ProcedureReader(std::shared_ptr<ProcedureStore> store) {
+      procedureStore = std::move(store);
+    }
+
+    bool isEmpty() const override {
+        return procedureStore->isEmpty();
+    }
+
+    std::unordered_set<std::string> getAllEntities() const override {
+        return getAllProcedures();
+    }
+
+    bool contains(std::string stmtNum) const override {
+      return hasProcedure(stmtNum);
+    }
+
+    // Custom methods
+    /**
+     * @brief Gets all procedure names.
+     * @return unordered_set<string>: The set of all procedure names.
+     */
+    std::unordered_set<std::string> getAllProcedures() const {
+      return procedureStore->getAllEntities();
+    }
+
+    /**
+     * @brief Checks if a specific procedure exists.
+     * @param proc The procedure name to check.
+     * @return true if the procedure exists, false otherwise.
+     */
+    bool hasProcedure(std::string proc) const {
+      return procedureStore->contains(proc);
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/spa/src/pkb/PKBManager.h
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class PKBManager {
+private:
+    std::shared_ptr<PKB> pkb;
+    std::shared_ptr<PKBReaderManager> pkbReaderManager;
+    std::shared_ptr<PKBWriterManager> pkbWriterManager;
+public:
+    PKBManager() {
+      pkb = std::make_shared<PKB>(); // TODO: Change to private
+      pkbReaderManager = std::make_shared<PKBReaderManager>(pkb);
+      pkbWriterManager = std::make_shared<PKBWriterManager>(pkb);
+    }
+    std::shared_ptr<PKB> getPKB() {
+        return pkb;
+    }
+    std::shared_ptr<PKBReaderManager> getPKBReaderManager() {
+        return pkbReaderManager;
+    }
+    std::shared_ptr<PKBWriterManager> getPKBWriterManager() {
+        return pkbWriterManager;
+    }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-19
+File: Team19/Code19/src/unit_testing/src/sp/TokenizerTest/LexicalTokenTest_AI.cpp
 Generator: gpt
 Intervention: 2
 Language: e
@@ -1178,7 +4644,7 @@ Prompt: https://platform.openai.com/playground/p/vwMjpyCtExjgJwMs6KZaXnTE?model=
 ChatId: vwMjpyCtExjgJwMs6KZaXnTE
 Code:
 #include "catch.hpp"
-#include "sp/LexicalToken.h"
+#include "sp/SPTokenizer/LexicalToken.h"
 
 // Test the constructor with only token type.
 TEST_CASE("Constructor with only type", "[LexicalToken]")
@@ -1194,60 +4660,12 @@ TEST_CASE("Get TokenType", "[LexicalToken]")
     REQUIRE(token.getTokenType() == LexicalTokenType::OPERATOR_PLUS);
 }
 --------------------
-RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/unit_testing/src/sp/ParseReadStatement_AI.cpp
-Generator: gpt
-Intervention: 2
-Language: e
-Prompt: https://platform.openai.com/playground/p/BL0U9QBHRxSO8JyQGo0KpEUZ?mode=chat
-ChatId: BL0U9QBHRxSO8JyQGo0KpEUZ
-Code:
-TEST_CASE("ReadStmt parsing throws an error with invalid syntax", "[SimpleParser]") {
-	const std::string testFileName = "../../../../../tests/sp/ParserTest/CallStmt1.txt";
-	REQUIRE(std::filesystem::exists(testFileName));
-	SimpleParser parser(testFileName);
-
-	// For this test, we expect parsing to terminate due to erroneous input.
-	CHECK_THROWS_AS(parser.parseRead(), std::runtime_error);
-}
---------------------
-RepoName: 23s2-cp-spa-team-19
-File: Team19/Code19/src/unit_testing/src/sp/ParseReadStatement_AI.cpp
-Generator: gpt
-Intervention: 2
-Language: e
-Prompt: https://platform.openai.com/playground/p/CRO1bXNAQZB3Adua8DmfPuWb?model=gpt-4&mode=chat
-ChatId: CRO1bXNAQZB3Adua8DmfPuWb
-Code:
-TEST_CASE("Testing ReadStmt::buildTree()", "[ReadStmt]") {
-	// Generate test file
-	const std::string testFileName = "../../../../../tests/sp/ParserTest/ReadStmt1.txt";
-	REQUIRE(std::filesystem::exists(testFileName));
-	SimpleParser parser(testFileName);
-
-	SECTION("Testing tree root node") {
-		std::shared_ptr<ASTNode> tree_ptr = parser.parseRead();
-
-		REQUIRE(tree_ptr->type == ASTNodeType::READ);
-		REQUIRE(tree_ptr->lineNumber == 1);
-		REQUIRE(tree_ptr->value == Utility::getASTNodeType(ASTNodeType::READ));
-
-		SECTION("Testing tree child node") {
-			const auto& children = tree_ptr->children;
-			REQUIRE(children.size() == 1);
-			REQUIRE(children[0]->type == ASTNodeType::VARIABLE);
-			REQUIRE(children[0]->lineNumber == 1);
-			REQUIRE(children[0]->value == "readableVariable");
-		}
-	}
-}
---------------------
 Directory:../sample/repo/23s2-cp-spa-team-19
-Total Snippets: 22
-Total lines: 1052
-SP Snippets: 22
-SP lines: 1052
-PKB Snippets: 0
-PKB lines: 0
+Total Snippets: 93
+Total lines: 3842
+SP Snippets: 16
+SP lines: 916
+PKB Snippets: 75
+PKB lines: 2844
 QPS Snippets: 0
 QPS lines: 0

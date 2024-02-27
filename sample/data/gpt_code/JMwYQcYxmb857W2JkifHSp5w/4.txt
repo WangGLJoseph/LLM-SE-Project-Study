@@ -1,9 +1,0 @@
-namespace std {
-    template <>
-    struct hash<Stmt> {
-        std::size_t operator()(const Stmt& stmt) const {
-            return ((hash<int>()(stmt.stmtNum)
-                     ^ (hash<int>()(static_cast<int>(stmt.type)) << 1)) >> 1);
-        }
-    };
-}

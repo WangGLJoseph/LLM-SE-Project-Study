@@ -1,4 +1,3 @@
-23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/spa/src/qps/entity/strategy/DeclarationStrategy.cpp
-23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/spa/src/qps/QueryParser.cpp
-23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/unit_testing/src/QPS/TestQueryParser.cpp
-23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/unit_testing/src/QPS/strategy/TestProjectionStrategy.cpp
+23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/spa/src/qps/entity/parser/DeclarationsParser.cpp
+23s2-cp-spa-team-03: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/spa/src/qps/entity/evaluation/QueryEvaluationContext.cpp
+23s2-cp-spa-team-03: Tag error, prompt is not found in file: ../sample/repo/23s2-cp-spa-team-03/Team03/Code03/src/spa/src/qps/QueryValidator.cpp

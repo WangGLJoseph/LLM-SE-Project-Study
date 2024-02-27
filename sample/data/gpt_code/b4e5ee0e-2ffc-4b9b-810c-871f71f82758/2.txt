@@ -7,6 +7,7 @@
 
 class ProjectionStrategy : public Strategy {
 public:
+    // TODO: support multiple synonyms
     explicit ProjectionStrategy(std::shared_ptr<Synonym> synonym);
     void execute(QueryEvaluationContext &context) override;
 

@@ -1,0 +1,97 @@
+Table TableJoiner::join(const Table& t1, const Table& t2) {
+  auto commonKeys = intersectionKeys(t1.getHeader(), t2.getHeader());
+  if (commonKeys.empty())
+    return crossJoin(t1, t2);
+  auto mapRows = getMapOfKeysWithRows(t1, commonKeys);
+  auto idxes = getCommonKeyIdsFromTable(t2, commonKeys);
+  auto joinedRows = innerJoin(t1, t2, commonKeys, mapRows, idxes);
+  auto resultHeader = getJoinedHeaders(t1, t2);
+  return {resultHeader, joinedRows};
+}
+Row TableJoiner::intersectionKeys(const Header& header1,
+                                  const Header& header2) {
+  Row commonKeys;
+  for (const auto& entry : header1) {
+    if (header2.find(entry.first) != header2.end()) {
+      commonKeys.push_back(entry.first);
+    }
+  }
+  return commonKeys;
+}
+std::vector<Row> TableJoiner::crossJoinRows(const std::vector<Row>& rowsA,
+                                            const std::vector<Row>& rowsB) {
+  std::vector<Row> joinedRows;
+  for (const auto& rowA : rowsA) {
+    for (const auto& rowB : rowsB) {
+      Row joinedRow = rowA;
+      joinedRow.insert(joinedRow.end(), rowB.begin(), rowB.end());
+      joinedRows.push_back(joinedRow);
+    }
+  }
+  return joinedRows;
+}
+Table TableJoiner::crossJoin(const Table& t1, const Table& t2) {
+  auto joinedRows = crossJoinRows(t1.getRows(), t2.getRows());
+  Header resultHeader = t1.getHeader();
+  auto idx = resultHeader.size();
+  for (const auto& pair : t2.getHeader()) {
+    resultHeader[pair.first] = TypeIdx(pair.second.first, idx++);
+  }
+
+  return {resultHeader, joinedRows};
+}
+std::unordered_map<std::string, std::vector<int>>
+TableJoiner::getMapOfKeysWithRows(const Table& t1, const Row& commonKeys) {
+  std::unordered_map<std::string, std::vector<int>> mapRows;
+  int i = 0;
+  for (const auto& row : t1.getRows()) {
+    std::stringstream ss;
+    for (const auto& key : commonKeys) {
+      ss << row[t1.getHeader().at(key).second] << '\n';
+    }
+    mapRows[ss.str()].push_back(i++);
+  }
+  return mapRows;
+}
+std::unordered_set<int> TableJoiner::getCommonKeyIdsFromTable(
+    const Table& table, const Row& commonKeys) {
+  std::unordered_set<int> idxes;
+  for (const auto& pair : commonKeys)
+    idxes.insert(table.getHeader().at(pair).second);
+  return idxes;
+}
+std::vector<Row> TableJoiner::innerJoin(
+    const Table& t1, const Table& t2, const Row& commonKeys,
+    std::unordered_map<std::string, std::vector<int>> mapRows,
+    std::unordered_set<int> idxes) {
+  std::vector<Row> joinedRows;
+  for (const auto& row : t2.getRows()) {
+    std::stringstream ss;
+    for (const auto& key : commonKeys) {
+      auto idx = t2.getHeader().at(key).second;
+      ss << row[idx] << '\n';
+    }
+    if (mapRows.find(ss.str()) != mapRows.end()) {
+      for (auto& row1 : mapRows[ss.str()]) {
+        Row joinedRow(t1.getRows()[row1]);
+        for (int j = 0; j < row.size(); j++) {
+          if (idxes.find(j) == idxes.end()) {
+            joinedRow.push_back(row[j]);
+          }
+        }
+        joinedRows.push_back(joinedRow);
+      }
+    }
+  }
+  return joinedRows;
+}
+Header TableJoiner::getJoinedHeaders(const Table& t1, const Table& t2) {
+  Header resultHeader = t1.getHeader();
+  auto idx = resultHeader.size();
+  for (const auto& [fst, snd] : t2.getHeader()) {
+    if (resultHeader.find(fst) == resultHeader.end()) {
+      resultHeader[fst] = TypeIdx(snd.first, idx++);
+    }
+  }
+  return resultHeader;
+}

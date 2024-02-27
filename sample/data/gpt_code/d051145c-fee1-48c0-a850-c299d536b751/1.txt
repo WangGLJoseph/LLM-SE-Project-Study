@@ -1,0 +1,88 @@
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "Common/Data/Abstractions/Follows/FollowsAbstraction.h"
+#include "Common/Data/Abstractions/Follows/FollowsTAbstraction.h"
+#include "Common/Data/Abstractions/Modifies/ModifiesAbstraction.h"
+#include "Common/Data/Abstractions/Parent/ParentAbstraction.h"
+#include "Common/Data/Abstractions/Parent/ParentTAbstraction.h"
+#include "Common/Data/Abstractions/Uses/UsesAbstraction.h"
+
+class SPFacadeStub {
+private:
+    SPFacadeStub() {}
+
+public:
+    static const SPFacadeStub &getInstance() {
+        static SPFacadeStub instance;
+        return instance;
+    }
+
+    static std::vector<std::vector<int>> &getFollowsTable() {
+        static std::vector<std::vector<int>> followsTable;
+        return followsTable;
+    }
+
+    static std::vector<std::vector<int>> &getFollowsTTable() {
+        static std::vector<std::vector<int>> followsTTable;
+        return followsTTable;
+    }
+
+    static std::vector<ModifiesAbstraction> &getModifiesTable() {
+        static std::vector<ModifiesAbstraction> modifiesTable;
+        return modifiesTable;
+    }
+
+    static std::vector<std::vector<int>> &getParentTable() {
+        static std::vector<std::vector<int>> parentTable;
+        return parentTable;
+    }
+
+    static std::vector<std::vector<int>> &getParentTTable() {
+        static std::vector<std::vector<int>> parentTTable;
+        return parentTTable;
+    }
+
+    static std::vector<UsesAbstraction> &getUsesTable() {
+        static std::vector<UsesAbstraction> usesTable;
+        return usesTable;
+    }
+
+    static void storeFollows(const FollowsAbstraction &abstraction) {
+        getFollowsTable().push_back(
+                {std::get<int>(abstraction.getLeftArgument()), std::get<int>(abstraction.getRightArgument())});
+    }
+
+    static void storeFollowsT(const FollowsTAbstraction &abstraction) {
+        getFollowsTTable().push_back(
+                {std::get<int>(abstraction.getLeftArgument()), std::get<int>(abstraction.getRightArgument())});
+    }
+
+    static void storeModifies(const ModifiesAbstraction &abstraction) {
+        getModifiesTable().push_back(abstraction);
+    }
+
+    static void storeParent(const ParentAbstraction &abstraction) {
+        getParentTable().push_back(
+                {std::get<int>(abstraction.getLeftArgument()), std::get<int>(abstraction.getRightArgument())});
+    }
+
+    static void storeParentT(const ParentTAbstraction &abstraction) {
+        getParentTTable().push_back(
+                {std::get<int>(abstraction.getLeftArgument()), std::get<int>(abstraction.getRightArgument())});
+    }
+
+    static void storeUses(const UsesAbstraction &abstraction) {
+        getUsesTable().push_back(abstraction);
+    }
+
+    static void clear() {
+        getFollowsTable().clear();
+        getFollowsTTable().clear();
+        getModifiesTable().clear();
+        getParentTable().clear();
+        getParentTTable().clear();
+        getUsesTable().clear();
+    }
+};

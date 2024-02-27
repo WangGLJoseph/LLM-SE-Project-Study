@@ -1,28 +1,42 @@
 TEST_CASE("noDeclarationRule_AllEntitiesDeclaredOnce_returnsNoString") {
     // Create a QueryObject with all entities declared exactly once
-    QueryObject qo;
+    IntermediateQuery qo;
     // Add entity declarations
-    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("q"));
-    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("s"));
 
-    qo.addDeclaration(e1);
-    qo.addDeclaration(e2);
-    // Add a constraint with entities as arguments
-    std::shared_ptr<ParentConstraint> pConstraint = std::make_shared<ParentConstraint>(e1, e2);
-    qo.addConstraint(pConstraint);
+    auto e1 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e1->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::STMT1), "p");
+    auto e2 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e2->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::PRINT), "s");
+
+
+    qo.addClause(e1);
+    qo.addClause(e2);
+
+    auto t1 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "p");
+    auto t2 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "s");
+    auto pConstraint = std::make_shared<RelationshipClause>(QPSTokenType::QPSTypeInfo::PARENT, t1, QPSTokenType::QPSTypeInfo::STMT_REF, t2, QPSTokenType::QPSTypeInfo::STMT_REF);
+
+    qo.addClause(pConstraint);
     NoDeclarationRule rule;
     REQUIRE(rule.validate(qo).empty());
 }
 
 TEST_CASE("noDeclarationRule_Missing2EntityDeclaration_returnsString") {
     // Create a QueryObject with a missing entity declaration
-    QueryObject qo;
+    IntermediateQuery qo;
     // Add entity declaration
-    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("j"));
-    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("h"));
+
+    auto e1 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e1->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::STMT1), "j");
+    auto e2 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e2->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::PRINT), "h");
+
+    auto t1 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "j");
+    auto t2 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "h");
+    auto pConstraint = std::make_shared<RelationshipClause>(QPSTokenType::QPSTypeInfo::PARENT, t1, QPSTokenType::QPSTypeInfo::STMT_REF, t2, QPSTokenType::QPSTypeInfo::STMT_REF);
 
     // Add a constraint with an undeclared entity as an argument
-    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2)); // e1, e2 is not declared in qo
+    qo.addClause(pConstraint); // e1, e2 is not declared in qo
     NoDeclarationRule rule;
 
     REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
@@ -30,15 +44,24 @@ TEST_CASE("noDeclarationRule_Missing2EntityDeclaration_returnsString") {
 
 TEST_CASE("noDeclarationRule_Missing1EntityDeclaration_returnsString") {
     // Create a QueryObject with a missing entity declaration
-    QueryObject qo;
+    IntermediateQuery qo;
     // Add entity declaration
 
-    auto e1 = std::make_shared<StatementEntity>(StatementEntity("g"));
-    auto e2 = std::make_shared<PrintEntity>(PrintEntity("f"));
+    auto e1= std::make_shared<DeclarationClause>(DeclarationClause());
+    e1->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::STMT1), "g");
+    auto e2 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e2->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::PRINT), "f");
 
-    qo.addDeclaration(e1);
+
+    qo.addClause(e1);
+
+    auto t1 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "g");
+    auto t2 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "f");
+    auto pConstraint = std::make_shared<RelationshipClause>(QPSTokenType::QPSTypeInfo::PARENT, t1, QPSTokenType::QPSTypeInfo::STMT_REF, t2, QPSTokenType::QPSTypeInfo::STMT_REF);
+
+
     // Add a constraint with an undeclared entity as an argument
-    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2));
+    qo.addClause(pConstraint);
     NoDeclarationRule rule;
 
     REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
@@ -48,34 +71,47 @@ TEST_CASE("noDeclarationRule_Missing1EntityDeclaration_returnsString") {
 
 TEST_CASE("noDeclarationRule_MultipleUsageOfMissingEntity_returnsString") {
     // Create a QueryObject with multiple usage of the same entity
-    QueryObject qo;
+    IntermediateQuery qo;
     // Add entity declaration
-    auto e1 = std::make_shared<StatementEntity>(StatementEntity("e"));
-    auto e2 = std::make_shared<PrintEntity>(PrintEntity("e2"));
-    qo.addDeclaration(e1);
+    auto e1 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e1->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::STMT1), "e");
+    auto e2 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e2->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::PRINT), "e2");
+
+    qo.addClause(e1);
+
+    auto t1 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "e");
+    auto t2 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "e2");
+
+    auto pConstraint = std::make_shared<RelationshipClause>(QPSTokenType::QPSTypeInfo::PARENT, t2, QPSTokenType::QPSTypeInfo::STMT_REF, t2, QPSTokenType::QPSTypeInfo::STMT_REF);
+    qo.addClause(pConstraint);
+
     // Add a constraint with multiple occurrences of the same entity as arguments
     //auto* p = new ParentConstraint(e2, e2); // e1 is assigned again
-    qo.addConstraint(std::make_shared<ParentConstraint>(e2, e2));
     NoDeclarationRule rule;
     REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
 }
 
 TEST_CASE("noDeclarationRule_EmptyQueryObjectPass_returnsNoString") {
     // Create an empty QueryObject
-    QueryObject qo;
+    IntermediateQuery qo;
     NoDeclarationRule rule;
     REQUIRE(rule.validate(qo).empty());
 }
 
 TEST_CASE("noDeclarationRule_EntitiesUsedAsArgumentsNotDeclared_returnsString") {
     // Create a QueryObject with entities used as arguments but not declared
-    QueryObject qo;
+    IntermediateQuery qo;
     // Add a constraint with an entity as an argument without declaration
-    std::shared_ptr<StatementEntity> e1 = std::make_shared<StatementEntity>(StatementEntity("q"));
-    std::shared_ptr<PrintEntity> e2 = std::make_shared<PrintEntity>(PrintEntity("s"));
+    auto e1 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e1->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::STMT1), "q");
+    auto e2 = std::make_shared<DeclarationClause>(DeclarationClause());
+    e2->addDeclaration(QPSTokenType(QPSTokenType::QPSTypeInfo::PRINT), "s");
 
-    ParentConstraint p = ParentConstraint(e1, e2); // e1 and e2 is not declared in qo
-    qo.addConstraint(std::make_shared<ParentConstraint>(e1, e2));
+    auto t1 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "q");
+    auto t2 = QPSToken(QPSTokenType(QPSTokenType::QPSTypeInfo::SYNONYM), "s");
+    auto pConstraint = std::make_shared<RelationshipClause>(QPSTokenType::QPSTypeInfo::PARENT, t1, QPSTokenType::QPSTypeInfo::STMT_REF, t2, QPSTokenType::QPSTypeInfo::STMT_REF);
+    qo.addClause(pConstraint); // e1 and e2 is not declared in qo
     NoDeclarationRule rule;
     REQUIRE(rule.validate(qo) == VALIDATION_RULE_NO_DECLARATION);
 }

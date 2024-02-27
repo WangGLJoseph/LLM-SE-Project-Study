@@ -1,0 +1,118 @@
+bool SyntaxValidator::isRelExpr(vector<Token> tokens, int start, int end) {
+  std::vector<std::string> rel_operators = { ">", ">=", "<", "<=", "==", "!=" };
+  int operator_index = -1;
+  for (int i = start + 1; i < end; i++) {
+    if(std::find(rel_operators.begin(), rel_operators.end(), tokens[i].getValue()) != rel_operators.end()) {
+      operator_index = i;
+      break;
+    }
+  }
+  if (operator_index == -1) {
+    return false;
+  }
+  return isRelFactor(tokens, start, operator_index - 1) && isRelFactor(tokens, operator_index + 1, end);
+}
+
+bool SyntaxValidator::validateAssignStmt(vector<Token> tokens) {
+  cout << "VALIDATE ASSIGN STMT";
+  if (tokens[1].getTokenType() == EQUALS && tokens[tokens.size() - 1].getValue() == ";") {
+    return isExpr(tokens, 2, tokens.size() - 2);
+  } else {
+    return false;
+  }
+}
+
+bool SyntaxValidator::isCondExpr(vector<Token> tokens, int start, int end) {
+  cout << "ISCONDEXPR REACHED " << start << "," << end << "\n";
+  if (tokens[start].getValue() == "!") {
+    return (tokens[start+1].getValue() == "(") &&
+           isCondExpr(tokens, start + 2, end - 1) && (tokens[end].getValue() == ")");
+  }
+  else if ((tokens[start].getValue() == "(") && (tokens[end].getValue() == ")")) {
+    int i = start;
+    int paren_depth = 0;
+    while(i <= end-1) {
+      if (tokens[i].getValue() == "(") {
+        ++paren_depth;
+      }
+      else if (tokens[i].getValue() == ")") {
+        --paren_depth;
+      }
+      else if ((paren_depth == 0) && ((tokens[i].getValue() == "&&") || (tokens[i].getValue() == "||"))) {
+        return isCondExpr(tokens, start + 1, i - 2) &&
+               isCondExpr(tokens, i + 2, end - 1);
+      }
+      i++;
+    }
+  }
+  // If we are still not sure about what kind of expression it is (maybe we didn't encounter '&&' or '||')
+  // We should try to check if it's a rel_expr
+  else if (isRelExpr(tokens, start, end)) {
+    cout << "ISRELEXPR " << start << "," << end << "\n";
+    return true;
+  }
+  // Finally, if none of the above return statements were hit,
+  // we know the expression isn't valid, so return false.
+  return false;
+}
+
+bool SyntaxValidator::isRelFactor(vector<Token> tokens, int start, int end) {
+  if (start == end)
+    return isVarOrConst(tokens[start].getTokenType());  // check if single token is var_name or const_value
+  return isExpr(tokens, start, end);  // else check if it's an expression
+}
+
+bool SyntaxValidator::isExpr(vector<Token> tokens, int start, int end) {
+  cout << "REACHED ISEXPR: start=" << start << " end=" << end << "\n";
+  int i = start;
+  int paren_depth = 0;
+  while(i <= end-1) {
+    if (tokens[i].getValue() == "(") {
+      ++paren_depth;
+    }
+    else if (tokens[i].getValue() == ")") {
+      --paren_depth;
+    }
+  //... check for "+" and "-" operator and verify terms on both side recursively...
+    else if((paren_depth == 0) && (tokens[i].getValue() == "+" || tokens[i].getValue() == "-")) {
+      return isTerm(tokens, start, i - 1) && isExpr(tokens, i + 1, end);
+    }
+    i++;
+  }
+  return isTerm(tokens, start, end);
+}
+
+bool SyntaxValidator::isTerm(vector<Token> tokens, int start, int end) {
+  cout << "REACHED ISTERM: start=" << start << " end=" << end << "\n";
+  int i = start;
+  int paren_depth = 0;
+  while(i <= end-1) {
+    if (tokens[i].getValue() == "(") {
+      ++paren_depth;
+    }
+    else if (tokens[i].getValue() == ")") {
+      --paren_depth;
+    }
+    else if ((paren_depth == 0) && (tokens[i].getValue() == "*" || tokens[i].getValue() == "/" || tokens[i].getValue() == "%")) {
+      return isTerm(tokens, start, i - 1) && isTerm(tokens, i + 1, end);
+    }
+    i++;
+  }
+  return isFactor(tokens, start, end);
+}
+
+bool SyntaxValidator::isFactor(vector<Token> tokens, int start, int end) {
+  cout << "REACHED ISFACTOR: start=" << start << " end=" << end << "\n";
+  // check if it's a var_name or const_value
+  if (start == end && isVarOrConst(tokens[start].getTokenType())) {
+    return true;
+  }
+  // check if it's an expr enclosed in parentheses
+  else if (tokens[start].getValue() == "(" && tokens[end].getValue() == ")"){
+    return isExpr(tokens, start + 1, end - 1);
+  }
+  // if it's neither a var_name/const_value nor an expr with parentheses - it's not a valid factor
+  else {
+    return false;
+  }
+}

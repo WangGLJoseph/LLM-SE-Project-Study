@@ -1,134 +1,1473 @@
 RepoName: 23s2-cp-spa-team-12
-File: Team12/Code12/src/spa/src/pkb/entities/Statement.h
-Generator: gpt-4
-Intervention: 0
-Language: e
-Prompt: 
-ChatId: 
-Code:
-// https://platform.openai.com/playground/p/vq9W243AjR6xwog4KY3Uw2zH?mode=chat
-#pragma once
-#include <functional>
-
-enum StatementType {
-  ASSIGN,
-  CALL,
-  IF,
-  PRINT,
-  READ,
-  WHILE,
-};
-
-class Statement {
- protected:
-  int lineNumber;  // Line number of the statement in the source code
-  StatementType type;
-
- public:
-  Statement(int lineNumber, StatementType type)
-      : lineNumber(lineNumber), type(type) {}
-
-  // Getters
-  int getLineNumber() const { return lineNumber; }
-
-  // Virtual destructor for proper cleanup of derived types
-  virtual ~Statement() = default;
-
-  bool operator==(const Statement &stmt) const {
-    return (lineNumber == stmt.lineNumber);
-  }
-
-  Statement &operator=(const Statement &stmt) {
-    lineNumber = stmt.lineNumber;
-    type = stmt.type;
-    return *this;
-  }
-};
---------------------
-RepoName: 23s2-cp-spa-team-12
-File: Team12/Code12/src/spa/src/pkb/entities/Statement.h
-Generator: gpt-4
-Intervention: 0
-Language: e
-Prompt: 
-ChatId: 
-Code:
-// https://platform.openai.com/playground/p/CAJRGV0RgoAPNYZ1pdq8yZPk?mode=chat
-namespace std {
-template <>
-struct hash<Statement> {
-  size_t operator()(const Statement &stmt) const {
-    // Custom hash function implementation based on statement's properties
-    return hash<int>()(stmt.getLineNumber());
-  }
-};
-}  // namespace std
---------------------
-RepoName: 23s2-cp-spa-team-12
-File: Team12/Code12/src/spa/src/source_processor/design_extractor/storage_manager/EntityWriter.cpp
+File: Team12/Code12/src/integration_testing/src/sp-pkb/TestDesignExtractor.cpp
 Generator: copilot
 Intervention: 1
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
-void EntityWriter::insertProcedure(std::shared_ptr<ProcedureNode>& procedureNode) {
+TEST_CASE("design_extractor Valid Test") {
+  /*
+   * procedure main {
+   *  read x;
+   *  print x;
+   * }
+   */
+  SECTION("Read and Print Statement") {
+    auto pkb = std::make_shared<PKB>();
+    auto readNode = std::make_shared<ReadNode>(1, "x");
+    auto printNode = std::make_shared<PrintNode>(2, "x");
+
+    // make a stmt list node
+    std::vector<std::shared_ptr<StmtNode>> stmtList{readNode, printNode};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+
+    // make procedure node
+    auto procedureNode = std::make_shared<ProcedureNode>("main", stmtLstNode);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList;
+    procedureList.push_back(procedureNode);
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+    designExtractor->extractDesign(programNode);
+
+    // Entities
+    REQUIRE(pkb->containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure(procedureNode->procedureName)));
+    REQUIRE(pkb->containsEntity<Read, ContainsReadQuery>(Read(1)));
+    REQUIRE(pkb->containsEntity<Print, ContainsPrintQuery>(Print(2)));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("x")));
+
+    // Patterns
+    REQUIRE(pkb->getAllVarStmt<GetAllVarStmtPatternAssignQuery>().empty());
+    REQUIRE(
+        pkb->getAllPostfixStmt<GetAllPostfixStmtPatternAssignQuery>().empty());
+
+    // Relationships
+    // Uses Relationships
+    REQUIRE(areSameSets<Statement>(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("x")),
+        {Statement(2)}));
+    REQUIRE(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(1))
+            .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(2)),
+        {Variable("x")}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("x")),
+        {Statement(2)}));
+
+    // Modifies Relationships
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(1)),
+        {Variable("x")}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(2)),
+        {}));
+
+    // Parent Relationships
+    REQUIRE(pkb->getAllFirst<Statement, Statement, GetAllFirstParentQuery>()
+                .empty());
+    REQUIRE(pkb->getAllSecond<Statement, Statement, GetAllSecondParentQuery>()
+                .empty());
+    REQUIRE(pkb->getAllFirst<Statement, Statement, GetAllFirstParentQuery>()
+                .empty());
+    REQUIRE(pkb->getAllSecond<Statement, Statement, GetAllSecondParentQuery>()
+                .empty());
+
+    // Follows Relationships
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(2)),
+        {Statement(1)}));
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(1)),
+                    {Statement(2)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(2)),
+        {Statement(1)}));
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(1)),
+                    {Statement(2)}));
+  }
+
+  /*
+   * procedure main {
+   *  call sub;
+   * }
+   *
+   * procedure sub {
+   *  print x;
+   * }
+   */
+  SECTION("Call Statement") {
+    auto pkb = std::make_shared<PKB>();
+    auto callNode = std::make_shared<CallNode>(1, "sub");
+
+    // make stmt list nodes
+    std::vector<std::shared_ptr<StmtNode>> stmtList{callNode};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+    std::vector<std::shared_ptr<StmtNode>> stmtList2{
+        std::make_shared<PrintNode>(3, "x")};
+    auto stmtLstNode2 = std::make_shared<StmtListNode>(stmtList2);
+
+    // make procedure node
+    auto procedureNodeMain =
+        std::make_shared<ProcedureNode>("main", stmtLstNode);
+    auto procedureNodeSub =
+        std::make_shared<ProcedureNode>("sub", stmtLstNode2);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList{procedureNodeMain,
+                                                              procedureNodeSub};
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+    designExtractor->extractDesign(programNode);
+
+    // Entities
+    REQUIRE(pkb->containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure(procedureNodeMain->procedureName)));
+    REQUIRE(pkb->containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure(procedureNodeSub->procedureName)));
+    REQUIRE(pkb->containsEntity<Call, ContainsCallQuery>(Call(1)));
+    REQUIRE(pkb->getAllVarStmt<GetAllVarStmtPatternAssignQuery>().empty());
+    REQUIRE(
+        pkb->getAllPostfixStmt<GetAllPostfixStmtPatternAssignQuery>().empty());
+
+    // Relationships
+    // Uses Relationships
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("x")),
+        {Statement(3)}));
+  }
+
+  /*
+   * procedure main {
+   *  if (z > 1) {
+   *   print x;
+   *  } else {
+   *   read y;
+   *   print a;
+   *  }
+   *  read b;
+   *  print z;
+   *  }
+   */
+  SECTION("If Statement with simple conditional expression") {
+    auto pkb = std::make_shared<PKB>();
+    auto printNode = std::make_shared<PrintNode>(2, "x");
+    auto readNode = std::make_shared<ReadNode>(3, "y");
+    auto printNode2 = std::make_shared<PrintNode>(4, "a");
+    auto readNode2 = std::make_shared<ReadNode>(5, "b");
+    auto printNode3 = std::make_shared<PrintNode>(6, "z");
+    auto relExprNodeIf = std::make_shared<RelExprNode>("z", "1", ">");
+
+    auto thenStatementListNode = std::make_shared<StmtListNode>(
+        std::vector<std::shared_ptr<StmtNode>>{printNode});
+    auto elseStatementListNode = std::make_shared<StmtListNode>(
+        std::vector<std::shared_ptr<StmtNode>>{readNode, printNode2});
+
+    auto ifNode = std::make_shared<IfNode>(
+        1, relExprNodeIf, thenStatementListNode, elseStatementListNode,
+        std::unordered_set<std::string>{"z"}, std::unordered_set<int>{1});
+
+    // make a stmt list node
+    std::vector<std::shared_ptr<StmtNode>> stmtList{ifNode, readNode2,
+                                                    printNode3};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+
+    // make procedure node
+    auto procedureNode = std::make_shared<ProcedureNode>("main", stmtLstNode);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList{procedureNode};
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+    designExtractor->extractDesign(programNode);
+
+    // Entities
+    REQUIRE(pkb->containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure(procedureNode->procedureName)));
+    REQUIRE(pkb->containsEntity<If, ContainsIfQuery>(If(1)));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("x")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("y")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("z")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("a")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("b")));
+    REQUIRE(pkb->containsEntity<Print, ContainsPrintQuery>(Print(2)));
+    REQUIRE(pkb->containsEntity<Print, ContainsPrintQuery>(Print(4)));
+    REQUIRE(pkb->containsEntity<Print, ContainsPrintQuery>(Print(6)));
+    REQUIRE(pkb->containsEntity<Read, ContainsReadQuery>(Read(3)));
+    REQUIRE(pkb->containsEntity<Read, ContainsReadQuery>(Read(5)));
+    REQUIRE(pkb->containsEntity<Const, ContainsConstantQuery>(Const(1)));
+
+    // Patterns
+    REQUIRE(pkb->getAllVarStmt<GetAllVarStmtPatternAssignQuery>().empty());
+    REQUIRE(
+        pkb->getAllPostfixStmt<GetAllPostfixStmtPatternAssignQuery>().empty());
+
+    // Uses Relationships
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("z")),
+        {Statement(1), Statement(6)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(1)),
+        {Variable("x"), Variable("z"), Variable("a")}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("x")),
+        {Statement(1), Statement(2)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(2)),
+        {Variable("x")}));
+    REQUIRE(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(3))
+            .empty());
+    REQUIRE(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("y"))
+            .empty());
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("a")),
+        {Statement(1), Statement(4)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(4)),
+        {Variable("a")}));
+    REQUIRE(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("b"))
+            .empty());
+    REQUIRE(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(5))
+            .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(6)),
+        {Variable("z")}));
+
+    // Modifies Relationships
+    REQUIRE(
+        areSameSets(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                        Variable("y")),
+                    {Statement(1), Statement(3)}));
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("x"))
+                .empty());
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("z"))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(3)),
+        {Variable("y")}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(1)),
+        {Variable("y")}));
+    REQUIRE(pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+                   Statement(2))
+                .empty());
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("a"))
+                .empty());
+    REQUIRE(
+        areSameSets(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                        Variable("b")),
+                    {Statement(5)}));
+    REQUIRE(pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+                   Statement(6))
+                .empty());
+
+    // Follows relationships
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(1))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(1)),
+                    {Statement(5)}));
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(2))
+            .empty());
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                   Statement(2))
+                .empty());
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(3))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(3)),
+                    {Statement(4)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(4)),
+        {Statement(3)}));
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                   Statement(4))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(5)),
+        {Statement(1)}));
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(5)),
+                    {Statement(6)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(6)),
+        {Statement(5)}));
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                   Statement(6))
+                .empty());
+
+    // Follows* relationships
+    REQUIRE(pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+                   Statement(1))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+            Statement(1)),
+        {Statement(5), Statement(6)}));
+    REQUIRE(pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+                   Statement(2))
+                .empty());
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+                   Statement(2))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+            Statement(4)),
+        {Statement(3)}));
+    REQUIRE(pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+                   Statement(3))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+            Statement(3)),
+        {Statement(4)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+            Statement(5)),
+        {Statement(1)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+            Statement(5)),
+        {Statement(6)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+            Statement(6)),
+        {Statement(1), Statement(5)}));
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+                   Statement(6))
+                .empty());
+
+    // Parent relationships
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstParentQuery>(Statement(1))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondParentQuery>(
+                        Statement(1)),
+                    {Statement(2), Statement(3), Statement(4)}));
+    REQUIRE(
+        pkb->getSecond<Statement, Statement, GetSecondParentQuery>(Statement(2))
+            .empty());
+  }
+
+  /*
+   * procedure main {
+   *   while (z > 1) {
+   *     print x;
+   *     read y;
+   *     y = a + b - 1; }
+   *   read b;
+   *   print c;
+   * }
+   */
+  SECTION("While Statement with simple conditional expression") {
+    auto pkb = std::make_shared<PKB>();
+    auto printNode = std::make_shared<PrintNode>(2, "x");
+    auto readNode = std::make_shared<ReadNode>(3, "y");
+
+    // make an expression node representing a + b - 1 in the abstract syntax tree
+    auto plusNode = std::make_shared<ArithOpNode>("a", "b", "+");
+    auto minusNode = std::make_shared<ArithOpNode>(plusNode, "1", "-");
+    auto assignNode = std::make_shared<AssignNode>(
+        4, "y", "a b + 1 - ", minusNode,
+        std::unordered_set<std::string>{"a", "b"}, std::unordered_set<int>{1});
+
+    auto relExprNodeWhile = std::make_shared<RelExprNode>("z", "1", ">");
+    auto readNode2 = std::make_shared<ReadNode>(5, "b");
+    auto printNode3 = std::make_shared<PrintNode>(6, "c");
+
+    auto statementListNode =
+        std::make_shared<StmtListNode>(std::vector<std::shared_ptr<StmtNode>>{
+            printNode, readNode, assignNode});
+
+    auto whileNode = std::make_shared<WhileNode>(
+        1, relExprNodeWhile, statementListNode,
+        std::unordered_set<std::string>{"z"}, std::unordered_set<int>{1});
+
+    // make a stmt list node
+    std::vector<std::shared_ptr<StmtNode>> stmtList{whileNode, readNode2,
+                                                    printNode3};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+
+    // make procedure node
+    auto procedureNode = std::make_shared<ProcedureNode>("main", stmtLstNode);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList{procedureNode};
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+    designExtractor->extractDesign(programNode);
+
+    // Entities
+    REQUIRE(pkb->containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure(procedureNode->procedureName)));
+    REQUIRE(pkb->containsEntity<While, ContainsWhileQuery>(While(1)));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("x")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("y")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("z")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("a")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("b")));
+    REQUIRE(pkb->containsEntity<Print, ContainsPrintQuery>(Print(2)));
+    REQUIRE(pkb->containsEntity<Read, ContainsReadQuery>(Read(3)));
+    REQUIRE(pkb->containsEntity<Const, ContainsConstantQuery>(Const(1)));
+    REQUIRE(pkb->containsEntity<Assign, ContainsAssignQuery>(
+        Assign(4, "y", "a b + 1 - ")));
+
+    // Patterns
+    auto varY = Variable("y");
+    auto postfixLine4 = std::string("a b + 1 - ");
+    REQUIRE(areSameSets(pkb->getVarStmt<GetVarStmtPatternAssignQuery>(varY),
+                        {Statement(4)}));
+
+    REQUIRE(areSameSets(
+        pkb->getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfixLine4),
+        {Statement(4)}));
+
+    // Uses Relationships
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("z")),
+        {Statement(1)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(1)),
+        {Variable("x"), Variable("z"), Variable("a"), Variable("b")}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("x")),
+        {Statement(1), Statement(2)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(2)),
+        {Variable("x")}));
+    REQUIRE(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("y"))
+            .empty());
+    REQUIRE(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(3))
+            .empty());
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("a")),
+        {Statement(1), Statement(4)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("b")),
+        {Statement(1), Statement(4)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("c")),
+        {Statement(6)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(6)),
+        {Variable("c")}));
+
+    // Modifies Relationships
+    REQUIRE(
+        areSameSets(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                        Variable("y")),
+                    {Statement(1), Statement(3), Statement(4)}));
+    REQUIRE(
+        areSameSets(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                        Variable("b")),
+                    {Statement(5)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(1)),
+        {Variable("y")}));
+    REQUIRE(pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+                   Statement(2))
+                .empty());
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("x"))
+                .empty());
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("z"))
+                .empty());
+
+    // Follows relationships
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(1))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(1)),
+                    {Statement(5)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+            Statement(1)),
+        {Statement(5), Statement(6)}));
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(2)),
+                    {Statement(3)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+            Statement(4)),
+        {Statement(2), Statement(3)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+            Statement(6)),
+        {Statement(1), Statement(5)}));
+
+    // Parents Relationships
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstParentQuery>(Statement(1))
+            .empty());
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstParentQuery>(Statement(5))
+            .empty());
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstParentQuery>(Statement(6))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondParentQuery>(
+                        Statement(1)),
+                    {Statement(2), Statement(3), Statement(4)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondParentStarQuery>(
+            Statement(1)),
+        {Statement(2), Statement(3), Statement(4)}));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("x")));
+  }
+
+  /*
+   * procedure main {
+   *  if (a < 1) {
+   *   while (z > 1) {
+   *    print x;
+   *    read y;
+   *    y = a + b - 1; }
+   *   print a;
+   *   read c;
+   *  } else {
+   *   print b;
+   *   print y;
+   *  }
+   * }
+   */
+  SECTION("While statement nested in If statement") {
+    auto pkb = std::make_shared<PKB>();
+
+    // make an expression node representing a + b - 1 in the abstract syntax tree
+    auto plusNode = std::make_shared<ArithOpNode>("a", "b", "+");
+    auto minusNode = std::make_shared<ArithOpNode>(plusNode, "1", "-");
+    auto assignNode = std::make_shared<AssignNode>(
+        5, "y", "a b + 1 - ", minusNode,
+        std::unordered_set<std::string>{"a", "b"}, std::unordered_set<int>{1});
+
+    auto whileNode = std::make_shared<WhileNode>(
+        2, std::make_shared<RelExprNode>("z", "1", ">"),
+        std::make_shared<StmtListNode>(std::vector<std::shared_ptr<StmtNode>>{
+            std::make_shared<PrintNode>(3, "x"),
+            std::make_shared<ReadNode>(4, "y"), assignNode}),
+        std::unordered_set<std::string>{"z"}, std::unordered_set<int>{1});
+
+    auto ifNode = std::make_shared<IfNode>(
+        1, std::make_shared<RelExprNode>("a", "1", "<"),
+        std::make_shared<StmtListNode>(std::vector<std::shared_ptr<StmtNode>>{
+            whileNode, std::make_shared<PrintNode>(6, "a"),
+            std::make_shared<ReadNode>(7, "c")}),
+        std::make_shared<StmtListNode>(std::vector<std::shared_ptr<StmtNode>>{
+            std::make_shared<PrintNode>(8, "b"),
+            std::make_shared<PrintNode>(9, "y")}),
+        std::unordered_set<std::string>{"a"}, std::unordered_set<int>{1});
+
+    // make a stmt list node
+    std::vector<std::shared_ptr<StmtNode>> stmtList{ifNode};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+
+    // make procedure node
+    auto procedureNode = std::make_shared<ProcedureNode>("main", stmtLstNode);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList{procedureNode};
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+    designExtractor->extractDesign(programNode);
+
+    // Entities
+    REQUIRE(pkb->containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure(procedureNode->procedureName)));
+    REQUIRE(pkb->containsEntity<If, ContainsIfQuery>(If(1)));
+    REQUIRE(pkb->containsEntity<While, ContainsWhileQuery>(While(2)));
+    REQUIRE(areSameSets(pkb->getAllEntities<Variable, ReadAllVariableQuery>(),
+                        {Variable("x"), Variable("y"), Variable("z"),
+                         Variable("a"), Variable("b"), Variable("c")}));
+    REQUIRE(areSameSets(pkb->getAllEntities<Print, ReadAllPrintQuery>(),
+                        {Print(3), Print(6), Print(8), Print(9)}));
+    REQUIRE(areSameSets(pkb->getAllEntities<Read, ReadAllReadQuery>(),
+                        {Read(4), Read(7)}));
+    REQUIRE(pkb->containsEntity<Const, ContainsConstantQuery>(Const(1)));
+
+    // Patterns
+    auto varY = Variable("y");
+    auto postfixLine5 = std::string("a b + 1 - ");
+    REQUIRE(areSameSets(pkb->getVarStmt<GetVarStmtPatternAssignQuery>(varY),
+                        {Statement(5)}));
+    REQUIRE(areSameSets(
+        pkb->getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfixLine5),
+        {Statement(5)}));
+
+    // Relationships
+    // Uses Relationships
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("z")),
+        {Statement(1), Statement(2)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("x")),
+        {Statement(1), Statement(2), Statement(3)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("y")),
+        {Statement(1), Statement(9)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("a")),
+        {Statement(1), Statement(2), Statement(5), Statement(6)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(1)),
+        {Variable("x"), Variable("y"), Variable("z"), Variable("a"),
+         Variable("b")}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(2)),
+        {Variable("x"), Variable("z"), Variable("a"), Variable("b")}));
+    REQUIRE(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(4))
+            .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(5)),
+        {Variable("a"), Variable("b")}));
+
+    // Modifies Relationships
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("x"))
+                .empty());
+    REQUIRE(
+        areSameSets(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                        Variable("y")),
+                    {Statement(1), Statement(2), Statement(4), Statement(5)}));
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("z"))
+                .empty());
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("a"))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(1)),
+        {Variable("y"), Variable("c")}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(2)),
+        {Variable("y")}));
+
+    // Follows Relationships
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(1))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(2)),
+                    {Statement(6)}));
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                   Statement(5))
+                .empty());
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                   Statement(7))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+            Statement(2)),
+        {Statement(6), Statement(7)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+            Statement(7)),
+        {Statement(2), Statement(6)}));
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+                   Statement(7))
+                .empty());
+
+    // Parent Relationships
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstParentQuery>(Statement(1))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondParentQuery>(
+                        Statement(1)),
+                    {Statement(2), Statement(6), Statement(7), Statement(8),
+                     Statement(9)}));
+    REQUIRE(
+        pkb->getSecond<Statement, Statement, GetSecondParentQuery>(Statement(4))
+            .empty());
+    REQUIRE(
+        pkb->getSecond<Statement, Statement, GetSecondParentQuery>(Statement(5))
+            .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondParentStarQuery>(
+            Statement(1)),
+        {Statement(2), Statement(3), Statement(4), Statement(5), Statement(6),
+         Statement(7), Statement(8), Statement(9)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstParentStarQuery>(
+            Statement(3)),
+        {Statement(1), Statement(2)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstParentStarQuery>(
+            Statement(6)),
+        {Statement(1)}));
+    REQUIRE(pkb->getFirst<Statement, Statement, GetFirstParentStarQuery>(
+                   Statement(1))
+                .empty());
+  }
+
+  /*
+   * procedure main {
+   *  while (a < 1) {
+   *   if (z > 1) {
+   *    print x;
+   *    read y;
+   *    y = a + b - 1;
+   *   } else {
+   *    print a;
+   *   }
+   *   print b;
+   *   print c;
+   *  }
+   * }
+   */
+  SECTION("If statement nested in While statement") {
+    auto pkb = std::make_shared<PKB>();
+
+    // make an expression node representing a + b - 1 in the abstract syntax tree
+    auto plusNode = std::make_shared<ArithOpNode>("a", "b", "+");
+    auto minusNode = std::make_shared<ArithOpNode>(plusNode, "1", "-");
+    auto assignNode = std::make_shared<AssignNode>(
+        5, "y", "a b + 1 - ", minusNode,
+        std::unordered_set<std::string>{"a", "b"}, std::unordered_set<int>{1});
+
+    auto ifNode = std::make_shared<IfNode>(
+        2, std::make_shared<RelExprNode>("z", "1", ">"),
+        std::make_shared<StmtListNode>(std::vector<std::shared_ptr<StmtNode>>{
+            std::make_shared<PrintNode>(3, "x"),
+            std::make_shared<ReadNode>(4, "y"), assignNode}),
+        std::make_shared<StmtListNode>(std::vector<std::shared_ptr<StmtNode>>{
+            std::make_shared<PrintNode>(6, "a")}),
+        std::unordered_set<std::string>{"z"}, std::unordered_set<int>{1});
+
+    auto whileNode = std::make_shared<WhileNode>(
+        1, std::make_shared<RelExprNode>("a", "1", "<"),
+        std::make_shared<StmtListNode>(std::vector<std::shared_ptr<StmtNode>>{
+            ifNode, std::make_shared<PrintNode>(7, "b"),
+            std::make_shared<PrintNode>(8, "c")}),
+        std::unordered_set<std::string>{"a"}, std::unordered_set<int>{1});
+
+    // make a stmt list node
+    std::vector<std::shared_ptr<StmtNode>> stmtList{whileNode};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+
+    // make procedure node
+    auto procedureNode = std::make_shared<ProcedureNode>("main", stmtLstNode);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList{procedureNode};
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+    designExtractor->extractDesign(programNode);
+
+    // Entities
+    REQUIRE(areSameSets(pkb->getAllEntities<Procedure, ReadAllProcedureQuery>(),
+                        {Procedure("main")}));
+    REQUIRE(areSameSets(pkb->getAllEntities<If, ReadAllIfQuery>(), {If(2)}));
+    REQUIRE(areSameSets(pkb->getAllEntities<While, ReadAllWhileQuery>(),
+                        {While(1)}));
+    REQUIRE(pkb->getAllEntities<Variable, ReadAllVariableQuery>() ==
+            std::unordered_set<Variable>{Variable("x"), Variable("y"),
+                                         Variable("z"), Variable("a"),
+                                         Variable("b"), Variable("c")});
+    REQUIRE(pkb->getAllEntities<Const, ReadAllConstantQuery>() ==
+            std::unordered_set<Const>{Const(1)});
+    REQUIRE(pkb->getAllEntities<Print, ReadAllPrintQuery>() ==
+            std::unordered_set<Print>{Print(3), Print(6), Print(7), Print(8)});
+    REQUIRE(pkb->getAllEntities<Read, ReadAllReadQuery>() ==
+            std::unordered_set<Read>{Read(4)});
+
+    // Patterns
+    auto varY = Variable("y");
+    auto postfixLine5 = std::string("a b + 1 - ");
+    REQUIRE(areSameSets(pkb->getVarStmt<GetVarStmtPatternAssignQuery>(varY),
+                        {Statement(5)}));
+    REQUIRE(areSameSets(
+        pkb->getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfixLine5),
+        {Statement(5)}));
+
+    // Relationships
+    // Uses Relationships
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("x")),
+        {Statement(1), Statement(2), Statement(3)}));
+    REQUIRE(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("y"))
+            .empty());
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("z")),
+        {Statement(1), Statement(2)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Variable, GetFirstUsesStQuery>(Variable("a")),
+        {Statement(1), Statement(2), Statement(5), Statement(6)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(1)),
+        {Variable("x"), Variable("z"), Variable("a"), Variable("b"),
+         Variable("c")}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(2)),
+        {Variable("x"), Variable("z"), Variable("a"), Variable("b")}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondUsesStQuery>(Statement(3)),
+        {Variable("x")}));
+
+    // Modifies Relationships
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("x"))
+                .empty());
+    REQUIRE(
+        areSameSets(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                        Variable("y")),
+                    {Statement(1), Statement(2), Statement(4), Statement(5)}));
+    REQUIRE(pkb->getFirst<Statement, Variable, GetFirstModifiesStQuery>(
+                   Variable("z"))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(1)),
+        {Variable("y")}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(2)),
+        {Variable("y")}));
+    REQUIRE(pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+                   Statement(3))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(4)),
+        {Variable("y")}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Variable, GetSecondModifiesStQuery>(
+            Statement(5)),
+        {Variable("y")}));
+
+    // Follows Relationships
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsQuery>(Statement(1))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(2)),
+                    {Statement(7)}));
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                        Statement(7)),
+                    {Statement(8)}));
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                   Statement(6))
+                .empty());
+    REQUIRE(pkb->getSecond<Statement, Statement, GetSecondFollowsQuery>(
+                   Statement(5))
+                .empty());
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+            Statement(2)),
+        {Statement(7), Statement(8)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondFollowsStarQuery>(
+            Statement(3)),
+        {Statement(4), Statement(5)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+            Statement(8)),
+        {Statement(2), Statement(7)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstFollowsStarQuery>(
+            Statement(5)),
+        {Statement(3), Statement(4)}));
+
+    // Parent Relationships
+    REQUIRE(
+        pkb->getFirst<Statement, Statement, GetFirstParentQuery>(Statement(1))
+            .empty());
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondParentQuery>(
+                        Statement(1)),
+                    {Statement(2), Statement(7), Statement(8)}));
+    REQUIRE(
+        areSameSets(pkb->getSecond<Statement, Statement, GetSecondParentQuery>(
+                        Statement(2)),
+                    {Statement(3), Statement(4), Statement(5), Statement(6)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstParentQuery>(Statement(5)),
+        {Statement(2)}));
+    REQUIRE(areSameSets(
+        pkb->getSecond<Statement, Statement, GetSecondParentStarQuery>(
+            Statement(1)),
+        {Statement(2), Statement(3), Statement(4), Statement(5), Statement(6),
+         Statement(7), Statement(8)}));
+    REQUIRE(areSameSets(
+        pkb->getFirst<Statement, Statement, GetFirstParentStarQuery>(
+            Statement(6)),
+        {Statement(1), Statement(2)}));
+  }
+
+  SECTION("Simple assign statement") {
+    auto pkb = std::make_shared<PKB>();
+
+    auto assignNode = std::make_shared<AssignNode>(
+        1, "x", "1", "1", std::unordered_set<std::string>{},
+        std::unordered_set<int>{1});
+
+    // make a stmt list node
+    std::vector<std::shared_ptr<StmtNode>> stmtList{assignNode};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+
+    // make procedure node
+    auto procedureNode = std::make_shared<ProcedureNode>("main", stmtLstNode);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList{procedureNode};
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+    designExtractor->extractDesign(programNode);
+
+    REQUIRE(pkb->containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure("main")));
+    REQUIRE(
+        pkb->containsEntity<Variable, ContainsVariableQuery>(Variable("x")));
+  }
+}
+
+TEST_CASE("design_extractor Invalid Test") {
+  SECTION("Two procedures with same name") {
+    auto pkb = std::make_shared<PKB>();
+
+    auto callNode = std::make_shared<CallNode>(1, "main");
+
+    // make a stmt list node
+    std::vector<std::shared_ptr<StmtNode>> stmtList{callNode};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+
+    // make procedure node
+    auto procedureNode = std::make_shared<ProcedureNode>("main", stmtLstNode);
+    auto procedureNode2 = std::make_shared<ProcedureNode>("main", stmtLstNode);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList{procedureNode,
+                                                              procedureNode2};
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+
+    REQUIRE_THROWS_AS(designExtractor->extractDesign(programNode),
+                      DesignExtractorException);
+  }
+
+  SECTION("Self-calling procedure") {
+    auto pkb = std::make_shared<PKB>();
+
+    auto callNode = std::make_shared<CallNode>(1, "main");
+
+    // make a stmt list node
+    std::vector<std::shared_ptr<StmtNode>> stmtList{callNode};
+    auto stmtLstNode = std::make_shared<StmtListNode>(stmtList);
+
+    // make procedure node
+    auto procedureNode = std::make_shared<ProcedureNode>("main", stmtLstNode);
+
+    // make program node
+    std::vector<std::shared_ptr<ProcedureNode>> procedureList{procedureNode};
+    auto programNode = std::make_shared<ProgramNode>(procedureList);
+
+    std::shared_ptr<DesignExtractor> designExtractor =
+        std::make_shared<DesignExtractor>(pkb);
+
+    REQUIRE_THROWS_AS(designExtractor->extractDesign(programNode),
+                      DesignExtractorException);
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/qps/table/TableJoiner.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/OOWAtMyJvt0vnx2zS0GrYCeE
+ChatId: OOWAtMyJvt0vnx2zS0GrYCeE
+Code:
+Table TableJoiner::join(const Table& t1, const Table& t2) {
+  auto commonKeys = intersectionKeys(t1.getHeader(), t2.getHeader());
+  if (commonKeys.empty())
+    return crossJoin(t1, t2);
+  auto mapRows = getMapOfKeysWithRows(t1, commonKeys);
+  auto idxes = getCommonKeyIdsFromTable(t2, commonKeys);
+  auto joinedRows = innerJoin(t1, t2, commonKeys, mapRows, idxes);
+  auto resultHeader = getJoinedHeaders(t1, t2);
+  return {resultHeader, joinedRows};
+}
+Row TableJoiner::intersectionKeys(const Header& header1,
+                                  const Header& header2) {
+  Row commonKeys;
+  for (const auto& entry : header1) {
+    if (header2.find(entry.first) != header2.end()) {
+      commonKeys.push_back(entry.first);
+    }
+  }
+  return commonKeys;
+}
+std::vector<Row> TableJoiner::crossJoinRows(const std::vector<Row>& rowsA,
+                                            const std::vector<Row>& rowsB) {
+  std::vector<Row> joinedRows;
+  for (const auto& rowA : rowsA) {
+    for (const auto& rowB : rowsB) {
+      Row joinedRow = rowA;
+      joinedRow.insert(joinedRow.end(), rowB.begin(), rowB.end());
+      joinedRows.push_back(joinedRow);
+    }
+  }
+  return joinedRows;
+}
+Table TableJoiner::crossJoin(const Table& t1, const Table& t2) {
+  auto joinedRows = crossJoinRows(t1.getRows(), t2.getRows());
+  Header resultHeader = t1.getHeader();
+  auto idx = resultHeader.size();
+  for (const auto& pair : t2.getHeader()) {
+    resultHeader[pair.first] = TypeIdx(pair.second.first, idx++);
+  }
+
+  return {resultHeader, joinedRows};
+}
+std::unordered_map<std::string, std::vector<int>>
+TableJoiner::getMapOfKeysWithRows(const Table& t1, const Row& commonKeys) {
+  std::unordered_map<std::string, std::vector<int>> mapRows;
+  int i = 0;
+  for (const auto& row : t1.getRows()) {
+    std::stringstream ss;
+    for (const auto& key : commonKeys) {
+      ss << row[t1.getHeader().at(key).second] << '\n';
+    }
+    mapRows[ss.str()].push_back(i++);
+  }
+  return mapRows;
+}
+std::unordered_set<int> TableJoiner::getCommonKeyIdsFromTable(
+    const Table& table, const Row& commonKeys) {
+  std::unordered_set<int> idxes;
+  for (const auto& pair : commonKeys)
+    idxes.insert(table.getHeader().at(pair).second);
+  return idxes;
+}
+std::vector<Row> TableJoiner::innerJoin(
+    const Table& t1, const Table& t2, const Row& commonKeys,
+    std::unordered_map<std::string, std::vector<int>> mapRows,
+    std::unordered_set<int> idxes) {
+  std::vector<Row> joinedRows;
+  for (const auto& row : t2.getRows()) {
+    std::stringstream ss;
+    for (const auto& key : commonKeys) {
+      auto idx = t2.getHeader().at(key).second;
+      ss << row[idx] << '\n';
+    }
+    if (mapRows.find(ss.str()) != mapRows.end()) {
+      for (auto& row1 : mapRows[ss.str()]) {
+        Row joinedRow(t1.getRows()[row1]);
+        for (int j = 0; j < row.size(); j++) {
+          if (idxes.find(j) == idxes.end()) {
+            joinedRow.push_back(row[j]);
+          }
+        }
+        joinedRows.push_back(joinedRow);
+      }
+    }
+  }
+  return joinedRows;
+}
+Header TableJoiner::getJoinedHeaders(const Table& t1, const Table& t2) {
+  Header resultHeader = t1.getHeader();
+  auto idx = resultHeader.size();
+  for (const auto& [fst, snd] : t2.getHeader()) {
+    if (resultHeader.find(fst) == resultHeader.end()) {
+      resultHeader[fst] = TypeIdx(snd.first, idx++);
+    }
+  }
+  return resultHeader;
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/sp/design_extractor/storage_manager/EntityWriter.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void EntityWriter::insertProcedure(
+    std::shared_ptr<ProcedureNode>& procedureNode) {
   auto procedure = Procedure(procedureNode->procedureName);
-  pkb->getProcedureManager().insert(procedure);
+  pkb->insert<Procedure, InsertProcedureCommand>(procedure);
+}
+
+void EntityWriter::insertStatement(std::shared_ptr<StmtNode>& stmtNode) {
+  auto statement = Statement(stmtNode->stmtNum);
+  pkb->insert<Statement, InsertStatementCommand>(statement);
 }
 
 void EntityWriter::insertRead(std::shared_ptr<ReadNode>& readNode) {
   auto read = Read(readNode->stmtNum);
   auto variable = Variable(readNode->varName);
-  pkb->getReadManager().insert(read);
-  pkb->getVariableManager().insert(variable);
+  pkb->insert<Read, InsertReadCommand>(read);
+  pkb->insert<Variable, InsertVariableCommand>(variable);
 }
 
 void EntityWriter::insertPrint(std::shared_ptr<PrintNode>& printNode) {
   auto print = Print(printNode->stmtNum);
   auto variable = Variable(printNode->varName);
-  pkb->getPrintManager().insert(print);
-  pkb->getVariableManager().insert(variable);
+  pkb->insert<Print, InsertPrintCommand>(print);
+  pkb->insert<Variable, InsertVariableCommand>(variable);
+}
+
+void EntityWriter::insertCall(std::shared_ptr<CallNode>& callNode) {
+  auto call = Call(callNode->stmtNum);
+  pkb->insert<Call, InsertCallCommand>(call);
+}
+
+void EntityWriter::insertIf(std::shared_ptr<IfNode>& ifNode) {
+  auto ifEntity = If(ifNode->stmtNum);
+  pkb->insert<If, InsertIfCommand>(ifEntity);
+  // extract and store variables
+  insertVariablesFromList(ifNode->condExprVars);
+  // extract and store constants
+  insertConstantsFromList(ifNode->condExprConsts);
+}
+
+void EntityWriter::insertWhile(std::shared_ptr<WhileNode>& whileNode) {
+  auto whileEntity = While(whileNode->stmtNum);
+  pkb->insert<While, InsertWhileCommand>(whileEntity);
+  // extract and store variables
+  insertVariablesFromList(whileNode->condExprVars);
+  // extract and store constants
+  insertConstantsFromList(whileNode->condExprConsts);
+}
+
+void EntityWriter::insertAssign(std::shared_ptr<AssignNode>& assignNode) {
+  auto assign =
+      Assign(assignNode->stmtNum, assignNode->varName, assignNode->exprStr);
+  pkb->insert<Assign, InsertAssignCommand>(assign);
+
+  // extract and store variables
+  pkb->insert<Variable, InsertVariableCommand>(Variable(assignNode->varName));
+  insertVariablesFromList(assignNode->exprVars);
+  // extract and store constants
+  insertConstantsFromList(assignNode->exprConsts);
+  // extract and store pattern expression
+  pkb->insertPatternStmt<Assign, InsertPatternAssignCommand>(assign);
 }
 
 bool EntityWriter::containsProcedure(std::string procedureName) {
-  return pkb->getProcedureManager().contains(Procedure(std::move(procedureName)));
+  return pkb->containsEntity<Procedure, ContainsProcedureQuery>(
+      Procedure(std::move(procedureName)));
 }
 --------------------
 RepoName: 23s2-cp-spa-team-12
-File: Team12/Code12/src/spa/src/source_processor/design_extractor/storage_manager/StorageManager.cpp
+File: Team12/Code12/src/spa/src/sp/design_extractor/storage_manager/StorageManager.cpp
 Generator: copilot
 Intervention: 0
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
-std::shared_ptr<EntityWriter> StorageManager::getEntityWriter(std::shared_ptr<PKB>& pkb) {
-    if (!entityWriter) {
-        entityWriter = std::make_shared<EntityWriter>(pkb);
-    }
-    return entityWriter;
+std::shared_ptr<EntityWriter>
+StorageManager::getEntityWriter(std::shared_ptr<PKB> &pkb) {
+  if (!entityWriter) {
+    entityWriter = std::make_shared<EntityWriter>(pkb);
+  }
+  return entityWriter;
+}
+
+std::shared_ptr<RelationshipWriter>
+StorageManager::getRelationshipWriter(std::shared_ptr<PKB> &pkb) {
+  if (!relationshipWriter) {
+    relationshipWriter = std::make_shared<RelationshipWriter>(pkb);
+  }
+  return relationshipWriter;
 }
 --------------------
 RepoName: 23s2-cp-spa-team-12
-File: Team12/Code12/src/spa/src/source_processor/design_extractor/visitor/EntityVisitor.cpp
+File: Team12/Code12/src/spa/src/sp/design_extractor/storage_manager/RelationshipWriter.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+RelationshipWriter::RelationshipWriter(std::shared_ptr<PKB>& pkb) {
+  this->pkb = pkb;
+}
+
+void RelationshipWriter::insertUsesS(int stmtNum, std::string variable) {
+  pkb->insert<Statement, Variable, InsertUsesStCommand>(Statement(stmtNum),
+                                                        Variable(variable));
+}
+
+void RelationshipWriter::insertUsesP(std::string procName,
+                                     std::string variable) {
+  pkb->insert<Procedure, Variable, InsertUsesPrCommand>(Procedure(procName),
+                                                        Variable(variable));
+}
+
+void RelationshipWriter::insertModifiesS(int stmtNum, std::string variable) {
+  pkb->insert<Statement, Variable, InsertModifiesStCommand>(Statement(stmtNum),
+                                                            Variable(variable));
+}
+
+void RelationshipWriter::insertModifiesP(std::string procName,
+                                         std::string variable) {
+  pkb->insert<Procedure, Variable, InsertModifiesPrCommand>(Procedure(procName),
+                                                            Variable(variable));
+}
+
+void RelationshipWriter::insertFollows(int stmtNum1, int stmtNum2) {
+  pkb->insert<Statement, Statement, InsertFollowsCommand>(Statement(stmtNum1),
+                                                          Statement(stmtNum2));
+}
+
+void RelationshipWriter::insertFollowsStar(int stmtNum1, int stmtNum2) {
+  pkb->insert<Statement, Statement, InsertFollowsStarCommand>(
+      Statement(stmtNum1), Statement(stmtNum2));
+}
+
+void RelationshipWriter::insertParent(int stmtNum1, int stmtNum2) {
+  pkb->insert<Statement, Statement, InsertParentCommand>(Statement(stmtNum1),
+                                                         Statement(stmtNum2));
+}
+
+void RelationshipWriter::insertParentStar(int stmtNum1, int stmtNum2) {
+  pkb->insert<Statement, Statement, InsertParentStarCommand>(
+      Statement(stmtNum1), Statement(stmtNum2));
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/sp/design_extractor/visitor/RelationshipVisitor.cpp
 Generator: copilot
 Intervention: 0
 Language: e
-Prompt: 
+Prompt: used copilot
 ChatId: 
 Code:
-EntityVisitor::EntityVisitor(std::shared_ptr<EntityWriter> entityWriter): entityWriter(std::move(entityWriter)) {}
+RelationshipVisitor::RelationshipVisitor(
+    std::shared_ptr<RelationshipWriter> relationshipWriter)
+    : relationshipWriter(std::move(relationshipWriter)),
+      parentTracker(std::make_shared<ParentTracker>()),
+      followsTracker(std::make_shared<FollowsTracker>()) {}
+
+void RelationshipVisitor::insertUsesAll(const std::string& usedVar) {
+  // insert uses relationships across parent stack
+  for (auto p : this->parentTracker->getParentStack()) {
+    relationshipWriter->insertUsesS(p, usedVar);
+  }
+}
+
+void RelationshipVisitor::insertModifiesAll(const std::string& modifiedVar) {
+  // insert modifies relationships across parent stack
+  for (auto p : this->parentTracker->getParentStack()) {
+    relationshipWriter->insertModifiesS(p, modifiedVar);
+  }
+}
+
+void RelationshipVisitor::insertFollows(int stmtNum) {
+  this->followsTracker->addFollows(stmtNum, this->relationshipWriter);
+}
+
+void RelationshipVisitor::insertChild(int stmtNum) {
+  this->parentTracker->addChild(stmtNum, this->relationshipWriter);
+}
 
 // entry point into visitor pattern loop
-void EntityVisitor::extractStatement(std::shared_ptr<StmtNode>& node) {
+void RelationshipVisitor::extractStatement(std::shared_ptr<StmtNode>& node) {
   node->accept(*this);
+}
+
+void RelationshipVisitor::extractProcedure(
+    std::shared_ptr<ProcedureNode>& procNode) {
+  this->procNames.push_back(procNode->procedureName);
+  this->followsTracker->incrementNestingLevel();
+
+  extractStatementList(procNode->stmtListNode);
+}
+
+void RelationshipVisitor::visit(std::shared_ptr<ProcedureNode>& procNode) {
+  extractProcedure(procNode);
+}
+
+void RelationshipVisitor::visit(std::shared_ptr<ReadNode>& readNode) {
+  relationshipWriter->insertModifiesS(readNode->stmtNum, readNode->varName);
+  insertModifiesAll(readNode->varName);
+
+  insertChild(readNode->stmtNum);
+  insertFollows(readNode->stmtNum);
+
+  // TODO: to be done after milestone 1
+  //  relationshipWriter->insertModifiesP(procNames.back(), readNode->varName);
+}
+
+void RelationshipVisitor::visit(std::shared_ptr<PrintNode>& printNode) {
+  relationshipWriter->insertUsesS(printNode->stmtNum, printNode->varName);
+  insertUsesAll(printNode->varName);
+
+  insertChild(printNode->stmtNum);
+  insertFollows(printNode->stmtNum);
+
+  // TODO: to be done after milestone 1
+  //  relationshipWriter->insertUsesP(procNames.back(), printNode->varName);
+}
+
+void RelationshipVisitor::visit(std::shared_ptr<CallNode>& callNode) {
+  // checks for self-call
+  if (callNode->procName == procNames.back()) {
+    throw DesignExtractorException(DesignExtractorRecursiveCall);
+  }
+
+  // checks for cyclic calls
+  if (callNode->procName == procNames[0]) {
+    throw DesignExtractorException(DesignExtractorCyclicCalls);
+  }
+
+  insertChild(callNode->stmtNum);
+  insertFollows(callNode->stmtNum);
+  // TODO: implement Uses and Modifies for procedure calls
+}
+
+void RelationshipVisitor::visit(std::shared_ptr<WhileNode>& whileNode) {
+  insertChild(whileNode->stmtNum);
+  insertFollows(whileNode->stmtNum);
+
+  this->parentTracker->addParentToStack(whileNode->stmtNum);
+  for (const auto& v : whileNode->condExprVars) {
+    insertUsesAll(v);
+  }
+
+  this->followsTracker->incrementNestingLevel();
+  extractStatementList(whileNode->stmtListNode);
+  this->followsTracker->decrementNestingLevel();
+
+  // TODO: to be done after milestone 1
+  //  relationshipWriter->insertUsesP(currProcName,
+  //  whileNode->getVariables());
+
+  this->parentTracker->popParentFromStack();
+}
+
+void RelationshipVisitor::visit(std::shared_ptr<IfNode>& ifNode) {
+  insertChild(ifNode->stmtNum);
+  insertFollows(ifNode->stmtNum);
+
+  this->parentTracker->addParentToStack(ifNode->stmtNum);
+  for (const auto& v : ifNode->condExprVars) {
+    insertUsesAll(v);
+  }
+
+  this->followsTracker->incrementNestingLevel();
+  extractStatementList(ifNode->thenStmtListNode);
+  this->followsTracker->decrementNestingLevel();
+
+  this->followsTracker->incrementNestingLevel();
+  extractStatementList(ifNode->elseStmtListNode);
+  this->followsTracker->decrementNestingLevel();
+
+  // TODO: to be done after milestone 1
+  //  relationshipWriter->insertUsesP(currProcName, ifNode->getVariables());
+  this->parentTracker->popParentFromStack();
+}
+
+void RelationshipVisitor::visit(std::shared_ptr<AssignNode>& assignNode) {
+  // extract variables, insert into ModifiesS and ModifiesP
+  relationshipWriter->insertModifiesS(assignNode->stmtNum, assignNode->varName);
+  insertModifiesAll(assignNode->varName);
+
+  for (const auto& v : assignNode->exprVars) {
+    relationshipWriter->insertUsesS(assignNode->stmtNum, v);
+    insertUsesAll(v);
+  }
+
+  insertChild(assignNode->stmtNum);
+  insertFollows(assignNode->stmtNum);
+
+  // TODO: to be done after milestone 1
+  //    relationshipWriter->insertUsesP(procNames.back(),
+  //    assignNode->getConstants());
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/sp/design_extractor/visitor/EntityVisitor.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+EntityVisitor::EntityVisitor(std::shared_ptr<EntityWriter> entityWriter)
+    : entityWriter(std::move(entityWriter)) {}
+
+// entry point into visitor pattern loop
+void EntityVisitor::extractStatement(std::shared_ptr<StmtNode>& stmtNode) {
+  entityWriter->insertStatement(stmtNode);
+  stmtNode->accept(*this);
 }
 
 void EntityVisitor::extractProcedure(std::shared_ptr<ProcedureNode>& procNode) {
   // checks if a procedure of the same name already exists
   if (entityWriter->containsProcedure(procNode->procedureName)) {
-    throw DesignExtractorException(DesignExtractorDuplicateProcName + procNode->procedureName);
+    throw DesignExtractorException(DesignExtractorDuplicateProcName +
+                                   procNode->procedureName);
   }
 
   entityWriter->insertProcedure(procNode);
@@ -146,9 +1485,558 @@ void EntityVisitor::visit(std::shared_ptr<ReadNode>& readNode) {
 void EntityVisitor::visit(std::shared_ptr<PrintNode>& printNode) {
   entityWriter->insertPrint(printNode);
 }
+
+void EntityVisitor::visit(std::shared_ptr<CallNode>& callNode) {
+  entityWriter->insertCall(callNode);
+}
+
+void EntityVisitor::visit(std::shared_ptr<IfNode>& ifNode) {
+  // add variables and constant in condition expression
+  entityWriter->insertIf(ifNode);
+
+  // handle statements in if-then block
+  auto thenStmtListNode = ifNode->thenStmtListNode;
+  MainExtractor::extractStatementList(thenStmtListNode);
+
+  // handle statements in else block
+  auto elseStmtListNode = ifNode->elseStmtListNode;
+  MainExtractor::extractStatementList(elseStmtListNode);
+}
+
+void EntityVisitor::visit(std::shared_ptr<WhileNode>& whileNode) {
+  // add variables and constant in condition expression
+  entityWriter->insertWhile(whileNode);
+
+  // handle statements in while block
+  auto stmtListNode = whileNode->stmtListNode;
+  MainExtractor::extractStatementList(stmtListNode);
+}
+
+void EntityVisitor::visit(std::shared_ptr<AssignNode>& assignNode) {
+  entityWriter->insertAssign(assignNode);
+}
 --------------------
 RepoName: 23s2-cp-spa-team-12
-File: Team12/Code12/src/spa/src/utility/validator/SyntaxValidator.cpp
+File: Team12/Code12/src/spa/src/sp/design_extractor/visitor/relationship_trackers/FollowsTracker.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+class FollowsTracker {
+public:
+  void incrementNestingLevel();
+  void decrementNestingLevel();
+  void clearFollowsTracker();
+  void addFollowsToCurrentLevel(int stmtNum);
+  void addFollows(int stmtNum,
+                  std::shared_ptr<RelationshipWriter> &relationshipWriter);
+
+private:
+  // a stack containing lists of statements at each nesting level
+  // a list that is higher up the stack is deeper in the nesting level
+  std::vector<std::vector<int>> followsList;
+};
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/sp/design_extractor/visitor/relationship_trackers/FollowsTracker.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void FollowsTracker::incrementNestingLevel() {
+  // adds a deeper nesting level
+  this->followsList.emplace_back();
+}
+
+void FollowsTracker::decrementNestingLevel() {
+  // removes the current nesting level
+  this->followsList.pop_back();
+}
+
+void FollowsTracker::clearFollowsTracker() { this->followsList.clear(); }
+
+void FollowsTracker::addFollowsToCurrentLevel(int stmtNum) {
+  // adds a statement to the list of statements in the current nesting level
+  this->followsList.back().push_back(stmtNum);
+}
+
+void FollowsTracker::addFollows(
+    int stmtNum, std::shared_ptr<RelationshipWriter> &relationshipWriter) {
+  auto currentNestingLevel = this->followsList.back();
+
+  // if current nesting level contains previous statements, add follows
+  // relationship
+  if (!currentNestingLevel.empty()) {
+    relationshipWriter->insertFollows(currentNestingLevel.back(), stmtNum);
+  }
+
+  // adds Follows* relationships, if any
+  for (auto prevStmt : currentNestingLevel) {
+    relationshipWriter->insertFollowsStar(prevStmt, stmtNum);
+  }
+
+  // adds the current statement to the current nesting level
+  this->addFollowsToCurrentLevel(stmtNum);
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/sp/design_extractor/visitor/relationship_trackers/ParentTracker.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+void ParentTracker::addParentToStack(int stmtNum) {
+  this->parentStack.push_back(stmtNum);
+}
+
+void ParentTracker::popParentFromStack() { this->parentStack.pop_back(); }
+
+void ParentTracker::clearParentStack() { this->parentStack.clear(); }
+
+std::vector<int> ParentTracker::getParentStack() { return this->parentStack; }
+
+void ParentTracker::addChild(
+    int child, std::shared_ptr<RelationshipWriter> &relationshipWriter) {
+  // insert Parent between direct parent and current child
+  if (!parentStack.empty()) {
+    relationshipWriter->insertParent(parentStack.back(), child);
+  }
+
+  // insert Parent* between all previous parents and current child
+  for (auto p : parentStack) {
+    relationshipWriter->insertParentStar(p, child);
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/sp/node/statement/expression/ExprNode.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: 
+ChatId: 
+Code:
+// Forward declarations for all node types that ExprNode can hold
+class ArithOpNode;
+
+// ExprNode is a variant that can hold a string (for variables and constants)
+// e.g. "x", "5", "y",
+// or a shared_ptr to a ArithOpNode (for expressions involving arithmetic operations)
+// e.g. "x + 5", "y * (x - 3)"
+using ExprNode = std::variant<std::string, std::shared_ptr<ArithOpNode>>;
+
+#include "ArithOpNode.h"
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/sp/node/statement/expression/CondExprNode.h
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+// Forward declarations for all node types that ExprNode can hold
+class LogicalCondExprNode;
+class NotCondExprNode;
+class RelExprNode;
+
+// CondExprNode is a variant that can hold a shared_ptr to a LogicalCondExprNode, NotCondExprNode, or RelExprNode
+// LogicalCondExprNode is a node that represents a logical conditional expression, left and right are CondExprNode, and operator are logical operators (&&, ||)
+// e.g. "x > 5 || y <= 3"
+// NotCondExprNode is a node that represents a unary conditional expression, it has a single CondExprNode and a logical operator !
+// e.g. "!(x > 5)"
+// RelExprNode is a node that represents a relational expression, left and right is an ExprNode, and operator are relational operators (>, <, >=, <=, ==, !=)
+// e.g. "x > 5", "(y+3) <= (x-2)"
+using CondExprNode = std::variant<std::shared_ptr<LogicalCondExprNode>, std::shared_ptr<NotCondExprNode>, std::shared_ptr<RelExprNode>>;
+
+#include "LogicalCondExprNode.h"
+#include "NotCondExprNode.h"
+#include "RelExprNode.h"
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/pkb/entities/Statement.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/vq9W243AjR6xwog4KY3Uw2zH?mode=chat
+ChatId: vq9W243AjR6xwog4KY3Uw2zH
+Code:
+class Statement {
+ protected:
+  int lineNumber;  // Line number of the statement in the source code
+
+ public:
+  explicit Statement(int lineNumber) : lineNumber(lineNumber) {}
+
+  // Getters
+  int getLineNumber() const { return lineNumber; }
+
+  // Virtual destructor for proper cleanup of derived types
+  virtual ~Statement() = default;
+
+  bool operator==(const Statement& stmt) const {
+    return (lineNumber == stmt.lineNumber);
+  }
+
+  Statement& operator=(const Statement& stmt) {
+    lineNumber = stmt.lineNumber;
+    return *this;
+  }
+};
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/pkb/entities/Statement.h
+Generator: gpt
+Intervention: 0
+Language: e
+Prompt: https://platform.openai.com/playground/p/CAJRGV0RgoAPNYZ1pdq8yZPk?mode=chat
+ChatId: CAJRGV0RgoAPNYZ1pdq8yZPk
+Code:
+namespace std {
+template <>
+struct hash<Statement> {
+  size_t operator()(const Statement& stmt) const {
+    // Custom hash function implementation based on statement's properties
+    return hash<int>()(stmt.getLineNumber());
+  }
+};
+}  // namespace std
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/common/parser/ShuntingYardParser.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+CondExprNode ShuntingYardParser::parseCondExpr(
+    const std::vector<std::shared_ptr<Token>>& tokens,
+    const std::shared_ptr<std::unordered_set<std::string>>& exprVar,
+    const std::shared_ptr<std::unordered_set<int>>& exprConst) {
+  auto postFixQueue = infixToPostfix(tokens);
+
+  std::stack<std::variant<CondExprNode, ExprNode>> stack;
+  for (const auto& token : postFixQueue) {
+    if (TokenUtil::isNameOrInteger(token)) {
+      processCondExprVarsAndConsts(token, exprVar, exprConst, stack);
+    } else {
+      switch (TokenUtil::getOperatorType(token)) {
+        case OperatorType::ARITHMETIC: {
+          processCondExprArithOp(token, stack);
+          break;
+        }
+        case OperatorType::RELATIONAL: {
+          processRelOp(token, stack);
+          break;
+        }
+        case OperatorType::LOGICAL: {
+          processLogicalOp(token, stack);
+          break;
+        }
+        case OperatorType::NOT_OPERATOR: {
+          processNotOp(stack);
+          break;
+        }
+        default: {
+          throw ShuntingYardParserException(
+              ShuntingYardParserUnexpectedTokenExceptionMessage + token->value);
+        }
+      }
+    }
+  }
+  if (stack.size() != 1 || std::holds_alternative<ExprNode>(stack.top())) {
+    throw ShuntingYardParserException(
+        ShuntingYardParserInvalidCondExprExceptionMessage);
+  }
+  return std::get<CondExprNode>(stack.top());
+}
+
+ExprNode ShuntingYardParser::parseExpr(
+    const std::vector<std::shared_ptr<Token>>& tokens,
+    std::shared_ptr<std::string>& exprStr,
+    const std::shared_ptr<std::unordered_set<std::string>>& exprVar,
+    const std::shared_ptr<std::unordered_set<int>>& exprConst) {
+  auto postFixQueue = infixToPostfix(tokens);
+  *exprStr = TokenUtil::tokensToString(postFixQueue);
+  std::stack<ExprNode> stack;
+  for (const auto& token : postFixQueue) {
+    if (TokenUtil::isNameOrInteger(token)) {
+      processExprVarsAndConsts(token, exprVar, exprConst, stack);
+    } else if (TokenUtil::isArithmeticOperator(token)) {
+      processExprArithOp(token, stack);
+    } else {
+      throw ShuntingYardParserException(
+          ShuntingYardParserUnexpectedTokenExceptionMessage + token->value);
+    }
+  }
+  if (stack.size() != 1) {
+    throw ShuntingYardParserException(
+        ShuntingYardParserMultipleOperandExceptionMessage +
+        std::to_string(stack.size()));
+  }
+
+  return stack.top();
+}
+
+std::vector<std::shared_ptr<Token>> ShuntingYardParser::infixToPostfix(
+    const std::vector<std::shared_ptr<Token>>& tokens) {
+  std::vector<std::shared_ptr<Token>> postFixQueue;
+  std::stack<std::shared_ptr<Token>> stack;
+
+  for (const auto& token : tokens) {
+    if (TokenUtil::isNameOrInteger(token)) {
+      postFixQueue.push_back(token);
+    } else if (TokenUtil::isOperator(token)) {
+      while (!stack.empty() &&
+             TokenUtil::hasHigherOrEqualPrecedence(stack.top(), token)) {
+        postFixQueue.push_back(stack.top());
+        stack.pop();
+      }
+      stack.push(token);
+    } else if (token->value == BRACKETS_OPEN) {
+      stack.push(token);
+    } else if (token->value == BRACKETS_CLOSE) {
+      bool foundMatchingOpening = false;
+      while (!stack.empty() && stack.top()->value != BRACKETS_OPEN) {
+        postFixQueue.push_back(stack.top());
+        stack.pop();
+      }
+      if (!stack.empty() && stack.top()->value == BRACKETS_OPEN) {
+        stack.pop();  // Pop the matching "("
+        foundMatchingOpening = true;
+      }
+      if (!foundMatchingOpening) {
+        throw ShuntingYardParserException(
+            ShuntingYardParserCloseParenthesisExceptionMessage);
+      }
+    } else {
+      throw ShuntingYardParserException(
+          ShuntingYardParserUnexpectedTokenExceptionMessage + "'" +
+          token->value + "'");
+    }
+  }
+  //  Check for any remaining "(" in the stack, indicating unbalanced parentheses
+  while (!stack.empty()) {
+    if (stack.top()->value == BRACKETS_OPEN) {
+      throw ShuntingYardParserException(
+          ShuntingYardParserOpenParenthesisExceptionMessage);
+    }
+    postFixQueue.push_back(stack.top());
+    stack.pop();
+  }
+
+  return postFixQueue;
+}
+
+void ShuntingYardParser::validateSufficientOperands(size_t stackSize,
+                                                    const std::string& op) {
+  if (stackSize < 2) {
+    throw ShuntingYardParserException(
+        ShuntingYardParserInsufficientOperandExceptionMessage + op);
+  }
+}
+
+void ShuntingYardParser::processCondExprVarsAndConsts(
+    const std::shared_ptr<Token>& token,
+    const std::shared_ptr<std::unordered_set<std::string>>& exprVar,
+    const std::shared_ptr<std::unordered_set<int>>& exprConst,
+    std::stack<std::variant<CondExprNode, ExprNode>>& stack) {
+  storeVarAndConsts(token, exprVar, exprConst);
+  stack.emplace(ExprNode(token->value));
+}
+void ShuntingYardParser::processExprVarsAndConsts(
+    const std::shared_ptr<Token>& token,
+    const std::shared_ptr<std::unordered_set<std::string>>& exprVar,
+    const std::shared_ptr<std::unordered_set<int>>& exprConst,
+    std::stack<ExprNode>& stack) {
+  storeVarAndConsts(token, exprVar, exprConst);
+  stack.emplace(token->value);
+}
+
+void ShuntingYardParser::storeVarAndConsts(
+    const std::shared_ptr<Token>& token,
+    const std::shared_ptr<std::unordered_set<std::string>>& exprVar,
+    const std::shared_ptr<std::unordered_set<int>>& exprConst) {
+  if (token->type == TokenType::NAME) {
+    exprVar->insert(token->value);
+  } else {
+    exprConst->insert(stoi(token->value));
+  }
+}
+
+void ShuntingYardParser::processExprArithOp(const std::shared_ptr<Token>& token,
+                                            std::stack<ExprNode>& stack) {
+  validateSufficientOperands(stack.size(), token->value);
+  auto right = stack.top();
+  stack.pop();
+  auto left = stack.top();
+  stack.pop();
+  stack.emplace(std::make_shared<ArithOpNode>(left, right, token->value));
+}
+
+void ShuntingYardParser::processCondExprArithOp(
+    const std::shared_ptr<Token>& token,
+    std::stack<std::variant<CondExprNode, ExprNode>>& stack) {
+  validateSufficientOperands(stack.size(), token->value);
+  auto right = std::get<ExprNode>(stack.top());
+  stack.pop();
+  auto left = std::get<ExprNode>(stack.top());
+  stack.pop();
+  stack.emplace(std::make_shared<ArithOpNode>(left, right, token->value));
+}
+
+void ShuntingYardParser::processRelOp(
+    const std::shared_ptr<Token>& token,
+    std::stack<std::variant<CondExprNode, ExprNode>>& stack) {
+  validateSufficientOperands(stack.size(), token->value);
+
+  validateExprNodeOperand(stack);
+  auto right = std::get<ExprNode>(stack.top());
+  stack.pop();
+
+  validateExprNodeOperand(stack);
+  auto left = std::get<ExprNode>(stack.top());
+  stack.pop();
+  stack.emplace(std::make_shared<RelExprNode>(left, right, token->value));
+}
+
+void ShuntingYardParser::processLogicalOp(
+    const std::shared_ptr<Token>& token,
+    std::stack<std::variant<CondExprNode, ExprNode>>& stack) {
+  validateSufficientOperands(stack.size(), token->value);
+
+  validateCondExprNodeOperand(stack);
+  auto right = std::get<CondExprNode>(stack.top());
+  stack.pop();
+
+  validateCondExprNodeOperand(stack);
+  auto left = std::get<CondExprNode>(stack.top());
+  stack.pop();
+  stack.emplace(
+      std::make_shared<LogicalCondExprNode>(left, right, token->value));
+}
+
+void ShuntingYardParser::processNotOp(
+    std::stack<std::variant<CondExprNode, ExprNode>>& stack) {
+  validateNotOperand(stack);
+  auto condExpr = std::get<CondExprNode>(stack.top());
+  stack.pop();
+  stack.emplace(std::make_shared<NotCondExprNode>(condExpr));
+}
+
+void ShuntingYardParser::validateNotOperand(
+    std::stack<std::variant<CondExprNode, ExprNode>>& stack) {
+  if (stack.empty()) {
+    throw ShuntingYardParserException(
+        ShuntingYardParserInsufficientOperandExceptionMessage + "!");
+  }
+  if (!std::holds_alternative<CondExprNode>(stack.top())) {
+    throw ShuntingYardParserException(
+        ShuntingYardParserInvalidCondExprExceptionMessage);
+  }
+}
+
+void ShuntingYardParser::validateCondExprNodeOperand(
+    std::stack<std::variant<CondExprNode, ExprNode>>& stack) {
+  if (!std::holds_alternative<CondExprNode>(stack.top())) {
+    throw ShuntingYardParserException(
+        ShuntingYardParserInvalidCondExprExceptionMessage);
+  }
+}
+
+void ShuntingYardParser::validateExprNodeOperand(
+    std::stack<std::variant<CondExprNode, ExprNode>>& stack) {
+  if (!std::holds_alternative<ExprNode>(stack.top())) {
+    throw ShuntingYardParserException(
+        ShuntingYardParserInvalidCondExprExceptionMessage);
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/common/utility/TokenUtil.cpp
+Generator: copilot
+Intervention: 1
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+std::unordered_set<std::string> arithOpStr = {"+", "-", "*", "/", "%"};
+std::unordered_set<std::string> relOpStr = {">", "<", ">=", "<=", "==", "!="};
+std::unordered_set<std::string> logicalOpStr = {"&&", "||"};
+std::unordered_map<std::string, int> precedence = {
+    // Arithmetic operators
+    {"+", 3}, {"-", 3},
+    {"*", 4}, {"/", 4}, {"%", 4},
+    // Relational operators
+    {">", 2}, {"<", 2}, {">=", 2}, {"<=", 2}, {"==", 2}, {"!=", 2},
+    // Logical operators
+    {"&&", 1}, {"||", 1},
+    // Unary operator (NOT)
+    {"!", 5},
+};
+std::string TokenUtil::tokensToString(const std::vector<std::shared_ptr<Token>> &tokens) {
+  std::string result;
+  for (const auto &token : tokens) {
+    result += token->value + " ";
+  }
+  return result;
+}
+
+OperatorType TokenUtil::getOperatorType(const std::shared_ptr<Token> &token) {
+  if (isArithmeticOperator(token)) {
+    return OperatorType::ARITHMETIC;
+  }
+  if (isRelationalOperator(token)) {
+    return OperatorType::RELATIONAL;
+  }
+  if (isLogicalOperator(token)) {
+    return OperatorType::LOGICAL;
+  }
+  if (isUnaryOperator(token)) {
+    return OperatorType::NOT_OPERATOR;
+  }
+  return OperatorType::UNKNOWN;
+}
+
+bool TokenUtil::isUnaryOperator(const std::shared_ptr<Token> &token) {
+  return token->value == NOT_OPERATOR;
+}
+
+bool TokenUtil::isArithmeticOperator(const std::shared_ptr<Token> &token) {
+  return arithOpStr.find(token->value) != arithOpStr.end();
+}
+
+bool TokenUtil::isLogicalOperator(const std::shared_ptr<Token> &token) {
+  return logicalOpStr.find(token->value) != logicalOpStr.end();
+}
+
+bool TokenUtil::isRelationalOperator(const std::shared_ptr<Token> &token) {
+  return relOpStr.find(token->value) != relOpStr.end();
+}
+
+bool TokenUtil::isOperator(const std::shared_ptr<Token> &token) {
+  return isArithmeticOperator(token) || isRelationalOperator(token) || isLogicalOperator(token)
+      || isUnaryOperator(token);
+}
+
+bool TokenUtil::isNameOrInteger(const std::shared_ptr<Token> &token) {
+  return token->type == TokenType::NAME || token->type == TokenType::INTEGER;
+}
+
+bool TokenUtil::hasHigherOrEqualPrecedence(const std::shared_ptr<Token> &token1,
+                                           const std::shared_ptr<Token> &token2) {
+  return precedence[token1->value] >= precedence[token2->value];
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/spa/src/common/utility/validator/SyntaxValidator.cpp
 Generator: copilot
 Intervention: 0
 Language: e
@@ -161,15 +2049,15 @@ Code:
  * @return true if the string is an integer, false otherwise
  */
 bool SyntaxValidator::validateInteger(const std::string& str) {
-    if (str.empty()) {
-        return false;
-    }
+  if (str.empty()) {
+    return false;
+  }
 
-    if (str[0] == '0' && str.size() > 1) {
-        return false;
-    }
+  if (str[0] == '0' && str.size() > 1) {
+    return false;
+  }
 
-    return std::all_of(str.begin(), str.end(), isdigit);
+  return std::all_of(str.begin(), str.end(), isdigit);
 }
 
 /* Validates if the given string is a valid name, which is a string that starts with an alphabet and contains only
@@ -178,15 +2066,15 @@ bool SyntaxValidator::validateInteger(const std::string& str) {
  * @return true if the string is a valid name, false otherwise
  */
 bool SyntaxValidator::validateName(const std::string& str) {
-    if (str.empty()) {
-        return false;
-    }
+  if (str.empty()) {
+    return false;
+  }
 
-    if (!std::isalpha(str[0])) {
-        return false;
-    }
+  if (!std::isalpha(str[0])) {
+    return false;
+  }
 
-    return std::all_of(str.begin(), str.end(), isalnum);
+  return std::all_of(str.begin(), str.end(), isalnum);
 }
 
 /* Validates if the given parentheses are closed properly.
@@ -196,30 +2084,1101 @@ bool SyntaxValidator::validateName(const std::string& str) {
  * @return true if the parentheses are closed properly, false otherwise
  */
 bool SyntaxValidator::validateParentheses(const std::string& str) {
-    std::vector<char> stack;
-    for (char c: str) {
-        if (c == '(' || c == '{') {
-            stack.push_back(c);
-        } else if (c == ')' || c == '}') {
-            if (stack.empty()) {
-                return false;
-            }
-            char top = stack.back();
-            stack.pop_back();
-            if ((c == ')' && top != '(') || (c == '}' && top != '{')) {
-                return false;
-            }
-        }
+  std::vector<char> stack;
+  for (char c : str) {
+    if (c == '(' || c == '{') {
+      stack.push_back(c);
+    } else if (c == ')' || c == '}') {
+      if (stack.empty()) {
+        return false;
+      }
+      char top = stack.back();
+      stack.pop_back();
+      if ((c == ')' && top != '(') || (c == '}' && top != '{')) {
+        return false;
+      }
     }
-    return stack.empty();
+  }
+  return stack.empty();
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/unit_testing/src/pkb/TestEntityManagerPool.cpp
+Generator: copilot
+Intervention: 0
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+SECTION("Do updates with all managers, and check all correct") {
+    auto assignManager = entityManagerPool.getAssignManager();
+    auto callManager = entityManagerPool.getCallManager();
+    auto constManager = entityManagerPool.getConstManager();
+    auto printManager = entityManagerPool.getPrintManager();
+    auto procedureManager = entityManagerPool.getProcedureManager();
+    auto readManager = entityManagerPool.getReadManager();
+    auto variableManager = entityManagerPool.getVariableManager();
+    auto stmtManager = entityManagerPool.getStmtManager();
+    auto whileManager = entityManagerPool.getWhileManager();
+    auto ifManager = entityManagerPool.getIfManager();
+
+    // Creating test Assign entities
+    Assign assign1 = Assign(1, "x", "1");
+    Assign assign2 = Assign(2, "y", "2");
+    Assign assign3 = Assign(3, "z", "3");
+
+    // Adding Assign entities to AssignManager
+    assignManager->insert(assign1);
+    assignManager->insert(assign2);
+    assignManager->insert(assign3);
+
+    // Creating test Call entities
+    Call call1 = Call(1);
+    Call call2 = Call(2);
+    Call call3 = Call(3);
+
+    // Adding Call entities to CallManager
+    callManager->insert(call1);
+    callManager->insert(call2);
+    callManager->insert(call3);
+
+    // Creating test Const entities
+    Const const1 = Const(1);
+    Const const2 = Const(2);
+    Const const3 = Const(3);
+
+    // Adding Const entities to ConstManager
+    constManager->insert(const1);
+    constManager->insert(const2);
+    constManager->insert(const3);
+
+    // Creating test Print entities
+    Print print1 = Print(1);
+    Print print2 = Print(2);
+    Print print3 = Print(3);
+
+    // Adding Print entities to PrintManager
+    printManager->insert(print1);
+    printManager->insert(print2);
+    printManager->insert(print3);
+
+    // Creating test Procedure entities
+    Procedure procedure1 = Procedure("proc1");
+    Procedure procedure2 = Procedure("proc2");
+    Procedure procedure3 = Procedure("proc3");
+
+    // Adding Procedure entities to ProcedureManager
+    procedureManager->insert(procedure1);
+    procedureManager->insert(procedure2);
+    procedureManager->insert(procedure3);
+
+    // Creating test Read entities
+    Read read1 = Read(1);
+    Read read2 = Read(2);
+    Read read3 = Read(3);
+
+    // Adding Read entities to ReadManager
+    readManager->insert(read1);
+    readManager->insert(read2);
+    readManager->insert(read3);
+
+    // Creating test Variable entities
+    Variable variable1 = Variable("var1");
+    Variable variable2 = Variable("var2");
+    Variable variable3 = Variable("var3");
+
+    // Adding Variable entities to VariableManager
+    variableManager->insert(variable1);
+    variableManager->insert(variable2);
+    variableManager->insert(variable3);
+
+    // Creating test Stmt entities
+    Statement stmt1 = Statement(1);
+    Statement stmt2 = Statement(2);
+    Statement stmt3 = Statement(3);
+
+    // Adding Stmt entities to StmtManager
+    stmtManager->insert(stmt1);
+    stmtManager->insert(stmt2);
+    stmtManager->insert(stmt3);
+
+    // Creating test While entities
+    While while1 = While(1);
+    While while2 = While(2);
+    While while3 = While(3);
+
+    // Adding While entities to WhileManager
+    whileManager->insert(while1);
+    whileManager->insert(while2);
+    whileManager->insert(while3);
+
+    // Creating test If entities
+    If if1 = If(1);
+    If if2 = If(2);
+    If if3 = If(3);
+
+    // Adding If entities to IfManager
+    ifManager->insert(if1);
+    ifManager->insert(if2);
+    ifManager->insert(if3);
+
+    // Retrieve all Assign entities
+    auto assignResult = assignManager->readAll();
+
+    // Check the number of Assign entities
+    REQUIRE(assignResult.size() == 3);
+
+    // Check that each Assign entity is correctly managed
+    REQUIRE(assignManager->contains(assign1));
+    REQUIRE(assignManager->contains(assign2));
+    REQUIRE(assignManager->contains(assign3));
+
+    REQUIRE_FALSE(assignManager->contains(Assign(4, "a", "4")));
+
+    // Retrieve all Call entities
+    auto callResult = callManager->readAll();
+
+    // Check the number of Call entities
+    REQUIRE(callResult.size() == 3);
+
+    // Check that each Call entity is correctly managed
+    REQUIRE(callManager->contains(call1));
+    REQUIRE(callManager->contains(call2));
+    REQUIRE(callManager->contains(call3));
+
+    REQUIRE_FALSE(callManager->contains(Call(4)));
+
+    // Retrieve all Const entities
+    auto constResult = constManager->readAll();
+
+    // Check the number of Const entities
+    REQUIRE(constResult.size() == 3);
+
+    // Check that each Const entity is correctly managed
+    REQUIRE(constManager->contains(const1));
+    REQUIRE(constManager->contains(const2));
+    REQUIRE(constManager->contains(const3));
+
+    REQUIRE_FALSE(constManager->contains(Const(4)));
+
+    // Retrieve all Print entities
+    auto printResult = printManager->readAll();
+
+    // Check the number of Print entities
+    REQUIRE(printResult.size() == 3);
+
+    // Check that each Print entity is correctly managed
+    REQUIRE(printManager->contains(print1));
+    REQUIRE(printManager->contains(print2));
+    REQUIRE(printManager->contains(print3));
+
+    REQUIRE_FALSE(printManager->contains(Print(4)));
+
+    // Retrieve all Procedure entities
+    auto procedureResult = procedureManager->readAll();
+
+    // Check the number of Procedure entities
+    REQUIRE(procedureResult.size() == 3);
+
+    // Check that each Procedure entity is correctly managed
+    REQUIRE(procedureManager->contains(procedure1));
+    REQUIRE(procedureManager->contains(procedure2));
+    REQUIRE(procedureManager->contains(procedure3));
+
+    REQUIRE_FALSE(procedureManager->contains(Procedure("proc4")));
+
+    // Retrieve all Read entities
+    auto readResult = readManager->readAll();
+
+    // Check the number of Read entities
+    REQUIRE(readResult.size() == 3);
+
+    // Check that each Read entity is correctly managed
+    REQUIRE(readManager->contains(read1));
+    REQUIRE(readManager->contains(read2));
+    REQUIRE(readManager->contains(read3));
+
+    REQUIRE_FALSE(readManager->contains(Read(4)));
+
+    // Retrieve all Variable entities
+    auto variableResult = variableManager->readAll();
+
+    // Check the number of Variable entities
+    REQUIRE(variableResult.size() == 3);
+
+    // Check that each Variable entity is correctly managed
+    REQUIRE(variableManager->contains(variable1));
+    REQUIRE(variableManager->contains(variable2));
+    REQUIRE(variableManager->contains(variable3));
+
+    REQUIRE_FALSE(variableManager->contains(Variable("var4")));
+
+    // Retrieve all Stmt entities
+    auto stmtResult = stmtManager->readAll();
+
+    // Check the number of Stmt entities
+    REQUIRE(stmtResult.size() == 3);
+
+    // Check that each Stmt entity is correctly managed
+    REQUIRE(stmtManager->contains(stmt1));
+    REQUIRE(stmtManager->contains(stmt2));
+    REQUIRE(stmtManager->contains(stmt3));
+
+    REQUIRE_FALSE(stmtManager->contains(Statement(4)));
+
+    // Retrieve all While entities
+    auto whileResult = whileManager->readAll();
+
+    // Check the number of While entities
+    REQUIRE(whileResult.size() == 3);
+
+    // Check that each While entity is correctly managed
+    REQUIRE(whileManager->contains(while1));
+    REQUIRE(whileManager->contains(while2));
+    REQUIRE(whileManager->contains(while3));
+
+    REQUIRE_FALSE(whileManager->contains(While(4)));
+
+    // Retrieve all If entities
+    auto ifResult = ifManager->readAll();
+
+    // Check the number of If entities
+    REQUIRE(ifResult.size() == 3);
+
+    // Check that each If entity is correctly managed
+    REQUIRE(ifManager->contains(if1));
+    REQUIRE(ifManager->contains(if2));
+    REQUIRE(ifManager->contains(if3));
+
+    REQUIRE_FALSE(ifManager->contains(If(4)));
+  }
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/unit_testing/src/pkb/TestPkbFacade.cpp
+Generator: gpt
+Intervention: 2
+Language: e
+Prompt: https://platform.openai.com/playground/p/jOn68GeDvUIerTWXXHMy9vHw?mode=chat
+ChatId: jOn68GeDvUIerTWXXHMy9vHw
+Code:
+TEST_CASE("PKB Test", "[PKB]") {
+  PKB pkb;
+
+  SECTION("Insert and check Assign Manager") {
+    // insert to pkb using EntityManagerPoolCommands
+    pkb.insert<Assign, InsertAssignCommand>(Assign(1, "x", "1"));
+    pkb.insert<Assign, InsertAssignCommand>(Assign(2, "y", "2"));
+
+    std::unordered_set<Assign> result =
+        pkb.getAllEntities<Assign, ReadAllAssignQuery>();
+    REQUIRE(result.size() == 2);
+    // check that assign(1) and assign(2) are in result
+    REQUIRE(result.count(Assign(1, "x", "1")) == 1);
+    REQUIRE(result.count(Assign(2, "y", "2")) == 1);
+
+    REQUIRE(
+        pkb.containsEntity<Assign, ContainsAssignQuery>(Assign(1, "x", "1")));
+    REQUIRE(
+        pkb.containsEntity<Assign, ContainsAssignQuery>(Assign(2, "y", "2")));
+    REQUIRE_FALSE(
+        pkb.containsEntity<Assign, ContainsAssignQuery>(Assign(3, "z", "3")));
+  }
+
+  SECTION("Insert and check Call Manager") {
+    pkb.insert<Call, InsertCallCommand>(Call(3));
+    pkb.insert<Call, InsertCallCommand>(Call(4));
+
+    std::unordered_set<Call> result =
+        pkb.getAllEntities<Call, ReadAllCallQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Call, ContainsCallQuery>(Call(3)));
+    REQUIRE(pkb.containsEntity<Call, ContainsCallQuery>(Call(4)));
+    REQUIRE_FALSE(pkb.containsEntity<Call, ContainsCallQuery>(Call(5)));
+  }
+
+  SECTION("Insert and check Constant Manager") {
+    pkb.insert<Const, InsertConstantCommand>(Const(5));
+    pkb.insert<Const, InsertConstantCommand>(Const(6));
+
+    std::unordered_set<Const> result =
+        pkb.getAllEntities<Const, ReadAllConstantQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Const, ContainsConstantQuery>(Const(5)));
+    REQUIRE(pkb.containsEntity<Const, ContainsConstantQuery>(Const(6)));
+    REQUIRE_FALSE(pkb.containsEntity<Const, ContainsConstantQuery>(Const(7)));
+  }
+
+  SECTION("Insert and check Print Manager") {
+    pkb.insert<Print, InsertPrintCommand>(Print(7));
+    pkb.insert<Print, InsertPrintCommand>(Print(8));
+
+    std::unordered_set<Print> result =
+        pkb.getAllEntities<Print, ReadAllPrintQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Print, ContainsPrintQuery>(Print(7)));
+    REQUIRE(pkb.containsEntity<Print, ContainsPrintQuery>(Print(8)));
+    REQUIRE_FALSE(pkb.containsEntity<Print, ContainsPrintQuery>(Print(9)));
+  }
+
+  SECTION("Insert and check read manager") {
+    pkb.insert<Read, InsertReadCommand>(Read(9));
+    pkb.insert<Read, InsertReadCommand>(Read(10));
+
+    std::unordered_set<Read> result =
+        pkb.getAllEntities<Read, ReadAllReadQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Read, ContainsReadQuery>(Read(9)));
+    REQUIRE(pkb.containsEntity<Read, ContainsReadQuery>(Read(10)));
+    REQUIRE_FALSE(pkb.containsEntity<Read, ContainsReadQuery>(Read(11)));
+  }
+  SECTION("Insert and check Procedure Manager") {
+    pkb.insert<Procedure, InsertProcedureCommand>(Procedure("test 1"));
+    pkb.insert<Procedure, InsertProcedureCommand>(Procedure("test 2"));
+
+    std::unordered_set<Procedure> result =
+        pkb.getAllEntities<Procedure, ReadAllProcedureQuery>();
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure("test 1")));
+    REQUIRE(pkb.containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure("test 2")));
+    REQUIRE_FALSE(pkb.containsEntity<Procedure, ContainsProcedureQuery>(
+        Procedure("test 3")));
+  }
+  SECTION("Insert and check Statement Manager") {
+    pkb.insert<Statement, InsertStatementCommand>(Statement(1));
+    pkb.insert<Statement, InsertStatementCommand>(Statement(2));
+
+    std::unordered_set<Statement> result =
+        pkb.getAllEntities<Statement, ReadAllStatementQuery>();
+
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(
+        pkb.containsEntity<Statement, ContainsStatementQuery>(Statement(1)));
+    REQUIRE(
+        pkb.containsEntity<Statement, ContainsStatementQuery>(Statement(2)));
+    REQUIRE_FALSE(
+        pkb.containsEntity<Statement, ContainsStatementQuery>(Statement(3)));
+  }
+
+  SECTION("Insert and check Variable Manager") {
+    pkb.insert<Variable, InsertVariableCommand>(Variable("x"));
+    pkb.insert<Variable, InsertVariableCommand>(Variable("y"));
+
+    std::unordered_set<Variable> result =
+        pkb.getAllEntities<Variable, ReadAllVariableQuery>();
+
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<Variable, ContainsVariableQuery>(Variable("x")));
+    REQUIRE(pkb.containsEntity<Variable, ContainsVariableQuery>(Variable("y")));
+    REQUIRE_FALSE(
+        pkb.containsEntity<Variable, ContainsVariableQuery>(Variable("z")));
+  }
+
+  SECTION("Insert and check If Manager") {
+    pkb.insert<If, InsertIfCommand>(If(1));
+    pkb.insert<If, InsertIfCommand>(If(2));
+
+    std::unordered_set<If> result = pkb.getAllEntities<If, ReadAllIfQuery>();
+
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<If, ContainsIfQuery>(If(1)));
+    REQUIRE(pkb.containsEntity<If, ContainsIfQuery>(If(2)));
+    REQUIRE_FALSE(pkb.containsEntity<If, ContainsIfQuery>(If(3)));
+  }
+
+  SECTION("Insert and check While Manager") {
+    pkb.insert<While, InsertWhileCommand>(While(1));
+    pkb.insert<While, InsertWhileCommand>(While(2));
+
+    std::unordered_set<While> result =
+        pkb.getAllEntities<While, ReadAllWhileQuery>();
+
+    REQUIRE(result.size() == 2);
+
+    REQUIRE(pkb.containsEntity<While, ContainsWhileQuery>(While(1)));
+    REQUIRE(pkb.containsEntity<While, ContainsWhileQuery>(While(2)));
+    REQUIRE_FALSE(pkb.containsEntity<While, ContainsWhileQuery>(While(3)));
+  }
+
+  SECTION("Insert and check Follows Manager") {
+    Read stmt1(1);
+    Call stmt2(2);
+    Assign stmt3(3, "x", "y");
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> fwddata = {
+        {stmt1, {stmt2}}, {stmt2, {stmt3}}};
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> bwddata = {
+        {stmt2, {stmt1}}, {stmt3, {stmt2}}};
+
+    pkb.insert<Statement, Statement, InsertFollowsCommand>(stmt1, stmt2);
+    pkb.insert<Statement, Statement, InsertFollowsCommand>(stmt2, stmt3);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Statement, GetAllSecondFollowsQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstFollowsQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt2)
+                .size() == 1);
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt3)
+                .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt1)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt1),
+        {stmt2}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt2),
+        {stmt3}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsQuery>(stmt3),
+        {stmt1}));
+
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt2)
+                .size() == 1);
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt1)
+                .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt3)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt3),
+        {stmt2}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt2),
+        {stmt1}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsQuery>(stmt1),
+        {stmt2}));
+  }
+
+  SECTION("Insert and check FollowsStar Manager") {
+    Print stmt1(1);
+    Call stmt2(2);
+    Assign stmt3(3, "x", "y");
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> fwddata = {
+        {stmt1, {stmt2, stmt3}}, {stmt2, {stmt3}}};
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> bwddata = {
+        {stmt2, {stmt1}}, {stmt3, {stmt2, stmt1}}};
+
+    pkb.insert<Statement, Statement, InsertFollowsStarCommand>(stmt1, stmt2);
+    pkb.insert<Statement, Statement, InsertFollowsStarCommand>(stmt1, stmt3);
+    pkb.insert<Statement, Statement, InsertFollowsStarCommand>(stmt2, stmt3);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Statement, GetAllSecondFollowsStarQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstFollowsStarQuery>(),
+        bwddata));
+    REQUIRE_FALSE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstFollowsStarQuery>(),
+        fwddata));
+
+    REQUIRE(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt1)
+            .size() == 2);
+    REQUIRE(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt3)
+            .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt2)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt1),
+        {stmt2, stmt3}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt2),
+        {stmt3}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondFollowsStarQuery>(stmt3),
+        {stmt2}));
+
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt3)
+                .size() == 2);
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt2)
+                .size() == 1);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt1)
+            .size() == 1);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt3),
+        {stmt2, stmt1}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt2),
+        {stmt1}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstFollowsStarQuery>(stmt1),
+        {stmt1}));
+  }
+
+  SECTION("Insert and check Parent Manager") {
+    If stmt1(1);
+    While stmt2(2);
+    If stmt3(3);
+    Assign stmt4(4, "x", "y");
+    Print stmt5(5);
+    Read stmt6(6);
+    Call stmt7(7);
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> fwddata = {
+        {stmt1, {stmt2, stmt3, stmt4}},
+        {stmt2, {stmt5, stmt6}},
+        {stmt3, {stmt7}}};
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> bwddata = {
+        {stmt2, {stmt1}}, {stmt3, {stmt1}}, {stmt4, {stmt1}},
+        {stmt5, {stmt2}}, {stmt6, {stmt2}}, {stmt7, {stmt3}}};
+
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt1, stmt2);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt1, stmt3);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt1, stmt4);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt2, stmt5);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt2, stmt6);
+    pkb.insert<Statement, Statement, InsertParentCommand>(stmt3, stmt7);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Statement, GetAllSecondParentQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstParentQuery>(),
+        bwddata));
+    REQUIRE_FALSE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstParentQuery>(),
+        fwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt1)
+                .size() == 3);
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt4)
+                .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt2)
+            .size() == 0);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt1),
+        {stmt2, stmt3, stmt4}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt2),
+        {stmt5, stmt6}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt3),
+        {stmt5}));
+
+    REQUIRE(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt2).size() ==
+        1);
+    REQUIRE(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt1).size() ==
+        0);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt3).size() ==
+        0);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt3),
+        {stmt1}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentQuery>(stmt1), {}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentQuery>(stmt5),
+        {stmt1}));
+  }
+
+  SECTION("Insert and check ParentStar Manager") {
+    If stmt1(1);
+    While stmt2(2);
+    If stmt3(3);
+    Assign stmt4(4, "x", "y");
+    If stmt5(5);
+    While stmt6(6);
+    Call stmt7(7);
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> fwddata = {
+        {stmt1, {stmt2, stmt3, stmt4, stmt5, stmt6, stmt7}},
+        {stmt2, {stmt5, stmt6}},
+        {stmt3, {stmt7}}};
+
+    std::unordered_map<Statement, std::unordered_set<Statement>> bwddata = {
+        {stmt2, {stmt1}},        {stmt3, {stmt1}},
+        {stmt4, {stmt1}},        {stmt5, {stmt1, stmt2}},
+        {stmt6, {stmt1, stmt2}}, {stmt7, {stmt1, stmt3}}};
+
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt2);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt3);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt4);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt5);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt6);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt1, stmt7);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt2, stmt5);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt2, stmt6);
+    pkb.insert<Statement, Statement, InsertParentStarCommand>(stmt3, stmt7);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Statement, GetAllSecondParentStarQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstParentStarQuery>(),
+        bwddata));
+    REQUIRE_FALSE(areSameMaps(
+        pkb.getAllFirst<Statement, Statement, GetAllFirstParentStarQuery>(),
+        fwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt1)
+                .size() == 6);
+    REQUIRE(pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt2)
+                .size() == 2);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt3)
+            .size() == 0);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt1),
+        {stmt2, stmt3, stmt4, stmt5, stmt6, stmt7}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt2),
+        {stmt5, stmt6}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Statement, GetSecondParentStarQuery>(stmt3),
+        {stmt5}));
+
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt5)
+                .size() == 2);
+    REQUIRE(pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt1)
+                .size() == 0);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt3)
+            .size() == 0);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt5),
+        {stmt1, stmt2}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt2),
+        {stmt1}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Statement, GetFirstParentStarQuery>(stmt3),
+        {}));
+  }
+
+  SECTION("Insert and check UsesStManager") {
+    If stmt1(1);
+    Assign stmt2(2, "x", "y");
+    While stmt3(3);
+
+    Variable varX("x");
+    Variable varY("y");
+    Variable varZ("z");
+    std::unordered_map<Statement, std::unordered_set<Variable>> fwddata = {
+        {stmt1, {varX}},        // print(x)
+        {stmt2, {varY, varZ}},  // x = y + z
+        {stmt3, {varX, varY}}   // call("proc1") uses x, y
+    };
+
+    std::unordered_map<Variable, std::unordered_set<Statement>> bwddata = {
+        {varX, {stmt1, stmt3}}, {varY, {stmt2, stmt3}}, {varZ, {stmt2}}};
+
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt1, varX);
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt2, varY);
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt2, varZ);
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt3, varX);
+    pkb.insert<Statement, Variable, InsertUsesStCommand>(stmt3, varY);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Variable, GetAllSecondUsesStQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Variable, GetAllFirstUsesStQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt1)
+                .size() == 1);
+
+    REQUIRE(pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt2)
+                .size() == 2);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt3)
+            .size() == 1
+
+    );
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt1),
+        {varX}));
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt2),
+        {varY, varZ}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondUsesStQuery>(stmt3),
+        {varX}));
+
+    REQUIRE(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varX).size() ==
+        2);
+    REQUIRE(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varZ).size() ==
+        1);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varY).size() ==
+        1);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varX),
+        {stmt1, stmt3}));
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varY),
+        {stmt2, stmt3}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstUsesStQuery>(varZ), {stmt1}));
+  }
+
+  SECTION("Insert and check UsesPrManager") {
+    Procedure proc1("proc1");  // proc1 uses x y z
+    Procedure proc2("proc2");  // proc2 uses z
+
+    Variable varX("x");
+    Variable varY("y");
+    Variable varZ("z");
+    std::unordered_map<Procedure, std::unordered_set<Variable>> fwddata = {
+        {proc1, {varZ, varX, varY}}, {proc2, {varZ}}};
+
+    std::unordered_map<Variable, std::unordered_set<Procedure>> bwddata = {
+        {varX, {proc1}}, {varY, {proc1}}, {varZ, {proc1, proc2}}};
+
+    pkb.insert<Procedure, Variable, InsertUsesPrCommand>(proc1, varZ);
+    pkb.insert<Procedure, Variable, InsertUsesPrCommand>(proc1, varX);
+    pkb.insert<Procedure, Variable, InsertUsesPrCommand>(proc1, varY);
+    pkb.insert<Procedure, Variable, InsertUsesPrCommand>(proc2, varZ);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Procedure, Variable, GetAllSecondUsesPrQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Procedure, Variable, GetAllFirstUsesPrQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Procedure, Variable, GetSecondUsesPrQuery>(proc1)
+                .size() == 3);
+    REQUIRE_FALSE(
+        pkb.getSecond<Procedure, Variable, GetSecondUsesPrQuery>(proc2)
+            .size() == 3);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Procedure, Variable, GetSecondUsesPrQuery>(proc1),
+        {varZ, varX, varY}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Procedure, Variable, GetSecondUsesPrQuery>(proc2),
+        {varZ, varX}));
+
+    REQUIRE(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varZ).size() ==
+        2);
+    REQUIRE(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varY).size() ==
+        1);
+    REQUIRE_FALSE(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varX).size() ==
+        0);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varZ),
+        {proc1, proc2}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Procedure, Variable, GetFirstUsesPrQuery>(varY), {proc2}));
+  }
+
+  SECTION("Insert and check ModifiesStManager") {
+    Read stmt1(1);
+    Assign stmt2(2, "x", "y");
+    Call stmt3(3);
+
+    Variable varX("x");
+    Variable varY("y");
+
+    std::unordered_map<Statement, std::unordered_set<Variable>> fwddata = {
+        {stmt1, {varX}},       // read(x)
+        {stmt2, {varX}},       // x = y + z
+        {stmt3, {varX, varY}}  // call("proc1") modifies x, y
+    };
+
+    std::unordered_map<Variable, std::unordered_set<Statement>> bwddata = {
+        {varX, {stmt1, stmt2, stmt3}}, {varY, {stmt3}}};
+
+    pkb.insert<Statement, Variable, InsertModifiesStCommand>(stmt1, varX);
+    pkb.insert<Statement, Variable, InsertModifiesStCommand>(stmt2, varX);
+    pkb.insert<Statement, Variable, InsertModifiesStCommand>(stmt3, varX);
+    pkb.insert<Statement, Variable, InsertModifiesStCommand>(stmt3, varY);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Statement, Variable, GetAllSecondModifiesStQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Statement, Variable, GetAllFirstModifiesStQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Statement, Variable, GetSecondModifiesStQuery>(stmt3)
+                .size() == 2);
+    REQUIRE_FALSE(
+        pkb.getSecond<Statement, Variable, GetSecondModifiesStQuery>(stmt2)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondModifiesStQuery>(stmt3),
+        {varX, varY}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Statement, Variable, GetSecondModifiesStQuery>(stmt2),
+        {}));
+
+    REQUIRE(pkb.getFirst<Statement, Variable, GetFirstModifiesStQuery>(varX)
+                .size() == 3);
+    REQUIRE_FALSE(
+        pkb.getFirst<Statement, Variable, GetFirstModifiesStQuery>(varY)
+            .size() == 2);
+    REQUIRE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstModifiesStQuery>(varX),
+        {stmt1, stmt2, stmt3}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Statement, Variable, GetFirstModifiesStQuery>(varY),
+        {stmt1}));
+  }
+
+  SECTION("Insert and check ModifiesPrManager") {
+    Procedure proc1("proc1");  // proc1 modifies x y z
+    Procedure proc2("proc2");  // proc2 modifies z
+
+    Variable varX("x");
+    Variable varY("y");
+    Variable varZ("z");
+    std::unordered_map<Procedure, std::unordered_set<Variable>> fwddata = {
+        {proc1, {varZ, varX, varY}}, {proc2, {varZ}}};
+
+    std::unordered_map<Variable, std::unordered_set<Procedure>> bwddata = {
+        {varX, {proc1}}, {varY, {proc1}}, {varZ, {proc1, proc2}}};
+
+    pkb.insert<Procedure, Variable, InsertModifiesPrCommand>(proc1, varZ);
+    pkb.insert<Procedure, Variable, InsertModifiesPrCommand>(proc1, varX);
+    pkb.insert<Procedure, Variable, InsertModifiesPrCommand>(proc1, varY);
+    pkb.insert<Procedure, Variable, InsertModifiesPrCommand>(proc2, varZ);
+
+    REQUIRE(areSameMaps(
+        pkb.getAllSecond<Procedure, Variable, GetAllSecondModifiesPrQuery>(),
+        fwddata));
+    REQUIRE(areSameMaps(
+        pkb.getAllFirst<Procedure, Variable, GetAllFirstModifiesPrQuery>(),
+        bwddata));
+
+    REQUIRE(pkb.getSecond<Procedure, Variable, GetSecondModifiesPrQuery>(proc1)
+                .size() == 3);
+    REQUIRE_FALSE(
+        pkb.getSecond<Procedure, Variable, GetSecondModifiesPrQuery>(proc2)
+            .size() == 3);
+
+    REQUIRE(areSameSets(
+        pkb.getSecond<Procedure, Variable, GetSecondModifiesPrQuery>(proc1),
+        {varZ, varX, varY}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getSecond<Procedure, Variable, GetSecondModifiesPrQuery>(proc2),
+        {varZ, varX}));
+
+    REQUIRE(pkb.getFirst<Procedure, Variable, GetFirstModifiesPrQuery>(varZ)
+                .size() == 2);
+    REQUIRE_FALSE(
+        pkb.getFirst<Procedure, Variable, GetFirstModifiesPrQuery>(varX)
+            .size() == 2);
+
+    REQUIRE(areSameSets(
+        pkb.getFirst<Procedure, Variable, GetFirstModifiesPrQuery>(varZ),
+        {proc1, proc2}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getFirst<Procedure, Variable, GetFirstModifiesPrQuery>(varY),
+        {proc2}));
+  }
+
+  SECTION("Inserting and Check PatternManager") {
+    Assign stmt1(1, "x", "x y + ");  // x = x + y
+    Assign stmt2(2, "y", "x y + ");  // y = x + y
+    Assign stmt3(3, "z", "x z + ");  // z = x + z
+    Assign stmt4(4, "y", "x z + ");  // y = x + z
+
+    std::string postfix1("x y + ");
+    std::string postfix2("x z + ");
+
+    Variable varX("x");
+    Variable varY("y");
+    Variable varZ("z");
+
+    // Used as test for lhs variable and rhs postfix hashmap
+    std::unordered_map<std::string, std::unordered_set<Statement>>
+        rhsPostfixData = {{postfix1, {stmt1, stmt2}},
+                          {postfix2, {stmt3, stmt4}}};
+
+    std::unordered_map<Variable, std::unordered_set<Statement>> lhsVarData = {
+        {varX, {stmt1}}, {varY, {stmt2, stmt4}}, {varZ, {stmt3}}};
+
+    // Insert Statement nodes into RHSPostfix and LHSVar hashmap
+    pkb.insertPatternStmt<Assign, InsertPatternAssignCommand>(stmt1);
+    pkb.insertPatternStmt<Assign, InsertPatternAssignCommand>(stmt2);
+    pkb.insertPatternStmt<Assign, InsertPatternAssignCommand>(stmt3);
+    pkb.insertPatternStmt<Assign, InsertPatternAssignCommand>(stmt4);
+
+    // Check if the rhs postfix hashmap is retrieved correctly
+    REQUIRE(areSameMaps(
+        pkb.getAllPostfixStmt<GetAllPostfixStmtPatternAssignQuery>(),
+        rhsPostfixData));
+
+    //Check if the lhs variable hashmap is retrieved correctly
+    REQUIRE(areSameMaps(pkb.getAllVarStmt<GetAllVarStmtPatternAssignQuery>(),
+                        lhsVarData));
+
+    // Check if the rhs postfix size is correct
+    REQUIRE(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix1).size() ==
+        2);
+    REQUIRE(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix2).size() ==
+        2);
+    REQUIRE_FALSE(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix2).size() ==
+        1);
+
+    // Check if the statements are retrieved correctly using rhs postfix
+    REQUIRE(areSameSets(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix1),
+        {stmt1, stmt2}));
+    REQUIRE(areSameSets(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix2),
+        {stmt3, stmt4}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getPostfixStmt<GetPostfixStmtPatternAssignQuery>(postfix2), {}));
+
+    // Check if the lhs variable size is correct
+    REQUIRE(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varX).size() == 1);
+    REQUIRE(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varY).size() == 2);
+    REQUIRE_FALSE(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varZ).size() ==
+                  2);
+
+    // Check if the statements are retrieved correctly using lhs var
+    REQUIRE(areSameSets(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varX),
+                        {stmt1}));
+    REQUIRE(areSameSets(pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varY),
+                        {stmt4, stmt2}));
+    REQUIRE_FALSE(areSameSets(
+        pkb.getVarStmt<GetVarStmtPatternAssignQuery>(varZ), {stmt3, stmt2}));
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/unit_testing/src/utils/TestTestUtils.cpp
+Generator: gpt
+Intervention: 1
+Language: e
+Prompt: https://platform.openai.com/playground/p/QLFyNorlVdcxVPiiWawNBJfO?mode=chat
+ChatId: QLFyNorlVdcxVPiiWawNBJfO
+Code:
+TEST_CASE("Testing areSameSets for Generic types") {
+  std::unordered_set<int> set1 = {1, 2, 3, 4, 5};
+  std::unordered_set<int> set2 = {5, 4, 3, 2, 1};
+  std::unordered_set<int> set3 = {1, 2, 3};
+  std::unordered_set<int> set4 = {1, 2, 3, 4, 5, 6};
+  std::unordered_set<int> set_empty;
+  std::unordered_set<std::string> set5 = {"1", "2", "3", "4", "5"};
+
+  SECTION("Test for two equal sets") {
+    REQUIRE(areSameSets(set1, {5, 4, 3, 2, 1}));
+  }
+
+  SECTION("Test for two different sets") {
+    REQUIRE_FALSE(areSameSets(set1, {1, 2, 3}));
+  }
+
+  SECTION("Test for two sets where one is a subset of the other") {
+    REQUIRE_FALSE(areSameSets(set1, {1, 2, 3, 4, 5, 6}));
+  }
+
+  SECTION("Test for two empty sets") {
+    REQUIRE(areSameSets(set_empty, {}));
+  }
+
+  SECTION("Test for a set and an empty set") {
+    REQUIRE_FALSE(areSameSets(set1, {}));
+  }
+
+  SECTION("Test for two equal sets with a type different from above") {
+    REQUIRE(areSameSets(
+        set5, std::initializer_list<std::string>({"1", "2", "3", "4", "5"})));
+  }
+
+  SECTION("Test for two different sets with a type different from above") {
+    REQUIRE_FALSE(areSameSets(set5, std::initializer_list<std::string>(
+                                        {"1", "2", "3", "4", "5", "6"})));
+  }
+}
+--------------------
+RepoName: 23s2-cp-spa-team-12
+File: Team12/Code12/src/unit_testing/src/utils/TestTestUtils.cpp
+Generator: copilot
+Intervention: 2
+Language: e
+Prompt: used copilot
+ChatId: 
+Code:
+TEST_CASE("Testing areSameSets for Statement") {
+  Statement stmt1(1);
+  Statement stmt2(2);
+  Statement stmt3(3);
+  Statement stmt4(4);
+  Statement stmt5(5);
+  Statement stmt6(6);
+  std::unordered_set<Statement> set1 = {stmt1, stmt2, stmt3, stmt4, stmt5};
+  std::unordered_set<Statement> set_empty;
+
+  SECTION("Test for two equal sets") {
+    REQUIRE(areSameSets(set1, {stmt5, stmt4, stmt3, stmt2, stmt1}));
+  }
+
+  SECTION("Test for two different sets") {
+    REQUIRE_FALSE(areSameSets(set1, {stmt1, stmt2, stmt3}));
+  }
+
+  SECTION("Test for two sets where one is a subset of the other") {
+    REQUIRE_FALSE(
+        areSameSets(set1, {stmt1, stmt2, stmt3, stmt4, stmt5, stmt6}));
+  }
+
+  SECTION("Test for two empty sets") {
+    REQUIRE(areSameSets(set_empty, {}));
+  }
+
+  SECTION("Test for a set and an empty set") {
+    REQUIRE_FALSE(areSameSets(set1, {}));
+  }
 }
 --------------------
 Directory:../sample/repo/23s2-cp-spa-team-12
-Total Snippets: 6
-Total lines: 163
-SP Snippets: 0
-SP lines: 0
-PKB Snippets: 2
-PKB lines: 49
-QPS Snippets: 0
-QPS lines: 0
+Total Snippets: 21
+Total lines: 2989
+SP Snippets: 10
+SP lines: 429
+PKB Snippets: 4
+PKB lines: 997
+QPS Snippets: 1
+QPS lines: 97

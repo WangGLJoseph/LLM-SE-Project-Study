@@ -1,0 +1,20 @@
+bool QueryEvaluationContext::isTableInitialized(const Synonym& synonym) const {
+    return synonymToTableMap.find(synonym) != synonymToTableMap.end();
+}
+
+void QueryEvaluationContext::putTableForSynonymGroup(const Synonym& synonym, const std::shared_ptr<BaseTable>& table) {
+    // Find the synonym group for the given synonym
+    for (const auto& group : synonymGroups) {
+        if (group.find(std::make_shared<Synonym>(synonym)) != group.end()) {
+            // For each synonym in the group, initialize the table
+            for (const auto& syn : group) {
+                synonymToTableMap[*syn] = table;
+            }
+            break;
+        }
+    }
+}
+
+void QueryEvaluationContext::setResultToFalse() {
+    resultMustBeEmpty = true;
+}

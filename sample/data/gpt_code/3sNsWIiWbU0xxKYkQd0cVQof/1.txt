@@ -1,0 +1,146 @@
+#include "sp/ParsingStrategy/AssignParsingStrategy.h"
+
+#include "catch.hpp"
+#include "common/exception/ErrorConstants.h"
+#include "sp/ASTNode/ASTNode.h"
+#include "sp/SPTokenizer/SPToken.h"
+#include "unit_testing//src/sp/utils/ASTBuilder.h"
+#include "unit_testing/src/sp/utils/CommonTokens.h"
+
+TEST_CASE("AssignParsingStrategy parse function", "[AssignParsingStrategy]") {
+
+  SECTION("Valid input: assign single variable") {
+    // x = y;
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 1;
+
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+    tokens.push_back(*CommonTokens::Y_TOKEN);
+    tokens.push_back(*CommonTokens::SEMICOLON_TOKEN);
+
+    auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+    auto assignNode = std::dynamic_pointer_cast<AssignNode>(node);
+
+    auto expectedExprNode = std::make_shared<ExpressionNode>(1, CommonTokens::Y_TOKEN);
+
+    REQUIRE(assignNode != nullptr);
+    REQUIRE(assignNode->GetLineNum() == 1);
+    REQUIRE(assignNode->getVariable()->getTokenValue() == "x");
+    REQUIRE(*assignNode->getExpression() == *expectedExprNode);
+  }
+
+  SECTION("Testing with valid inputs (expression assignment)") {
+    // x =  3 + x * 1 + 0 / y;
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 1;
+
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+    tokens.push_back(*CommonTokens::THREE_TOKEN);
+    tokens.push_back(*CommonTokens::PLUS_TOKEN);
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::MULTIPLY_TOKEN);
+    tokens.push_back(*CommonTokens::ONE_TOKEN);
+    tokens.push_back(*CommonTokens::PLUS_TOKEN);
+    tokens.push_back(*CommonTokens::ZERO_TOKEN);
+    tokens.push_back(*CommonTokens::DIVIDE_TOKEN);
+    tokens.push_back(*CommonTokens::Y_TOKEN);
+    tokens.push_back(*CommonTokens::SEMICOLON_TOKEN);
+
+    auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+    auto assignNode = std::dynamic_pointer_cast<AssignNode>(node);
+
+    // Build expected ExpressionNode
+    // 3 + x * 1 + 0 / y;
+    auto multNode1 = ASTBuilder::buildSimpleExpressionNode(1, "*", CommonTokens::X_TOKEN, CommonTokens::ONE_TOKEN);
+    auto threeNode = std::make_shared<ExpressionNode>(1, CommonTokens::THREE_TOKEN);
+    auto plusNode1 = std::make_shared<ExpressionNode>(1, CommonTokens::PLUS_TOKEN, threeNode, multNode1);
+    auto multNode2 = ASTBuilder::buildSimpleExpressionNode(1, "/", CommonTokens::ZERO_TOKEN, CommonTokens::Y_TOKEN);
+    auto expectedExprNode = std::make_shared<ExpressionNode>(1, CommonTokens::PLUS_TOKEN, plusNode1, multNode2);
+
+    REQUIRE(assignNode != nullptr);
+    REQUIRE(assignNode->GetLineNum() == 1);
+    REQUIRE(assignNode->getVariable()->getTokenValue() == "x");
+    REQUIRE(*assignNode->getExpression() == *expectedExprNode);
+  }
+
+  SECTION("Testing with invalid inputs: Incomplete assignment") {
+    // x =   //(incomplete)
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 0;
+
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+
+    try {
+      auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+      FAIL();
+    } catch (const SyntaxError &ex) {
+      REQUIRE(ex.what() == "Syntax Error: " + ErrorConstants::INCOMPLETE_ASSIGNMENT);
+    }
+  }
+
+  SECTION("Testing with invalid inputs: Does not start with identifier") {
+    // 1 = 1;  //(incomplete)
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 0;
+
+    tokens.emplace_back("1", SPTokenType::INTEGER); // Error
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+    tokens.push_back(*CommonTokens::ONE_TOKEN);
+    tokens.push_back(*CommonTokens::SEMICOLON_TOKEN);
+
+    try {
+      auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+      FAIL();
+    } catch (const SyntaxError &ex) {
+      REQUIRE(ex.what() == "Syntax Error: " + ErrorConstants::EXPECTED_IDENTIFIER);
+    }
+  }
+
+  SECTION("Testing with invalid inputs: Invalid expression") {
+    // x = 1 +/ x;  //(invalid)
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens;
+    size_t current = 0;
+    int stmtNo = 0;
+
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::EQUAL_TOKEN);
+    tokens.push_back(*CommonTokens::ONE_TOKEN);
+    tokens.push_back(*CommonTokens::PLUS_TOKEN);
+    tokens.push_back(*CommonTokens::DIVIDE_TOKEN);
+    tokens.push_back(*CommonTokens::X_TOKEN);
+    tokens.push_back(*CommonTokens::SEMICOLON_TOKEN);
+
+    try {
+      auto node = assignParsingStrategy.parse(tokens, current, stmtNo);
+      FAIL();
+    } catch (const SyntaxError &ex) {
+      REQUIRE(ex.what() == "Syntax Error: " + ErrorConstants::UNEXPECTED_TOKEN_EXPRESSION);
+    }
+  }
+
+  SECTION("Missing semi colon") {
+    AssignParsingStrategy assignParsingStrategy;
+    std::vector<SPToken> tokens = {
+        *CommonTokens::X_TOKEN, *CommonTokens::EQUAL_TOKEN,    *CommonTokens::A_TOKEN, *CommonTokens::PLUS_TOKEN,
+        *CommonTokens::X_TOKEN, *CommonTokens::MULTIPLY_TOKEN, *CommonTokens::Y_TOKEN, *CommonTokens::PLUS_TOKEN,
+        *CommonTokens::Z_TOKEN, *CommonTokens::DIVIDE_TOKEN,   *CommonTokens::B_TOKEN,
+    };
+    size_t current = 0;
+    int stmtNo = 0;
+
+    REQUIRE_THROWS_WITH(assignParsingStrategy.parse(tokens, current, stmtNo),
+                        "Syntax Error: " + ErrorConstants::MISSING_TRAILING_SEMICOLON);
+  }
+}
