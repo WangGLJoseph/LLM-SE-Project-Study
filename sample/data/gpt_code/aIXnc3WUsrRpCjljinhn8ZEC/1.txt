@@ -1,0 +1,24 @@
+#ifndef QPS_ABSTRACTQUERY_CLAUSEFACTORY_H_
+#define QPS_ABSTRACTQUERY_CLAUSEFACTORY_H_
+
+#include "Clauses/SuchThatClauses/ConcreteClauses/ParentClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/ParentTClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/FollowsClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/FollowsTClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/ModifiesPClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/ModifiesSClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/ModifiesUndecidedClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/UsesPClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/UsesSClause.h"
+#include "Clauses/SuchThatClauses/ConcreteClauses/UsesUndecidedClause.h"
+#include "Clauses/PatternClauses/ConcreteClauses/AssignPatternClause.h"
+#include "References/Ref.h"
+#include "Expression/ExpressionSpec.h"
+
+class ClauseFactory
+{
+public:
+    static SuchThatClause *createSuchThatClause(std::string relationType, Ref leftRef, Ref rightRef);
+    static PatternClause *createPatternClause(std::string patternType, std::string synonym, Ref leftRef, ExpressionSpec expressionSpec);
+};
+#endif // QPS_ABSTRACTQUERY_CLAUSEFACTORY_H_

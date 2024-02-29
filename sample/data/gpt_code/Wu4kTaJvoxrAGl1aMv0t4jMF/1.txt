@@ -1,0 +1,106 @@
+#include "ParseIfStrategy.h"
+#include "../../ErrorHandling/ParseError.h"
+#include "../../ErrorHandling/SemanticError.h"
+#include "../../Tokens/SPToken.h"
+#include "../../Tokens/TokenType.h"
+#include "../SPParser.h"
+#include "ParseCondExprStrategy.h"
+#include "ParseStmtLstStrategy.h"
+#include "SP/AST/ASTNode.h"
+#include "SP/AST/ASTNodeStmtLst.h"
+#include "SP/AST/Expr/ASTNodeCondExpr.h"
+#include "SP/AST/Stmt/ASTNodeIfStmt.h"
+#include <Common/SPAConstants/SPAConstants.h>
+#include <memory>
+#include <stdexcept>
+
+std::unique_ptr<ASTNode> ParseIfStrategy::parse(SPParser& parser) {
+    auto ifNode = std::make_unique<ASTNodeIfStmt>(
+        to_string(parser.getCurrentStmtNo())); // since if statements do have a statement number
+
+    // Extract 'if' token
+    SPToken ifToken = parser.extract();
+    if (ifToken.GetType() != TokenType::IF) {
+        throw SemanticError("Expected 'if' keyword", ".");
+    }
+
+    // Parse conditional expression in if block
+    SPToken currentToken = parser.extract();
+
+    // Check for '(' token
+    if (currentToken.GetValue() != std::string(1, SPAConstants::PunctuationSymbols::OpenRoundParenthesis)) {
+        throw SemanticError("Expected '(' at start of condition", " and after an `if` keyword.");
+    }
+
+    parser.setStrategy(std::make_unique<ParseCondExprStrategy>());
+    std::shared_ptr<ASTNode> condExpr = parser.parse();
+    std::shared_ptr<ASTNodeCondExpr> derivedSharedCond = std::dynamic_pointer_cast<ASTNodeCondExpr>(condExpr);
+
+    if (derivedSharedCond) {
+        ifNode->setCondExpr(derivedSharedCond);
+    } else {
+        // Handle the case where the dynamic cast fails
+        throw ParseError("Dynamic casting failed from: ", "ASTNode to ASTNodeCondExpr");
+    }
+
+    currentToken = parser.extract();
+
+    // Check for ')' token
+    if (currentToken.GetValue() != std::string(1, SPAConstants::PunctuationSymbols::CloseRoundParenthesis)) {
+        throw SemanticError("Expected '(' at start of condition", " and after an `if` keyword.");
+    }
+
+    currentToken = parser.extract();
+
+    // Check for 'then' token
+    if (currentToken.GetType() != TokenType::THEN) { // will integrate fine.
+        throw SemanticError("Expected 'then' keyword after condition", ".");
+    }
+
+    currentToken = parser.extract();
+
+    // Check for '{' token for the then block
+    if (currentToken.GetValue() != std::string(1, SPAConstants::PunctuationSymbols::OpenCurlyParenthesis)) {
+        throw SemanticError("Expected '{' at start of then block", ".");
+    }
+
+    parser.incrementCurrentStmtNo(); // Start of statement list
+
+    // Parse the statements in the then block
+    parser.setStrategy(std::make_unique<ParseStmtLstStrategy>());
+    std::shared_ptr<ASTNode> thenStmtLst = parser.parse();
+    std::shared_ptr<ASTNodeStmtLst> thenStmtLstDerived = std::dynamic_pointer_cast<ASTNodeStmtLst>(thenStmtLst);
+
+    if (thenStmtLstDerived) {
+        ifNode->setThenStmtLst(thenStmtLstDerived);
+    } else {
+        // Handle the case where the dynamic cast fails
+        throw ParseError("Dynamic casting failed from: ", "ASTNode to ASTNodeStmtLst");
+    }
+
+    currentToken = parser.extract();
+
+    // Check for 'else' token for the else block
+    if (currentToken.GetType() == TokenType::ELSE) { // will integrate ok
+        currentToken = parser.extract();
+
+        // Check for '{' token for the else block
+        if (currentToken.GetValue() != std::string(1, SPAConstants::PunctuationSymbols::OpenCurlyParenthesis)) {
+            throw SemanticError("Expected '{' at start of else block", ".");
+        }
+
+        // Parse the statements in the else block
+        parser.setStrategy(std::make_unique<ParseStmtLstStrategy>());
+        std::shared_ptr<ASTNode> elseStmtLst = parser.parse();
+        std::shared_ptr<ASTNodeStmtLst> elseStmtLstDerived = std::dynamic_pointer_cast<ASTNodeStmtLst>(elseStmtLst);
+
+        if (elseStmtLstDerived) {
+            ifNode->setElseStmtLst(elseStmtLstDerived);
+        } else {
+            // Handle the case where the dynamic cast fails
+            throw ParseError("Dynamic casting failed from: ", "ASTNode to ASTNodeStmtLst");
+        }
+    }
+
+    return ifNode;
+}

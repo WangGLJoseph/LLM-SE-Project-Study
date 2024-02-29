@@ -1,0 +1,155 @@
+#include "QueryProcessor.h"
+
+class Query;
+class retrieveInterfacePtr;
+class retrieveInterfacePtr;
+class QueryProcessorStrategy;
+class VariableQueryProcessor;
+class ClauseResultTableManager;
+class SelectProjection;
+class SuchThatClause;
+class PatternClause;
+enum class SuchThatRelationship;
+
+QueryProcessor::QueryProcessor() {}
+
+void QueryProcessor::processQuery(std::list<std::string> &results, std::shared_ptr<ClauseResultTableManager> clauseResultTableManager,
+                                  std::shared_ptr<AbstractQuery> AbstractQuery, std::shared_ptr<Retrieve> retrieveInterfacePtr)
+{
+    clauseResultTableManager->createGroup();
+    std::vector<Declaration> declarations = AbstractQuery->getDeclarations();
+    std::vector<SelectProjection> querySelectProjections = AbstractQuery->getSelectProjections();
+    std::vector<SuchThatClause *> querySuchThatClauses = AbstractQuery->getSuchThatClauses();
+    std::vector<PatternClause *> queryPatternClauses = AbstractQuery->getPatternClauses();
+
+    for (auto querySuchThatClause : querySuchThatClauses)
+    {
+        // To be updated with SuchThatClause's entityType
+        setSuchThatClauseStrategy(querySuchThatClause->getSuchThatRelationship(), querySuchThatClause->getLeftRef(), querySuchThatClause->getRightRef());
+        bool retrieveInterfacePtrData = strategy->processQuery(clauseResultTableManager, retrieveInterfacePtr, declarations);
+        // If retrieveInterfacePtrData is empty, means the query was invalid, clear results and return
+        if (!retrieveInterfacePtrData)
+        {
+            results.clear();
+            return;
+        }
+    }
+
+    for (auto queryPatternClause : queryPatternClauses)
+    {
+        setPatternStrategy(queryPatternClause->getSynonymDesignEntityType(), queryPatternClause->getLeftRef(), queryPatternClause->getExpressionSpec());
+        bool retrieveInterfacePtrData = strategy->processQuery(clauseResultTableManager, retrieveInterfacePtr, declarations);
+        // If retrieveInterfacePtrData is empty, means the query was invalid, clear results and return
+        if (!retrieveInterfacePtrData)
+        {
+            results.clear();
+            return;
+        }
+    }
+
+    for (auto querySelectProjection : querySelectProjections)
+    {
+        setSelectProjectionStrategy(querySelectProjection.getDesignEntityType(), querySelectProjection.getSynonym().getName());
+        bool retrieveInterfacePtrData = strategy->processQuery(clauseResultTableManager, retrieveInterfacePtr, declarations);
+        // If retrieveInterfacePtrData is empty, means the query was invalid, clear results and return
+        if (!retrieveInterfacePtrData)
+        {
+            results.clear();
+            return;
+        }
+    }
+
+    ClauseResultTableEvaluator evaluator = ClauseResultTableEvaluator();
+    std::vector<std::string> selectProjectionSynonyms;
+    for (const auto &querySelectProjection : querySelectProjections)
+    {
+        std::string name = querySelectProjection.getSynonym().getName();
+        selectProjectionSynonyms.push_back(name);
+    }
+    // Return the results
+    evaluator.evaluateQuery(results, clauseResultTableManager, selectProjectionSynonyms);
+}
+
+void QueryProcessor::setSuchThatClauseStrategy(SuchThatClause::SuchThatRelationship suchThatType, Ref leftRef, Ref rightRef)
+{
+    switch (suchThatType)
+    {
+    case SuchThatClause::SuchThatRelationship::PARENT:
+        strategy = std::make_unique<ParentClauseProcessor>(leftRef, rightRef);
+        break;
+    case SuchThatClause::SuchThatRelationship::PARENT_T:
+        strategy = std::make_unique<ParentTClauseProcessor>(leftRef, rightRef);
+        break;
+    case SuchThatClause::SuchThatRelationship::FOLLOWS:
+        strategy = std::make_unique<FollowsClauseProcessor>(leftRef, rightRef);
+        break;
+    case SuchThatClause::SuchThatRelationship::FOLLOWS_T:
+        strategy = std::make_unique<FollowsTClauseProcessor>(leftRef, rightRef);
+        break;
+    case SuchThatClause::SuchThatRelationship::USES_S:
+        strategy = std::make_unique<UsesSClauseProcessor>(leftRef, rightRef);
+        break;
+    case SuchThatClause::SuchThatRelationship::USES_P:
+        strategy = std::make_unique<UsesPClauseProcessor>(leftRef, rightRef);
+        break;
+    case SuchThatClause::SuchThatRelationship::MODIFIES_S:
+        strategy = std::make_unique<ModifiesSClauseProcessor>(leftRef, rightRef);
+        break;
+    case SuchThatClause::SuchThatRelationship::MODIFIES_P:
+        strategy = std::make_unique<ModifiesPClauseProcessor>(leftRef, rightRef);
+        break;
+    default:
+        throw std::invalid_argument("Invalid entity type found");
+    }
+}
+
+void QueryProcessor::setPatternStrategy(DesignEntityType entityType, Ref leftRef, ExpressionSpec expressionSpec)
+{
+    switch (entityType)
+    {
+    case DesignEntityType::ASSIGN:
+        strategy = std::make_unique<AssignPatternProcessor>(leftRef, expressionSpec);
+        break;
+    default:
+        throw std::invalid_argument("Invalid entity type found");
+    }
+}
+
+void QueryProcessor::setSelectProjectionStrategy(DesignEntityType entityType, std::string selectProjectionValue)
+{
+    switch (entityType)
+    {
+    case DesignEntityType::ASSIGN:
+        strategy = std::make_unique<AssignEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::CALL:
+        strategy = std::make_unique<CallEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::CONSTANT:
+        strategy = std::make_unique<ConstantEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::IF:
+        strategy = std::make_unique<IfEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::PRINT:
+        strategy = std::make_unique<PrintEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::PROCEDURE:
+        strategy = std::make_unique<ProcedureEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::READ:
+        strategy = std::make_unique<ReadEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::STMT:
+        strategy = std::make_unique<StatementEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::VARIABLE:
+        strategy = std::make_unique<VariableEntityProcessor>(selectProjectionValue);
+        break;
+    case DesignEntityType::WHILE:
+        strategy = std::make_unique<WhileEntityProcessor>(selectProjectionValue);
+        break;
+    default:
+        throw std::invalid_argument("Invalid entity type found");
+    }
+}

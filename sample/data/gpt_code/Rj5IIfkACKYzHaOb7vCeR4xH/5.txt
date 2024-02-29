@@ -1,0 +1,24 @@
+#ifndef QPS_ABSTRACTQUERY_DESIGNENTITY_H_
+#define QPS_ABSTRACTQUERY_DESIGNENTITY_H_
+
+#include <string>
+
+enum class DesignEntityType
+{
+    ASSIGN,
+    CALL,
+    CONSTANT,
+    IF,
+    PRINT,
+    PROCEDURE,
+    READ,
+    STMT,
+    VARIABLE,
+    WHILE
+};
+
+DesignEntityType getDesignEntityTypeFromString(std::string name);
+
+std::string getDesignEntityStringFromType(DesignEntityType type);
+
+#endif // QPS_ABSTRACTQUERY_DESIGNENTITY_H_

@@ -1,0 +1,17 @@
+#ifndef SYNONYM_H
+#define SYNONYM_H
+
+#include <string>
+
+class Synonym
+{
+protected:
+    std::string name;
+
+public:
+    Synonym(std::string name);
+    std::string getName() const;
+    // Additional methods as necessary
+};
+
+#endif // SYNONYM_H

@@ -1,0 +1,25 @@
+#ifndef QPS_ABSTRACTQUERY_SELECTPROJECTION_H_
+#define QPS_ABSTRACTQUERY_SELECTPROJECTION_H_
+
+#include "DesignEntityType.h"
+#include "Synonym.h"
+#include <string>
+
+// This class will be populated only DURING VALIDATION, since the parser would now know the type of the synonym
+class SelectProjection
+{
+private:
+    DesignEntityType type;
+    Synonym synonym;
+
+public:
+    SelectProjection(DesignEntityType type, Synonym synonym);
+    SelectProjection(std::string typeString, std::string synonymString);
+
+    DesignEntityType getDesignEntityType() const;
+    Synonym getSynonym() const;
+};
+
+// TODO: in the future milestones, Select can select a boolean or tuple or others, so need to support it
+
+#endif // QPS_ABSTRACTQUERY_SELECTPROJECTION_H_

@@ -1,0 +1,327 @@
+SECTION("Testing tokenisation of relational operators- with spaces.") {
+       std::string input = "if(i >= 10)";
+       std::vector<SPToken> expectedTokens{
+           SPToken(TokenType::NAME, "if"),
+           SPToken(TokenType::PUNCTUATION, "("),
+           SPToken(TokenType::NAME, "i"),
+           SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, ">="),
+           SPToken(TokenType::INTEGER, "10"),
+           SPToken(TokenType::PUNCTUATION, ")")
+       };
+
+       SPTokenizer tokenizer(input);
+       std::vector<SPToken> actualTokens = tokenizer.tokenize();
+
+       REQUIRE(actualTokens == expectedTokens);
+   }
+    
+}
+
+TEST_CASE("Tokenization of relational operators") {
+    SECTION("Testing tokenisation of relational operators with spaces") {
+        std::string input = "if(i >= 10)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "i"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, ">="),
+            SPToken(TokenType::INTEGER, "10"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Greater Than operator") {
+        std::string input = "if(i > 5)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "i"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, ">"),
+            SPToken(TokenType::INTEGER, "5"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Less Than operator") {
+        std::string input = "if(x < 20)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "x"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, "<"),
+            SPToken(TokenType::INTEGER, "20"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Less Than or Equal To operator") {
+        std::string input = "if(y <= 100)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "y"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, "<="),
+            SPToken(TokenType::INTEGER, "100"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Equal To operator") {
+        std::string input = "if(a == 50)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "a"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, "=="),
+            SPToken(TokenType::INTEGER, "50"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Not Equal To operator") {
+        std::string input = "if(b != 0)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "b"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, "!="),
+            SPToken(TokenType::INTEGER, "0"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of GTE without spaces") {
+        std::string input = "if(i>=10)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "i"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, ">="),
+            SPToken(TokenType::INTEGER, "10"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Greater Than operator") {
+        std::string input = "if(i>5)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "i"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, ">"),
+            SPToken(TokenType::INTEGER, "5"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Less Than operator") {
+        std::string input = "if(x<20)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "x"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, "<"),
+            SPToken(TokenType::INTEGER, "20"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Less Than or Equal To operator") {
+        std::string input = "if(y<=100)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "y"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, "<="),
+            SPToken(TokenType::INTEGER, "100"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Equal To operator") {
+        std::string input = "if(a==50)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "a"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, "=="),
+            SPToken(TokenType::INTEGER, "50"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of Not Equal To operator") {
+        std::string input = "if(b!=0)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "b"),
+            SPToken(TokenType::RELATIONAL_EXPRESSION_OPERATORS, "!="),
+            SPToken(TokenType::INTEGER, "0"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of unary conditional operator not- without whitespaces") {
+        std::string input = "if(!b)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::UNARY_CONDITIONAL_EXPRESSION_OPERATORS, "!"),
+            SPToken(TokenType::NAME, "b"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+}
+
+TEST_CASE("Tokenization of conditional operators") {
+    // Existing test cases for relational operators
+
+    SECTION("Testing tokenisation of unary conditional operator not- with whitespaces") {
+        std::string input = "if( ! b )";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::UNARY_CONDITIONAL_EXPRESSION_OPERATORS, "!"),
+            SPToken(TokenType::NAME, "b"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of unary conditional operator not- with partial whitespaces") {
+        std::string input = "if( !b )";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::UNARY_CONDITIONAL_EXPRESSION_OPERATORS, "!"),
+            SPToken(TokenType::NAME, "b"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of binary logical AND operator") {
+        std::string input = "if(a && b)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "a"),
+            SPToken(TokenType::BINARY_CONDITIONAL_EXPRESSION_OPERATORS, "&&"),
+            SPToken(TokenType::NAME, "b"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of binary logical AND operator - without whitespace") {
+        std::string input = "if(a&&b)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "a"),
+            SPToken(TokenType::BINARY_CONDITIONAL_EXPRESSION_OPERATORS, "&&"),
+            SPToken(TokenType::NAME, "b"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of binary logical OR operator") {
+        std::string input = "if(x || y)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "x"),
+            SPToken(TokenType::BINARY_CONDITIONAL_EXPRESSION_OPERATORS, "||"),
+            SPToken(TokenType::NAME, "y"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+
+    SECTION("Testing tokenisation of binary logical OR operator- without whitespaces") {
+        std::string input = "if(x||y)";
+        std::vector<SPToken> expectedTokens{
+            SPToken(TokenType::NAME, "if"),
+            SPToken(TokenType::PUNCTUATION, "("),
+            SPToken(TokenType::NAME, "x"),
+            SPToken(TokenType::BINARY_CONDITIONAL_EXPRESSION_OPERATORS, "||"),
+            SPToken(TokenType::NAME, "y"),
+            SPToken(TokenType::PUNCTUATION, ")")
+        };
+
+        SPTokenizer tokenizer(input);
+        std::vector<SPToken> actualTokens = tokenizer.tokenize();
+        REQUIRE(actualTokens == expectedTokens);
+    }
+}

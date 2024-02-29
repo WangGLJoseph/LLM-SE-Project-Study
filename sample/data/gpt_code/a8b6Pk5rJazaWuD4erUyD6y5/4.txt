@@ -1,0 +1,37 @@
+#include "ParsePrintStrategy.h"
+#include "../../ErrorHandling/ParseError.h"
+#include "../../ErrorHandling/SemanticError.h"
+#include "../../Tokens/SPToken.h"
+#include "../../Tokens/TokenType.h"
+#include "../SPParser.h"
+#include "SP/AST/ASTNode.h"
+#include "SP/AST/Stmt/ASTNodePrintStmt.h"
+#include <memory>
+#include <stdexcept>
+
+std::unique_ptr<ASTNode> ParsePrintStrategy::parse(SPParser& parser) {
+
+    // Check for the PRINT keyword
+    SPToken& printToken = parser.extract();
+    if (printToken.GetValue() != "print") {
+        throw SemanticError("Expected 'print' keyword", ".");
+    }
+
+    // Extract variable name
+    SPToken& variableNameToken = parser.extract();
+    if (variableNameToken.GetType() != TokenType::NAME) {
+        throw SemanticError("Expected variable name in the print statement", ".");
+    }
+
+    std::string stmtNo = to_string(parser.getCurrentStmtNo());
+    auto printNode = std::make_unique<ASTNodePrintStmt>(variableNameToken, stmtNo);
+
+    // Expect semicolon at the end of statement
+    SPToken& semicolonToken = parser.extract();
+    if (semicolonToken.GetType() != TokenType::SEMICOLON) {
+        throw SemanticError("Expected ';' after variable name in print statement", ".");
+    }
+
+    parser.incrementCurrentStmtNo();
+    return printNode;
+}

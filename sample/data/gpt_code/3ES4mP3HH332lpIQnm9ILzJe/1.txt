@@ -1,0 +1,9 @@
+// Vector of tokens to be returned
+    // std::vector<QPSToken> tokens;
+
+    this->tokens.clear();
+    this->currentIndex = 0;
+    // Create a string stream from the input string
+    std::istringstream iss(query);
+    std::string token;
+    QPSToken tempToken(QPSTokenType::NAME, "default");

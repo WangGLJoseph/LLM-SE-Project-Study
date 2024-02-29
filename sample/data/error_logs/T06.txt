@@ -1,0 +1,16 @@
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/integration_testing/src/SP/DesignExtractor/Util/MockDesignExtractors.h
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/SP/Parser/ParseStrategy/ParseCallStrategy.h
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/SP/Parser/ParseStrategy/ParseCallStrategy.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/PKB/EntityStorage/IfStorage.h
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/PKB/AbstractionStorage/AbstractionStorageBase.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/Common/Patterns/Pattern.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/Common/ITokenizer/ITokenizer.h
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/Common/Exceptions/SyntaxError.h
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/Common/Exceptions/SyntaxError.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/Common/Exceptions/SemanticError.h
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/Common/Exceptions/SemanticError.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/Common/Relationships/Relationship.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/spa/src/Common/Entities/Entity.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/unit_testing/src/PKB/TestPKBPatternMethods.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/unit_testing/src/PKB/TestPKBRelationshipMethods.cpp
+23s2-cp-spa-team-06: Tag error, 'ai-gen end' tag is not found in file: ../sample/repo/23s2-cp-spa-team-06/Team06/Code06/src/unit_testing/src/PKB/TestPKBEntityMethods.cpp

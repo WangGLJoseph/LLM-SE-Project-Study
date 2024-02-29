@@ -24,12 +24,12 @@ get_branch_name() {
     1) echo "milestone1-2";;
     2) echo "milestone1";;
     3) echo "milestone1";;
-    4) echo "master";;
-    5) echo "milestone1-1";;
-    6) echo "master";;
+    4) echo "milestone1-2";;
+    5) echo "milestone1-late-1";;
+    6) echo "milestone1-5";;
     7) echo "milestone1-1";;
     8) echo "milestone1-1";;
-    9) echo "milestone1-1";;
+    9) echo "milestone1-2";;
     10) echo "milestone1";;
     11) echo "milestone1";;
     12) echo "milestone1";;
@@ -40,7 +40,7 @@ get_branch_name() {
     17) echo "milestone1";;
     18) echo "milestone1-1";;
     19) echo "milestone1";;
-    20) echo "master";;
+    20) echo "milestone1";;
     21) echo "milestone1-1";;
     *) echo "master";; # Default case if team number is outside expected range
   esac

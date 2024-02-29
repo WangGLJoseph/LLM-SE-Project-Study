@@ -1,0 +1,16 @@
+#ifndef SP_PARSER_PARSESTRATEGY_PARSEWHILELOOPSTRATEGY_H_
+#define SP_PARSER_PARSESTRATEGY_PARSEWHILELOOPSTRATEGY_H_
+
+#include "ParseStrategy.h"
+#include <SP/Parser/ParseStrategy/ParseUnaryCondExprStrategy.h>
+#include <memory>
+
+class ASTNode;
+class SPParser;
+
+class ParseWhileStrategy : public ParseStrategy {
+public:
+    std::unique_ptr<ASTNode> parse(SPParser& parser) override;
+};
+
+#endif // SP_PARSER_PARSESTRATEGY_PARSEWHILELOOPSTRATEGY_H_

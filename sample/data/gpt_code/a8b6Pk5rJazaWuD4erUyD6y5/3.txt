@@ -1,0 +1,13 @@
+#include "ParseStrategy.h"
+#include <memory>
+
+class ASTNodeCondExpr;
+class SPParser;
+class ParseUnaryCondExprStrategy;
+class ParseBinaryCondExprStrategy;
+class ParseRelCondExprStrategy;
+
+class ParseCondExprStrategy : public ParseStrategy {
+public:
+    std::unique_ptr<ASTNode> parse(SPParser& parser) override;
+};

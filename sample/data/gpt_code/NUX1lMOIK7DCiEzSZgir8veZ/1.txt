@@ -6,11 +6,11 @@ vector<Token> Parser::infixToPostfix(vector<Token>& infix){
         if(token.getTokenType() == INTEGER || token.getTokenType() == NAME){
             postfix.push_back(token);
         }
-        else if(token.getValue() == "("){
+        else if(token.getValue() == OPEN_BRACKET){
             stk.push(token);
         }
-        else if(token.getValue() == ")"){
-            while(!stk.empty() && stk.top().getValue() != "("){
+        else if(token.getValue() == CLOSE_BRACKET){
+            while(!stk.empty() && stk.top().getValue() != OPEN_BRACKET){
                 postfix.push_back(stk.top());
                 stk.pop();
             }

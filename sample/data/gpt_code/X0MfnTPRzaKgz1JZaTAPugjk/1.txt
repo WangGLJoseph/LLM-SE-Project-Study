@@ -1,0 +1,70 @@
+#include "AbstractionStorageBase.h"
+
+AbstractionStorageBase::~AbstractionStorageBase() {}
+
+void AbstractionStorageBase::addToRelationship(const std::string& key, const std::string& value) {
+    relationship[key].insert(value);
+}
+
+void AbstractionStorageBase::addToInverseRelationship(const std::string& key, const std::string& value) {
+    inverseRelationship[key].insert(value);
+}
+
+void AbstractionStorageBase::addToBoth(const std::string& key, const std::string& value) {
+
+    // One relationship is stored in two places, so we need to add it to both
+    addToRelationship(key, value);
+    addToInverseRelationship(value, key);
+}
+
+std::unordered_set<std::string> AbstractionStorageBase::getKeys() const {
+    std::unordered_set<std::string> keys;
+    for (const auto& entry : relationship) {
+        keys.insert(entry.first);
+    }
+    return keys;
+}
+
+std::unordered_set<std::string> AbstractionStorageBase::getValue(const std::string& key) const {
+    if (relationship.find(key) != relationship.end()) {
+        return relationship.at(key);
+    }
+    return {};
+}
+
+std::unordered_set<std::string> AbstractionStorageBase::getInvertedKeys() const {
+    std::unordered_set<std::string> keys;
+    for (const auto& entry : inverseRelationship) {
+        keys.insert(entry.first);
+    }
+    return keys;
+}
+
+std::unordered_set<std::string> AbstractionStorageBase::getInvertedValue(const std::string& key) const {
+    if (inverseRelationship.find(key) != inverseRelationship.end()) {
+        return inverseRelationship.at(key);
+    }
+    return {};
+}
+
+bool AbstractionStorageBase::isEmpty() const {
+    return relationship.empty();
+}
+
+bool AbstractionStorageBase::containsKey(const std::string& key) const {
+    return relationship.count(key) > 0;
+}
+
+bool AbstractionStorageBase::containsInvertedKey(const std::string& key) const {
+    return inverseRelationship.count(key) > 0;
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> AbstractionStorageBase::getRelationship() const {
+    return relationship;
+}
+
+std::unordered_map<std::string, std::unordered_set<std::string>> AbstractionStorageBase::getInverseRelationship() const {
+    return inverseRelationship;
+}
+
+// end ai-gen

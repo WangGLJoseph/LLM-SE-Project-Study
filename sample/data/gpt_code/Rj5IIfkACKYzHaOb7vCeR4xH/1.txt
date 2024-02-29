@@ -1,0 +1,38 @@
+#ifndef QPS_ABSTRACTQUERY_REFERENCES_REF_H_
+#define QPS_ABSTRACTQUERY_REFERENCES_REF_H_
+
+#include <string>
+
+// Abstract base class for a reference
+class Ref
+{
+
+public:
+    enum class RefType
+    {
+        STMT_REF,
+        ENT_REF,
+        UNDECIDED_REF // for the case of synonyms and wildcard as it can be either STMT_REF or ENT_REF until QueryValidator checks the declaration
+    };
+
+    enum class RefSubType
+    {
+        INTEGER,
+        NAME, //ident
+        SYNONYM,
+        WILDCARD
+    };
+
+    Ref(RefType refType, RefSubType RefSubType, std::string value);
+    std::string getValue() const;
+    RefType getRefType() const;
+    RefSubType getRefSubType() const;
+    void setRefType(RefType refType); // For QueryValidator to set the refType of a synonym and wildcard after checking declaration
+
+private:
+    RefType refType;
+    RefSubType refSubType;
+    std::string value;
+};
+
+#endif // QPS_ABSTRACTQUERY_REFERENCES_REF_H_

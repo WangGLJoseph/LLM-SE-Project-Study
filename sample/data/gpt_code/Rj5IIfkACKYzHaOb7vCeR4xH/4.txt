@@ -1,0 +1,60 @@
+#include "DesignEntityType.h"
+#include <stdexcept>
+
+std::string getDesignEntityStringFromType(DesignEntityType type)
+{
+    switch (type)
+    {
+    case DesignEntityType::ASSIGN:
+        return "assign";
+    case DesignEntityType::VARIABLE:
+        return "variable";
+    case DesignEntityType::CALL:
+        return "call";
+    case DesignEntityType::CONSTANT:
+        return "constant";
+    case DesignEntityType::IF:
+        return "if";
+    case DesignEntityType::PRINT:
+        return "print";
+    case DesignEntityType::PROCEDURE:
+        return "procedure";
+    case DesignEntityType::READ:
+        return "read";
+    case DesignEntityType::STMT:
+        return "stmt";
+    case DesignEntityType::WHILE:
+        return "while";
+
+    // should not be possible, but just in case
+    default:
+        throw std::invalid_argument("Given Design Entity type is not supported.");
+    }
+}
+
+DesignEntityType getDesignEntityTypeFromString(std::string name)
+{
+    if (name == "assign")
+        return DesignEntityType::ASSIGN;
+    if (name == "variable")
+        return DesignEntityType::VARIABLE;
+    if (name == "call")
+        return DesignEntityType::CALL;
+    if (name == "constant")
+        return DesignEntityType::CONSTANT;
+    if (name == "if")
+        return DesignEntityType::IF;
+    if (name == "print")
+        return DesignEntityType::PRINT;
+    if (name == "procedure")
+        return DesignEntityType::PROCEDURE;
+    if (name == "read")
+        return DesignEntityType::READ;
+    if (name == "stmt")
+        return DesignEntityType::STMT;
+    if (name == "while")
+        return DesignEntityType::WHILE;
+
+    // Handle more cases as necessary
+    throw std::invalid_argument("Given Design Entity: " + name + " is not supported.");
+}

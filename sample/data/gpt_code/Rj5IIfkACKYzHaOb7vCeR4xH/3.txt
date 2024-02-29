@@ -1,0 +1,22 @@
+#ifndef QPS_QPSPARSER_DECLARATION_H_
+#define QPS_QPSPARSER_DECLARATION_H_
+#include <string>
+#include "DesignEntityType.h"
+#include "Synonym.h"
+
+class Declaration
+{
+private:
+    DesignEntityType entityType;
+    Synonym synonym;
+
+public:
+    // Supports different constructors for flexibility as not sure which version QPSParser will use
+    Declaration(DesignEntityType type, Synonym synonym);
+    Declaration(std::string typeString, std::string synonymString);
+
+    DesignEntityType getDesignEntityType() const;
+    Synonym getSynonym() const;
+};
+
+#endif // QPS_QPSPARSER_DECLARATION_H_

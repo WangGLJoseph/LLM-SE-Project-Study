@@ -1,0 +1,8 @@
+class ASTNode;
+class SPParser;
+
+class ParsePrintStrategy : public ParseStrategy {
+public:
+    std::unique_ptr<ASTNode> parse(SPParser& parser) override;
+
+};

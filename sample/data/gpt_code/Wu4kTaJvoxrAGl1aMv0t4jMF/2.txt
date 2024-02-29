@@ -1,0 +1,18 @@
+#ifndef PARSE_IF_STRATEGY_H
+#define PARSE_IF_STRATEGY_H
+
+#include "ParseStrategy.h"
+#include "../../AST/ASTNode.h"
+#include "../../AST/Stmt/ASTNodeIfStmt.h"
+#include <memory>
+
+class ASTNode;
+class ASTNodeIfStmt;
+class SPParser;
+
+class ParseIfStrategy : public ParseStrategy {
+public:
+    std::unique_ptr<ASTNode> parse(SPParser& parser);
+};
+
+#endif // PARSE_IF_STRATEGY_H
